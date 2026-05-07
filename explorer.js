@@ -184,14 +184,22 @@ function initGame() {
 }
 
 function renderLevelIndicators() {
-    levelIndicators.innerHTML = '';
+    const indicators = document.getElementById('levelIndicators');
+    if (!indicators) {
+        setTimeout(renderLevelIndicators, 200);
+        return;
+    }
+    
+    indicators.innerHTML = '';
     LEVELS.forEach((_, i) => {
         const dot = document.createElement('div');
         dot.className = `level-dot ${i === currentLevelIndex ? 'active' : ''}`;
         dot.innerText = i + 1;
+        dot.style.background = i === currentLevelIndex ? 'var(--accent)' : 'rgba(255,255,255,0.4)';
+        dot.style.color = i === currentLevelIndex ? 'white' : 'rgba(255,255,255,0.6)';
         dot.style.cursor = 'pointer';
         dot.onclick = () => loadLevel(i);
-        levelIndicators.appendChild(dot);
+        indicators.appendChild(dot);
     });
 }
 

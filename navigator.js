@@ -164,20 +164,27 @@ function initGame() {
 }
 
 function renderLevelIndicators() {
-    if (!levelIndicators) return;
-    levelIndicators.innerHTML = '';
+    const indicators = document.getElementById('levelIndicators');
+    if (!indicators) {
+        // If the element isn't ready yet, try again in 200ms
+        setTimeout(renderLevelIndicators, 200);
+        return;
+    }
+    
+    indicators.innerHTML = '';
     LEVELS.forEach((_, i) => {
         const dot = document.createElement('div');
         dot.className = `level-dot ${i === currentLevelIndex ? 'active' : ''}`;
         dot.style.width = '16px';
         dot.style.height = '16px';
         dot.style.borderRadius = '50%';
-        dot.style.background = i === currentLevelIndex ? '#10b981' : 'rgba(255,255,255,0.3)';
-        dot.style.border = '2px solid ' + (i === currentLevelIndex ? '#10b981' : 'rgba(255,255,255,0.1)');
+        dot.style.background = i === currentLevelIndex ? '#10b981' : 'rgba(255,255,255,0.4)';
+        dot.style.border = '2px solid ' + (i === currentLevelIndex ? '#10b981' : 'rgba(255,255,255,0.2)');
         dot.style.cursor = 'pointer';
+        dot.style.transition = 'all 0.3s ease';
         dot.onclick = () => loadLevel(i);
         dot.title = `Mission ${i + 1}`;
-        levelIndicators.appendChild(dot);
+        indicators.appendChild(dot);
     });
 }
 
