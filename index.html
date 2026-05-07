@@ -492,13 +492,17 @@
 
         // Detect logout request from dashboard
         if (window.location.search.includes('logout=true')) {
-            logoutUser();
-            // Clean URL
-            window.history.replaceState({}, document.title, window.location.pathname);
+            console.log("Logout Flag Detected. Clearing session...");
+            logoutUser().then(() => {
+                console.log("Session cleared. Finalizing UI...");
+                // Clean URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+                updateUI();
+            });
+        } else {
+            // Initial load
+            updateUI();
         }
-
-        // Initial load
-        updateUI();
     </script>
 </body>
 

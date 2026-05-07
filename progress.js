@@ -208,12 +208,25 @@ async function loginUser(name, email, avatar) {
 async function logoutUser() {
     const user = getUserProfile();
     if (user && user.email) {
-        // Use the same robust sync for logout
-        await syncWithSheets('logout', { 
-            email: user.email, 
-            name: user.name, 
-            status: 'Logout' 
+        console.log("Transmitting Logout Signal to Cloud...");
+        const payload = JSON.stringify({
+            action: 'logout',
+            email: user.email,
+            name: user.name,
+            status: 'Logout'
         });
+
+        // Direct, high-priority fetch for logout
+        try {
+            await fetch(SHEETS_API_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain' },
+                body: payload
+            });
+        } catch (e) {
+            console.warn("Logout transmission failed, clearing session anyway.", e);
+        }
     }
     localStorage.removeItem(USER_KEY);
     window.dispatchEvent(new Event('userStateChanged'));
