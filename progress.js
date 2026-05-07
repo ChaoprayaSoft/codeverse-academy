@@ -208,24 +208,16 @@ async function loginUser(name, email, avatar) {
 async function logoutUser() {
     const user = getUserProfile();
     if (user && user.email) {
-        console.log("Transmitting Logout Signal to Cloud...");
-        const payload = JSON.stringify({
-            action: 'logout',
-            email: user.email,
-            name: user.name,
-            status: 'Logout'
-        });
+        console.log("Transmitting Logout Postcard to Cloud...");
+        
+        // The "Postcard" Strategy: Send data in the URL itself
+        const logoutUrl = `${SHEETS_API_URL}?action=logout&email=${encodeURIComponent(user.email)}&name=${encodeURIComponent(user.name)}&status=Logout`;
 
-        // Direct, high-priority fetch for logout
         try {
-            await fetch(SHEETS_API_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'text/plain' },
-                body: payload
-            });
+            // A simple image-style fetch that never gets blocked
+            await fetch(logoutUrl, { mode: 'no-cors' });
         } catch (e) {
-            console.warn("Logout transmission failed, clearing session anyway.", e);
+            console.warn("Logout transmission failed.", e);
         }
     }
     localStorage.removeItem(USER_KEY);
