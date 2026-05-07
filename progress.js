@@ -180,12 +180,7 @@ async function loginUser(name, email, avatar) {
     const profile = { name, email, avatar };
     localStorage.setItem(USER_KEY, JSON.stringify(profile));
 
-    // 1. Log login to Sheets
-    if (SHEETS_API_URL) {
-        syncWithSheets('login', { name });
-    }
-
-    // 2. Try to load progress and profile from Sheets
+    // 1. Try to load progress and profile from Sheets
     const remoteData = await loadProgressFromSheets(email);
     if (remoteData) {
         // Restore Name, Avatar, Color
@@ -201,6 +196,9 @@ async function loginUser(name, email, avatar) {
             localStorage.setItem(`codeverse_progress_${email.replace(/[^a-zA-Z0-9]/g, '')}`, JSON.stringify(remoteData.progress));
         }
     }
+
+    // 2. IMMEDIATE SYNC: Record this user in the sheet right now
+    await syncNow();
 
     window.dispatchEvent(new Event('userStateChanged'));
     window.dispatchEvent(new Event('progressUpdated'));
