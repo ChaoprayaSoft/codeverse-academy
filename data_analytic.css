@@ -1,0 +1,329 @@
+:root {
+    --primary: #FF9F1C;
+    --secondary: #2EC4B6;
+    --bg: #F0F4F8;
+    --card: #FFFFFF;
+    --text: #2D3748;
+    --border: #E2E8F0;
+    --editor-bg: #2D3748;
+    --editor-text: #F7FAFC;
+    --success: #48BB78;
+}
+
+body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+    background-image: radial-gradient(var(--secondary) 2px, transparent 2px);
+    background-size: 40px 40px;
+}
+
+.layout {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.nav-container {
+    background: var(--card);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 4px solid var(--border);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    z-index: 10;
+}
+
+.logo {
+    font-size: 1.8rem;
+    font-weight: 900;
+    letter-spacing: -1px;
+}
+
+.module-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 300px;
+}
+
+.step-badge {
+    background: #FF9F1C;
+    color: white;
+    font-weight: 900;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+}
+
+.module-name {
+    font-weight: 800;
+    font-size: 1.1rem;
+}
+
+.progress-track {
+    height: 10px;
+    background: #E2E8F0;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #F6E05E, #FF9F1C);
+    width: 0%;
+    transition: width 0.5s ease;
+}
+
+.btn-exit {
+    background: white;
+    color: var(--muted);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 700;
+    border: 2px solid var(--border);
+    transition: all 0.2s;
+}
+
+.btn-exit:hover {
+    border-color: var(--secondary);
+    color: var(--secondary);
+}
+
+.main-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    padding: 1.5rem;
+    gap: 1.5rem;
+}
+
+.sidebar {
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.editor-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--editor-bg);
+    border-radius: 24px;
+    border: 4px solid var(--border);
+    overflow: hidden;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.editor-header {
+    background: #1A202C;
+    color: #A0AEC0;
+    padding: 0.8rem 1.5rem;
+    font-weight: 800;
+    font-family: monospace;
+    font-size: 1rem;
+}
+
+.editor {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--editor-text);
+    padding: 1.5rem;
+    font-family: 'Consolas', monospace;
+    font-size: 1.1rem;
+    resize: none;
+    outline: none;
+    line-height: 1.6;
+}
+
+.viz-area {
+    width: 350px;
+    display: flex;
+    flex-direction: column;
+}
+
+.panel {
+    background: var(--card);
+    border-radius: 24px;
+    border: 4px solid var(--border);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 8px 0 var(--border);
+}
+
+.panel h2 {
+    font-size: 1.4rem;
+    font-weight: 900;
+    margin: 0 0 1rem 0;
+    color: var(--secondary);
+    text-transform: uppercase;
+}
+
+.mission-panel {
+    flex: 1;
+}
+
+.logs-panel {
+    height: 200px;
+    background: #1A202C;
+    border-color: #2D3748;
+    box-shadow: 0 8px 0 #000;
+}
+
+.logs-panel h2 {
+    color: #F6E05E;
+}
+
+.console-output {
+    flex: 1;
+    overflow-y: auto;
+    font-family: monospace;
+    color: #48BB78;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.console-output .error {
+    color: #F56565;
+}
+
+.chart-panel {
+    flex: 1;
+}
+
+.chart-container {
+    flex: 1;
+    background: #F7FAFC;
+    border-radius: 12px;
+    border: 2px dashed #CBD5E0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    padding: 1rem;
+    position: relative;
+}
+
+.empty-chart {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #A0AEC0;
+    font-weight: 700;
+}
+
+.bar {
+    width: 40px;
+    background: var(--primary);
+    border-radius: 8px 8px 0 0;
+    transition: height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    box-shadow: 0 4px 0 #C05621 inset;
+}
+
+.bar span {
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-weight: 900;
+    color: var(--text);
+}
+
+.objectives {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+}
+
+.objective {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-weight: 700;
+    color: var(--muted);
+}
+
+.objective.completed {
+    color: var(--success);
+}
+
+.objective-check {
+    width: 20px;
+    height: 20px;
+    border: 3px solid var(--border);
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.objective.completed .objective-check {
+    background: var(--success);
+    border-color: var(--success);
+}
+
+.run-btn, .next-btn {
+    padding: 1rem;
+    border-radius: 16px;
+    border: 3px solid transparent;
+    font-weight: 900;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Nunito', sans-serif;
+}
+
+.run-btn {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 6px 0 #DD6B20;
+    margin-bottom: 0.5rem;
+}
+
+.run-btn:hover { transform: translateY(2px); box-shadow: 0 4px 0 #DD6B20; }
+.run-btn:active { transform: translateY(6px); box-shadow: 0 0 0 #DD6B20; }
+
+.next-btn {
+    background: var(--success);
+    color: white;
+    box-shadow: 0 6px 0 #2F855A;
+}
+
+.next-btn:hover { transform: translateY(2px); box-shadow: 0 4px 0 #2F855A; }
+.next-btn:active { transform: translateY(6px); box-shadow: 0 0 0 #2F855A; }
+
+.overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(45, 55, 72, 0.9);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(10px);
+}
+
+.modal {
+    background: white;
+    padding: 3rem;
+    border-radius: 30px;
+    border: 6px solid var(--primary);
+    text-align: center;
+    max-width: 500px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+}
+
+.modal h1 {
+    font-size: 2.5rem;
+    color: var(--primary);
+    margin-bottom: 1rem;
+    font-weight: 900;
+}

@@ -1,0 +1,205 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+
+:root {
+    --primary: #FF9F1C; 
+    --secondary: #2EC4B6; 
+    --bg: #F0F4F8;
+    --card: #FFFFFF;
+    --text: #2D3748;
+    --muted: #718096;
+    --border: #E2E8F0;
+}
+
+body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 2rem;
+    background-image: radial-gradient(var(--secondary) 2px, transparent 2px);
+    background-size: 40px 40px;
+    background-position: 0 0;
+    min-height: 100vh;
+}
+
+.dashboard-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    background: var(--card);
+    padding: 3rem;
+    border-radius: 40px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+    border: 4px solid var(--border);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+
+.header h1 {
+    font-size: 3.5rem;
+    margin: 0;
+    font-weight: 900;
+    color: var(--text);
+    letter-spacing: -1px;
+}
+
+.header h1 span {
+    color: var(--primary);
+}
+
+.xp-card {
+    background: #FFFBEA;
+    padding: 1.5rem 2.5rem;
+    border-radius: 24px;
+    border: 3px dashed #F6E05E;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 300px;
+    box-shadow: 0 8px 0 rgba(246, 224, 94, 0.4);
+    transform: rotate(2deg);
+}
+
+.xp-card span#totalXp {
+    color: #D69E2E;
+    font-size: 2.5rem;
+}
+
+.xp-bar-container {
+    height: 16px;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid #F6E05E;
+}
+
+.xp-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #F6E05E, #FF9F1C);
+    width: 0%;
+    transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border-radius: 8px;
+}
+
+h2 {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: var(--secondary);
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.badge-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 2rem;
+    margin-top: 1rem;
+}
+
+.badge-card {
+    background: transparent;
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.badge-card:nth-child(even) .badge-icon {
+    transform: rotate(15deg);
+}
+
+.badge-card:nth-child(odd) .badge-icon {
+    transform: rotate(-10deg);
+}
+
+.badge-card:hover {
+    transform: scale(1.15) !important;
+}
+
+.badge-icon {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 0.5rem;
+    filter: drop-shadow(3px 5px 0 rgba(0,0,0,0.1));
+    transition: transform 0.3s;
+}
+
+.mission-status {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+}
+
+.status-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 24px;
+    border: 3px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    gap: 1.5rem;
+    box-shadow: 0 10px 0 var(--border);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.status-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 0 var(--border);
+}
+
+.status-card h3 {
+    font-size: 1.6rem;
+    font-weight: 900;
+    margin: 0;
+    color: var(--text);
+}
+
+.btn-continue {
+    background: var(--secondary);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 1.1rem;
+    transition: all 0.2s;
+    border: 3px solid transparent;
+    box-shadow: 0 6px 0 #239b8f;
+    display: inline-block;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.btn-continue:hover {
+    transform: translateY(3px);
+    box-shadow: 0 3px 0 #239b8f;
+}
+
+.btn-continue:active {
+    transform: translateY(6px);
+    box-shadow: 0 0 0 #239b8f;
+}
+
+.locked {
+    opacity: 0.7;
+    filter: grayscale(1);
+    background: #F7FAFC;
+}
+
+.completed { 
+    border-color: #48BB78;
+    box-shadow: 0 10px 0 #48BB78;
+}
+
+.completed h3 {
+    color: #48BB78;
+}

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commander Mission | CodeVerse Academy</title>
+    <link rel="stylesheet" href="commander.css">
+</head>
+<body>
+    <div class="level-nav" style="background: #0f1218; border-bottom: 1px solid #2a2f3a;">
+        <div style="max-width: 1400px; margin: 0 auto; padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; height: 60px;">
+            <div style="font-weight: 800; font-size: 1.2rem; color: #6366f1;">COMMANDER <span style="color: white;">IDE</span></div>
+            <div style="display: flex; gap: 10px;" id="levelIndicators">
+                <!-- level dots injected here -->
+            </div>
+            <a href="index.html" style="color: #64748b; text-decoration: none; font-size: 0.8rem; font-weight: 600;">TERMINATE SESSION</a>
+        </div>
+    </div>
+
+    <div class="commander-layout" style="height: calc(100vh - 60px);">
+        <!-- IDE Panel -->
+        <div class="ide-panel">
+            <div style="padding: 1.5rem 1.5rem 0;">
+                <h2 style="margin-bottom: 0.5rem; font-size: 1.2rem;" id="missionTitle">Mission: <span style="color: #6366f1;">Colony Alpha-1</span></h2>
+                <div id="guide" class="guide-panel">
+                    <!-- Tasks will be injected here -->
+                </div>
+            </div>
+
+            <div class="tabs">
+                <div class="tab active" id="htmlTab" onclick="switchTab('html')">index.html</div>
+                <div class="tab" id="cssTab" onclick="switchTab('css')">style.css</div>
+                <div class="tab" id="visionTab" onclick="switchTab('vision')" style="color: #10b981;">vision.py</div>
+                <div class="tab" id="serverTab" onclick="switchTab('server')" style="color: #f59e0b;">app.py</div>
+                <div class="tab" id="threeTab" onclick="switchTab('three')" style="color: #f472b6;">scene.js</div>
+            </div>
+
+            <div class="editor-container">
+                <textarea id="htmlEditor" class="editor" spellcheck="false"></textarea>
+                <textarea id="cssEditor" class="editor" style="display: none;" spellcheck="false"></textarea>
+                <textarea id="visionEditor" class="editor" style="display: none; color: #10b981;" spellcheck="false"></textarea>
+                <textarea id="serverEditor" class="editor" style="display: none; color: #f59e0b;" spellcheck="false"></textarea>
+                <textarea id="threeEditor" class="editor" style="display: none; color: #f472b6;" spellcheck="false"></textarea>
+            </div>
+
+            <div class="stats-bar">
+                <div class="stat">
+                    <span class="stat-label">Population</span>
+                    <span class="stat-value" id="popValue">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Oxygen Level</span>
+                    <span class="stat-value" id="oxValue">15%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Colony Energy</span>
+                    <span class="stat-value" id="enValue">5%</span>
+                </div>
+                <div style="flex-grow: 1; text-align: right; display: flex; gap: 10px; justify-content: flex-end;">
+                    <button class="deploy-btn" onclick="updatePreview()">Update Preview 🚀</button>
+                    <button id="nextMissionBtn" class="deploy-btn" onclick="nextLevel()" style="display: none; background: #6366f1; box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);">Next Mission ➔</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Preview Panel -->
+        <div class="preview-panel">
+            <div class="preview-header">
+                <div style="font-weight: 700; color: #64748b; font-size: 0.8rem;">LIVE COLONY PREVIEW</div>
+                <div style="display: flex; gap: 10px;">
+                    <div style="width: 10px; height: 10px; background: #e2e8f0; border-radius: 50%;"></div>
+                    <div style="width: 10px; height: 10px; background: #e2e8f0; border-radius: 50%;"></div>
+                </div>
+            </div>
+            
+            <div style="position: relative; height: 300px; overflow: hidden;">
+                <img src="assets/colony.png" style="width: 100%; height: 100%; object-fit: cover; filter: brightness(0.7);" alt="New Planet">
+                <div style="position: absolute; bottom: 1rem; left: 1rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+                    <h2 style="margin: 0;">Planet Aurelia</h2>
+                    <p style="margin: 0; font-size: 0.8rem;">Coordinate: 42.09, -12.44</p>
+                </div>
+            </div>
+
+            <iframe id="preview-frame"></iframe>
+        </div>
+    </div>
+
+    <!-- Win Modal -->
+    <div id="winModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(5px);">
+        <div style="background: #1e293b; padding: 3rem; border-radius: 30px; text-align: center; border: 2px solid #6366f1;">
+            <h1 style="font-size: 3rem; margin-bottom: 1rem; color: white;">MISSION SUCCESS! 🎉</h1>
+            <p style="color: #94a3b8; margin-bottom: 2rem;">You've mastered these advanced engineering concepts. Ready for the next challenge?</p>
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <button class="deploy-btn" onclick="location.href='index.html'" style="background: #334155;">Main Menu</button>
+                <button class="deploy-btn" onclick="nextLevel()">Next Mission 🚀</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="progress.js"></script>
+    <script src="commander.js"></script>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architect Console | CodeVerse Academy</title>
+    <link rel="stylesheet" href="architect.css">
+</head>
+<body>
+    <div class="system-nav">
+        <div class="nav-container">
+            <div class="logo">ARCHITECT <span class="text-glow">OS v2.4</span></div>
+            <div class="module-info">
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <span id="moduleStepIndicator" style="background: var(--arch-primary); color: #000; font-weight: 800; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem;">01 / 12</span>
+                    <span id="currentModuleName" style="font-weight: 600; font-size: 0.9rem;">Module: Basic Python Foundations</span>
+                </div>
+                <div id="levelDots" style="display: flex; gap: 8px; margin-top: 10px;"></div>
+                <div class="progress-track" style="display: none;">
+                    <div class="progress-fill" id="moduleProgress"></div>
+                </div>
+            </div>
+            <a href="index.html" class="exit-btn">SHUTDOWN</a>
+        </div>
+    </div>
+
+    <div class="main-layout">
+        <!-- Documentation / Mission Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <h3>SYSTEM SCHEMATIC</h3>
+                <div id="missionDesc" class="mission-desc">
+                    Initializing...
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3>MISSION OBJECTIVES</h3>
+                <div id="objectives" class="objectives-list">
+                    <!-- Objectives injected here -->
+                </div>
+            </div>
+
+            <div class="sidebar-section feedback">
+                <h3>DIAGNOSTICS</h3>
+                <div id="diagnostics" class="diagnostics-log">
+                    System ready for input...
+                </div>
+            </div>
+        </div>
+
+        <!-- Development Environment -->
+        <div class="dev-env">
+            <div class="tabs">
+                <div class="tab active" data-file="main.py" onclick="switchTab('editor')">main.py</div>
+                <div class="tab" data-file="system.map" onclick="switchTab('map')">system.map</div>
+                <div class="tab" data-file="terminal" onclick="switchTab('terminal')">terminal</div>
+                <div class="tab" data-file="mission.log" onclick="switchTab('log')">mission.log</div>
+            </div>
+            
+            <div class="editor-area" id="editorContainer">
+                <div class="line-numbers" id="lineNumbers"></div>
+                <textarea id="pythonEditor" class="editor" spellcheck="false" placeholder="Write your system logic here..."></textarea>
+            </div>
+
+            <div class="log-area" id="logContainer" style="display: none; flex-grow: 1; background: #0a0f18; padding: 2rem; overflow-y: auto;">
+                <h3 style="color: var(--arch-primary); margin-bottom: 1.5rem; letter-spacing: 2px;">CERTIFIED MISSION HISTORY</h3>
+                <div id="missionLog" style="display: flex; flex-direction: column; gap: 1rem;">
+                    <div class="terminal-line" style="color: #475569;">No completed missions in current session.</div>
+                </div>
+            </div>
+
+            <div class="map-area" id="mapContainer" style="display: none; flex-grow: 1; padding: 2rem; background: #020617; position: relative; overflow: hidden;">
+                <div class="blueprint-bg"></div>
+                <div id="systemMap" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
+                    <!-- Map nodes injected here -->
+                </div>
+            </div>
+
+            <div class="terminal-area" id="terminalContainer" style="display: none; flex-grow: 1; background: #000; padding: 1.5rem; font-family: 'JetBrains Mono', monospace;">
+                <div id="terminalLog" style="height: calc(100% - 30px); overflow-y: auto; color: #10b981; font-size: 0.9rem;">
+                    <div class="terminal-line">ARCHITECT OS Simulated Environment [Version 2.4.0]</div>
+                    <div class="terminal-line">(c) 2026 CodeVerse Systems. All rights reserved.</div>
+                    <br>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <span style="color: #10b981;">$</span>
+                    <input type="text" id="terminalInput" style="background: transparent; border: none; color: #fff; font-family: inherit; font-size: 0.9rem; flex-grow: 1; outline: none;" placeholder="Enter command...">
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="run-btn" onclick="executeCode()">RUN SYSTEM ⚡</button>
+                <button id="nextModuleBtn" class="next-btn" style="display: none;" onclick="nextModule()">NEXT MODULE ➔</button>
+            </div>
+        </div>
+
+        <!-- System Preview / Result -->
+        <div class="preview-panel">
+            <div class="preview-header">SYSTEM OUTPUT</div>
+            <div class="output-display" id="outputDisplay">
+                <div class="terminal-line">> Awaiting execution...</div>
+            </div>
+            
+            <div class="visualization" id="visualization">
+                <div class="scan-line"></div>
+                <div class="blueprint-bg"></div>
+                <div id="vizContainer" class="viz-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Completion Overlay -->
+    <div id="completionOverlay" class="overlay">
+        <div class="modal">
+            <h1 class="text-glow">SYSTEM STABILIZED</h1>
+            <p>Your logic has successfully been integrated into the core architecture.</p>
+            <div class="stats">
+                <div class="stat-card">
+                    <span class="label">XP Gained</span>
+                    <span class="value">+500</span>
+                </div>
+                <div class="stat-card">
+                    <span class="label">Rank</span>
+                    <span class="value">Junior Architect</span>
+                </div>
+            </div>
+            <button class="run-btn" onclick="nextModule()">PROCEED TO NEXT MODULE</button>
+        </div>
+    </div>
+
+    <script src="progress.js"></script>
+    <script src="architect.js"></script>
+</body>
+</html>

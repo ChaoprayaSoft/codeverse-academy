@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI & Machine Learning | CodeVerse</title>
+    <link rel="stylesheet" href="ai_ml.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div id="completionOverlay" class="overlay" style="display: none;"></div>
+
+    <div class="layout">
+        <div class="nav-container">
+            <div class="logo">🧠 AI <span style="color: #a78bfa;">CORE</span></div>
+            <div class="module-info">
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <span id="moduleStepIndicator" class="step-badge">01 / 20</span>
+                    <span id="currentModuleName" class="module-name">Module: AI Foundations</span>
+                </div>
+                <div id="levelDots" style="display: flex; gap: 8px; margin-top: 10px;"></div>
+            </div>
+            <a href="index.html" class="btn-exit">Exit</a>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="panel mission-panel">
+                    <h2>Mission Objective</h2>
+                    <p id="missionDesc" style="font-size: 1.1rem; line-height: 1.5;">Welcome to AI Core.</p>
+                    <div class="objectives" id="objectives"></div>
+                    
+                    <div class="editor-mini">
+                        <div class="editor-header">core_logic.py</div>
+                        <textarea id="pythonEditor" class="editor" spellcheck="false" placeholder="Commands..."></textarea>
+                    </div>
+
+                    <button class="run-btn" onclick="executeCode()">ACTIVATE AI</button>
+                    <button class="next-btn" id="nextModuleBtn" onclick="nextModule()" style="display: none;">NEXT MODULE</button>
+                </div>
+                <div class="panel logs-panel">
+                    <h2>Brain Status</h2>
+                    <div class="console-output" id="outputDisplay"></div>
+                </div>
+            </div>
+
+            <div class="viz-area-large">
+                <div class="panel full-panel">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h2>Neural Network Mapping</h2>
+                        <div id="aiTypeBadge" style="background: var(--primary); padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: 800;">STATUS: IDLE</div>
+                    </div>
+                    <div id="brainViz" class="brain-viz">
+                        <div id="interactiveZone" style="position: absolute; inset: 0; z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; background: rgba(15, 23, 42, 0.85); padding: 2rem; border-radius: 20px;">
+                            <!-- Interactive content will be injected here -->
+                        </div>
+                        <svg id="networkSvg" viewBox="0 0 400 300" style="width: 100%; height: 100%;">
+                            <!-- Input Layer -->
+                            <g id="inputLayer"></g>
+                            <!-- Hidden Layer -->
+                            <g id="hiddenLayer"></g>
+                            <!-- Output Layer -->
+                            <g id="outputLayer"></g>
+                            <!-- Connections -->
+                            <g id="connectionsLayer"></g>
+                        </svg>
+                    </div>
+                    <div id="visualFeedback" style="margin-top: 1rem; text-align: center; font-weight: 800; color: var(--brain); min-height: 24px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="progress.js"></script>
+    <script src="ai_ml.js"></script>
+</body>
+
+</html>

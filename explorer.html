@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explorer Mission | CodeVerse Academy</title>
+    <link rel="stylesheet" href="explorer.css">
+</head>
+<body>
+    <!-- Character overlay injected by explorer.js -->
+    <div class="level-nav">
+        <div class="container" style="display: flex; align-items: center; justify-content: space-between; height: 60px;">
+            <div style="font-weight: 800; font-size: 1.2rem; color: var(--accent);">EXPLORER <span style="color: white;">ACADEMY</span></div>
+            <div style="display: flex; gap: 10px;" id="levelIndicators">
+                <!-- level dots will be injected here -->
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <button onclick="changeHero()" style="
+                    background: rgba(6,182,212,0.15); border: 1px solid #06b6d4;
+                    color: #06b6d4; font-size: 0.75rem; font-weight: 700;
+                    padding: 4px 12px; border-radius: 20px; cursor: pointer;
+                " title="Change your character">🔄 Change Hero</button>
+                <a href="index.html" style="color: #64748b; text-decoration: none; font-size: 0.8rem; font-weight: 600;">EXIT MISSION</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-container" style="height: calc(100vh - 60px);">
+        <!-- Sidebar: Command Blocks -->
+        <div class="sidebar">
+            <h2 style="color: var(--accent);">Commands</h2>
+            <p style="font-size: 0.9rem; color: #94a3b8;">Click blocks to add them to your program!</p>
+            
+            <div class="block block-blue" onclick="addCommand('right', '➡️ Move Right')" title="Moves the astronaut 1 step to the right.">
+                <span>➡️</span> Move Right
+            </div>
+            <div class="block block-blue" onclick="addCommand('left', '⬅️ Move Left')" title="Moves the astronaut 1 step to the left.">
+                <span>⬅️</span> Move Left
+            </div>
+            <div class="block block-purple" onclick="addCommand('up', '⬆️ Move Up')" title="Moves the astronaut 1 step up.">
+                <span>⬆️</span> Move Up
+            </div>
+            <div class="block block-purple" onclick="addCommand('down', '⬇️ Move Down')" title="Moves the astronaut 1 step down.">
+                <span>⬇️</span> Move Down
+            </div>
+            <div class="block block-pink" onclick="addCommand('jump', '✨ Space Jump')" title="A Super Leap! Moves 2 steps and can fly OVER walls.">
+                <span>✨</span> Space Jump
+            </div>
+            
+            <div style="margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
+                <h3 style="color: #fb923c; font-size: 0.9rem; margin-bottom: 0.5rem;">Loops & Patterns</h3>
+                <div class="block block-orange" onclick="addCommand('repeat2', '🔁 Repeat 2x')" title="A Container! Everything dropped inside will repeat twice.">
+                    <span>🔁</span> Repeat 2x
+                </div>
+            </div>
+        </div>
+
+        <!-- Main: Space World -->
+        <div class="world">
+            <div id="astronaut" style="font-size: 3.5rem; transition: all 0.5s; z-index: 20; display: flex; justify-content: center; align-items: center; width: 70px; height: 70px;">👨‍🚀</div>
+            <div class="grid" id="grid">
+                <!-- 5x5 Grid Cells -->
+                <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+                <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+                <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell">⭐</div>
+                <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+                <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+            </div>
+
+            <div style="position: absolute; top: 20px; left: 20px;">
+                <h1 style="margin: 0; font-size: 1.5rem;" id="missionTitle">Mission 1: <span style="color: var(--accent);">The Golden Star</span></h1>
+                <p style="color: #94a3b8; margin: 5px 0;" id="missionDesc">Help your hero reach the star!</p>
+            </div>
+        </div>
+
+        <!-- Panel: Your Program -->
+        <div class="panel">
+            <h2 style="color: #22c55e;">Your Program</h2>
+            <div class="sequence-list" id="sequenceList">
+                <!-- Commands will appear here -->
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 1rem;">
+                <button class="run-btn" id="runBtn" onclick="runProgram()" style="flex-grow: 2;">🚀 LAUNCH</button>
+                <button class="run-btn" onclick="clearProgram()" style="background: #ef4444; box-shadow: 0 5px 0 #b91c1c;">🗑️</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Win Modal -->
+    <div class="modal" id="winModal">
+        <h1 style="font-size: 4rem;">🎉</h1>
+        <h2>Mission Accomplished!</h2>
+        <p style="color: #94a3b8; margin: 1rem 0;">You've mastered the basics of sequencing!</p>
+        <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+            <button class="run-btn" onclick="location.href='index.html'">Main Menu</button>
+            <button class="run-btn" style="background: var(--accent); box-shadow: 0 5px 0 #0891b2;" onclick="nextLevel()">Next Level</button>
+        </div>
+    </div>
+
+    <script src="progress.js"></script>
+    <script src="explorer.js"></script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap');
+
+:root {
+    --bg: #0b0e14;
+    --sidebar: #151921;
+    --border: #2a2f3a;
+    --accent: #6366f1;
+    --text: #e2e8f0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.commander-layout {
+    display: flex;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+/* Sidebar IDE */
+.ide-panel {
+    width: 600px;
+    background: var(--sidebar);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+}
+
+.tabs {
+    display: flex;
+    background: #0f1218;
+    padding: 0 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.tab {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.8rem;
+    color: #64748b;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+}
+
+.tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    background: var(--sidebar);
+}
+
+.editor-container {
+    flex-grow: 1;
+    position: relative;
+}
+
+.editor {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: none;
+    padding: 1.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.95rem;
+    color: #94a3b8;
+    resize: none;
+    outline: none;
+    line-height: 1.6;
+    overflow-y: auto;
+}
+
+/* Preview Section */
+.preview-panel {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    background: #f1f5f9;
+    color: #0f172a;
+}
+
+.preview-header {
+    background: #fff;
+    padding: 0.75rem 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#preview-frame {
+    flex-grow: 1;
+    border: none;
+    background: white;
+}
+
+/* Stats Section */
+.stats-bar {
+    height: 100px;
+    background: #0f1218;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 2rem;
+    gap: 3rem;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-label { font-size: 0.7rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
+.stat-value { font-size: 1.2rem; font-weight: 700; color: var(--accent); }
+
+/* Buttons */
+.deploy-btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.deploy-btn:hover { background: #4f46e5; }
+
+/* Guide Panel */
+.guide-panel {
+    background: rgba(99, 102, 241, 0.1);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.task-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin-bottom: 8px;
+}
+
+.task-item.active { color: #f8fafc; font-weight: 600; }
+.task-item.done { color: #6366f1; text-decoration: line-through; opacity: 0.7; }
+.task-item::before { content: '○'; color: #6366f1; }
+.task-item.done::before { content: '●'; }

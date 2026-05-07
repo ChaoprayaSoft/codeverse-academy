@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Analytic | CodeVerse</title>
+    <link rel="stylesheet" href="data_analytic.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div id="completionOverlay" class="overlay" style="display: none;"></div>
+
+    <div class="layout">
+        <div class="nav-container">
+            <div class="logo">🐼 PANDA <span style="color: #FF9F1C;">ANALYTICS</span></div>
+            <div class="module-info">
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <span id="moduleStepIndicator" class="step-badge">01 / 10</span>
+                    <span id="currentModuleName" class="module-name">Module: Intro to Data</span>
+                </div>
+                <div id="levelDots" style="display: flex; gap: 8px; margin-top: 10px;"></div>
+            </div>
+            <a href="index.html" class="btn-exit">Exit</a>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="panel mission-panel">
+                    <h2>Mission Objective</h2>
+                    <p id="missionDesc">Load the dataset.</p>
+                    <div class="objectives" id="objectives"></div>
+                    <button class="run-btn" onclick="executeCode()">RUN ANALYSIS</button>
+                    <button class="next-btn" id="nextModuleBtn" onclick="nextModule()" style="display: none;">NEXT
+                        MODULE</button>
+                </div>
+                <div class="panel logs-panel">
+                    <h2>Data Console</h2>
+                    <div class="console-output" id="outputDisplay"></div>
+                </div>
+            </div>
+
+            <div class="editor-area">
+                <div class="editor-header">main.py</div>
+                <textarea id="pythonEditor" class="editor" spellcheck="false"
+                    placeholder="Write your python data logic here..."></textarea>
+            </div>
+
+            <div class="viz-area">
+                <div class="panel chart-panel">
+                    <h2>Data Visualization</h2>
+                    <div id="chartContainer" class="chart-container">
+                        <div class="empty-chart">Waiting for data...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="progress.js"></script>
+    <script src="data_analytic.js"></script>
+</body>
+
+</html>

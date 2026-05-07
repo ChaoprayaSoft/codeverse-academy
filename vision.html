@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Computer Vision Mission | CodeVerse</title>
+    <link rel="stylesheet" href="vision.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <a href="dashboard.html" style="color: var(--text-main); text-decoration: none; font-weight: 600;">&larr; Back to Base</a>
+            <div class="level-indicator" id="levelNum">Level 1 / 15</div>
+        </div>
+
+        <!-- Interactive Progress Bar -->
+        <div class="progress-bar-container" id="progressBar">
+            <!-- Level dots will be injected here -->
+        </div>
+
+        <div class="mission-card">
+            <h1 id="levelTitle" style="margin: 0; font-size: 2rem;">Pixel Basics</h1>
+            <p id="question" style="color: #94a3b8; margin-top: 0.5rem; font-size: 1.1rem;">Question text</p>
+
+            <div class="vision-viewport">
+                <!-- Before Side -->
+                <div class="viewport-side">
+                    <span class="side-label">BEFORE</span>
+                    <img src="assets/mascot.png" id="beforeImage" alt="Original Image">
+                </div>
+                <!-- After Side -->
+                <div class="viewport-side">
+                    <span class="side-label" style="color: var(--primary);">AFTER (PROCESS)</span>
+                    <img src="assets/mascot.png" id="afterImage" alt="Processed Image">
+                </div>
+            </div>
+
+            <div id="challengeArea" class="challenge-box">
+                <!-- Game content will be injected here by vision.js -->
+            </div>
+        </div>
+    </div>
+
+    <div id="feedbackModal" class="modal">
+        <div class="success-content">
+            <!-- Feedback content injected here -->
+        </div>
+    </div>
+
+    <script src="progress.js"></script>
+    <script src="vision.js"></script>
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigator Mission | CodeVerse Academy</title>
+    <link rel="stylesheet" href="navigator.css">
+</head>
+<body>
+    <div class="level-nav" style="background: #020617; border-bottom: 1px solid #1e293b;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; height: 60px;">
+            <div style="font-weight: 800; font-size: 1.2rem; color: #10b981;">NAVIGATOR <span style="color: white;">TERMINAL</span></div>
+            <div style="display: flex; gap: 10px;" id="levelIndicators">
+                <!-- level dots injected here -->
+            </div>
+            <a href="index.html" style="color: #64748b; text-decoration: none; font-size: 0.8rem; font-weight: 600;">DISCONNECT</a>
+        </div>
+    </div>
+
+    <div class="navigator-layout" style="height: calc(100vh - 60px);">
+        <!-- Code Editor Section -->
+        <div class="editor-panel">
+            <div class="terminal-header">
+                <div style="display: flex; gap: 8px;">
+                    <div style="width: 12px; height: 12px; border-radius: 50%; background: #ef4444;"></div>
+                    <div style="width: 12px; height: 12px; border-radius: 50%; background: #f59e0b;"></div>
+                    <div style="width: 12px; height: 12px; border-radius: 50%; background: #10b981;"></div>
+                </div>
+                <div style="font-size: 0.8rem; color: #64748b; font-weight: 600;">starship_core.py</div>
+            </div>
+
+            <h2 style="margin-bottom: 0.5rem; font-size: 1.2rem;" id="missionTitle">Mission: <span style="color: #10b981;">Repair Life Support</span></h2>
+            <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 1.5rem;" id="missionDesc">
+                The ship's life support is failing! Use the `ship` object to fix the issues.
+            </p>
+
+            <textarea class="code-editor" id="codeEditor" spellcheck="false"># Fix the ship systems!
+# Commands available:
+# ship.repair_engine()
+# ship.reboot_life_support()
+# ship.set_energy(level)
+
+ship.repair_engine()
+</textarea>
+
+            <div class="console" id="console">
+                <div class="console-entry">[SYSTEM] Awaiting commands...</div>
+            </div>
+
+            <div class="run-btn-container">
+                <button class="run-btn" style="width: 100%;" onclick="executeCode()">Run Script ⚡</button>
+            </div>
+        </div>
+
+        <!-- Visual Scene Section -->
+        <div class="scene-panel">
+            <div class="status-overlay">
+                <h3 style="font-size: 0.9rem; margin-bottom: 1rem; color: #10b981;">SYSTEM STATUS</h3>
+                
+                <div class="status-item">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem;">
+                        <span>Life Support</span>
+                        <span id="lifeSupportText" style="color: #ef4444;">10%</span>
+                    </div>
+                    <div class="status-bar">
+                        <div class="status-fill" id="lifeSupportBar" style="width: 10%; background: #ef4444;"></div>
+                    </div>
+                </div>
+
+                <div class="status-item">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem;">
+                        <span>Engine Power</span>
+                        <span id="enginePowerText">0%</span>
+                    </div>
+                    <div class="status-bar">
+                        <div class="status-fill" id="enginePowerBar" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <div class="status-item">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem;">
+                        <span>Energy Reserves</span>
+                        <span id="energyText">50%</span>
+                    </div>
+                    <div class="status-bar">
+                        <div class="status-fill" id="energyBar" style="width: 50%;"></div>
+                    </div>
+                </div>
+
+                <div class="status-item">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem;">
+                        <span>Velocity</span>
+                        <span id="velocityText" style="color: #fbbf24;">0 km/s</span>
+                    </div>
+                    <div class="status-bar">
+                        <div class="status-fill" id="velocityBar" style="width: 0%; background: #fbbf24;"></div>
+                    </div>
+                </div>
+
+                <div class="status-item">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem;">
+                        <span>Fuel Level</span>
+                        <span id="fuelText" style="color: #f472b6;">100%</span>
+                    </div>
+                    <div class="status-bar">
+                        <div class="status-fill" id="fuelBar" style="width: 100%; background: #f472b6;"></div>
+                    </div>
+                </div>
+
+                <div class="status-item">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem;">
+                        <span>Shield Integrity</span>
+                        <span id="shieldText" style="color: #6d28d9;">0%</span>
+                    </div>
+                    <div class="status-bar">
+                        <div class="status-fill" id="shieldBar" style="width: 0%; background: #8b5cf6;"></div>
+                    </div>
+                </div>
+
+                <div class="status-item">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem;">
+                        <span>Target Distance</span>
+                        <span id="distanceText" style="color: #64748b;">9999 km</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ship-display">
+                <img src="assets/starship.png" alt="Starship" class="ship-image offline" id="shipImage">
+            </div>
+
+            <div style="padding: 2rem; background: rgba(0,0,0,0.3);">
+                <p style="color: #64748b; font-size: 0.8rem;">&copy; CodeVerse Navigator Terminal v2.4.0</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Win Modal -->
+    <div id="winModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(5px);">
+        <div style="background: #1e293b; padding: 3rem; border-radius: 30px; text-align: center; border: 2px solid #10b981;">
+            <h1 style="font-size: 3rem; margin-bottom: 1rem;" id="winModalTitle">MISSION SUCCESS! 🎉</h1>
+            <p style="color: #94a3b8; margin-bottom: 2rem;" id="winModalDesc">The starship is fully operational. You've mastered Python syntax!</p>
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <button class="run-btn" onclick="location.href='index.html'">Main Menu</button>
+                <button class="run-btn" style="background: #0ea5e9;" id="nextLevelBtn" onclick="nextLevel()">Next Mission</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="progress.js"></script>
+    <script src="navigator.js"></script>
+</body>
+</html>
