@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeVerse Academy | Launch Your Coding Journey</title>
+    <meta name="description"
+        content="The ultimate coding platform for kids and teens aged 5-15. Learn logic, game design, and web development through a gamified space adventure.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="assets/mascot.png">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+
+<body>
+    <nav>
+        <div class="container nav-content">
+            <div class="logo">CODE<span class="text-gradient">VERSE</span></div>
+            <div class="nav-links" style="display: flex; align-items: center;">
+                <a href="dashboard.html" class="btn btn-glass" id="dashLink"
+                    style="padding: 0.5rem 1.5rem; font-size: 0.9rem; display: none;">My Dashboard</a>
+                <a href="#missions" class="btn btn-glass"
+                    style="padding: 0.5rem 1.5rem; font-size: 0.9rem; margin-left: 1rem;">Missions</a>
+
+                <div id="authContainer" style="margin-left: 1rem;">
+                    <a href="#" class="btn btn-primary" id="loginBtn"
+                        style="padding: 0.5rem 1.5rem; font-size: 0.9rem;">Join Now</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero container">
+        <div class="hero-text reveal">
+
+            <h1>The Universe is Your <span class="text-gradient">Playground.</span></h1>
+            <p style="font-size: 1.25rem; color: var(--text-muted); margin-bottom: 2.5rem; max-width: 550px;">
+                Embark on a coding adventure through the stars. Master the languages of the future with gamified
+                challenges designed for every age.
+            </p>
+            <div class="hero-btns">
+                <a href="#missions" class="btn btn-primary">Start Your Mission</a>
+            </div>
+        </div>
+        <div class="hero-image">
+            <img src="assets/mascot.png" alt="CodeVerse Mascot">
+        </div>
+    </header>
+
+    <section id="missions" class="paths container">
+        <div class="reveal">
+            <h2 style="font-size: 3rem; margin-bottom: 1rem;">Choose Your <span class="text-gradient">Path</span></h2>
+            <p style="color: var(--text-muted);">Every journey starts with a single line of code.</p>
+        </div>
+
+        <div class="path-grid">
+            <!-- Level 1 -->
+            <div class="glass-card reveal">
+                <div class="age-badge">Ages 5-8</div>
+                <div class="path-icon">🚀</div>
+                <h3>Explorer Path</h3>
+                <p style="color: var(--text-muted); margin: 1rem 0;">Logic puzzles and visual block-based coding.
+                    Perfect for early learners.</p>
+                <ul style="text-align: left; margin: 1.5rem 0; list-style: none;">
+                    <li>✨ Sequential Thinking</li>
+                    <li>✨ Loops & Patterns</li>
+                    <li>✨ Basic Problem Solving</li>
+                </ul>
+                <button class="btn btn-glass" style="width: 100%;" onclick="location.href='explorer.html'">Enter
+                    Nebula</button>
+            </div>
+
+            <!-- Level 2 -->
+            <div class="glass-card reveal">
+                <div class="age-badge">Ages 9-12</div>
+                <div class="path-icon">🛰️</div>
+                <h3>Navigator Path</h3>
+                <p style="color: var(--text-muted); margin: 1rem 0;">Dive into game mechanics and interactive
+                    storytelling using scripting.</p>
+                <ul style="text-align: left; margin: 1.5rem 0; list-style: none;">
+                    <li>✨ Python Foundations</li>
+                    <li>✨ Game Physics</li>
+                    <li>✨ Creative Animation</li>
+                </ul>
+                <button class="btn btn-primary" style="width: 100%;" onclick="location.href='navigator.html'">Visit
+                    Starbase</button>
+            </div>
+
+            <!-- Level 3 -->
+            <div class="glass-card reveal">
+                <div class="age-badge">Ages 13-15</div>
+                <div class="path-icon">🛸</div>
+                <h3>Commander Path</h3>
+                <p style="color: var(--text-muted); margin: 1rem 0;">Professional tools and real-world projects. Build
+                    apps, bots, and AI.</p>
+                <ul style="text-align: left; margin: 1.5rem 0; list-style: none;">
+                    <li>✨ Fullstack Web Dev</li>
+                    <li>✨ AI & Data Science</li>
+                    <li>✨ 3D Game Engines</li>
+                </ul>
+                <button class="btn btn-glass" style="width: 100%;" onclick="location.href='commander.html'">Launch
+                    Fleet</button>
+            </div>
+
+            <!-- Level 4 -->
+            <div class="glass-card reveal" style="border-color: var(--accent);">
+                <div class="age-badge" style="background: rgba(6, 182, 212, 0.2); color: var(--accent);">Ages 15+</div>
+                <div class="path-icon">🌌</div>
+                <h3>Architect Path</h3>
+                <p style="color: var(--text-muted); margin: 1rem 0;">Master system design and high-level engineering.
+                    From Python to AI systems.</p>
+                <ul style="text-align: left; margin: 1.5rem 0; list-style: none;">
+                    <li>✨ Advanced Python Logic</li>
+                    <li>✨ Distributed Systems</li>
+                    <li>✨ Neural Architecture</li>
+                </ul>
+                <button class="btn btn-primary"
+                    style="width: 100%; background: var(--accent); box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);"
+                    onclick="location.href='architect.html'">Build the Future</button>
+            </div>
+
+            <!-- Level 5 -->
+            <div class="glass-card reveal" style="border-color: #f59e0b;">
+                <div class="age-badge" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b;">Ages 15+</div>
+                <div class="path-icon">📊</div>
+                <h3>Data Analytic</h3>
+                <p style="color: var(--text-muted); margin: 1rem 0;">Panda Analytics! Learn to process data sets, filter
+                    arrays, and create visualizations.</p>
+                <ul style="text-align: left; margin: 1.5rem 0; list-style: none;">
+                    <li>✨ Datasets & Filtering</li>
+                    <li>✨ Data Visualizations</li>
+                </ul>
+                <button class="btn btn-primary"
+                    style="width: 100%; background: #f59e0b; box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);"
+                    onclick="location.href='data_analytic.html'">Analyze Data</button>
+            </div>
+
+            <!-- Level 6 -->
+            <div class="glass-card reveal" style="border-color: #8b5cf6;">
+                <div class="age-badge" style="background: rgba(139, 92, 246, 0.2); color: #a78bfa;">Ages 15+</div>
+                <div class="path-icon">🧠</div>
+                <h3>AI & Machine Learning</h3>
+                <p style="color: var(--text-muted); margin: 1rem 0;">Explore the world of Artificial Intelligence. Learn
+                    how machines learn and build your own models.</p>
+                <ul style="text-align: left; margin: 1.5rem 0; list-style: none;">
+                    <li>✨ Neural Networks</li>
+                    <li>✨ Pattern Recognition</li>
+                </ul>
+                <button class="btn btn-primary"
+                    style="width: 100%; background: #8b5cf6; box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);"
+                    onclick="location.href='ai_ml.html'">Master AI</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="sandbox container">
+        <div class="reveal" style="text-align: center; margin-bottom: 4rem;">
+            <h2 style="font-size: 3rem;">Try a <span class="text-gradient">Quick Mission</span></h2>
+            <p style="color: var(--text-muted);">Change the astronaut's size or rotation using CSS!</p>
+        </div>
+
+        <div class="sandbox-container">
+            <div class="editor-window reveal">
+                <div class="editor-header">
+                    <div class="dot red"></div>
+                    <div class="dot yellow"></div>
+                    <div class="dot green"></div>
+                    <span
+                        style="color: var(--text-muted); font-size: 0.8rem; margin-left: 1rem;">mission_control.css</span>
+                </div>
+                <textarea class="code-input" id="codeInput">/* Type your code here! */
+.astronaut {
+  transform: scale(1) rotate(0deg);
+  filter: brightness(1);
+}</textarea>
+            </div>
+
+            <div class="preview-window reveal">
+                <img src="assets/mascot.png" class="preview-mascot" id="previewMascot" alt="Preview Mascot">
+                <div style="margin-top: 2rem; color: var(--accent); font-weight: 600;" id="statusText">System Status:
+                    Stable</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Roadmap Section -->
+    <section id="roadmap" style="padding: 100px 2rem; background: rgba(15, 23, 42, 0.5);">
+        <div style="max-width: 1200px; margin: 0 auto; text-align: center;">
+            <h2 style="font-size: 3rem; margin-bottom: 4rem;">The <span class="text-glow">Learning Roadmap</span></h2>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 3rem;">
+                <!-- Explorer Path -->
+                <div class="card" style="text-align: left;">
+                    <div style="font-size: 0.8rem; color: #10b981; font-weight: 800; margin-bottom: 1rem;">AGES 5-8
+                    </div>
+                    <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem;">🚀 Explorer Academy</h3>
+                    <ul style="list-style: none; padding: 0; color: #94a3b8; font-size: 0.9rem;">
+                        <li style="margin-bottom: 10px;">✨ Sequential Thinking</li>
+                        <li style="margin-bottom: 10px;">✨ Loop-Based Efficiency</li>
+                        <li style="margin-bottom: 10px;">✨ Pattern Recognition</li>
+                        <li style="margin-bottom: 10px;">✨ Basic Problem Solving</li>
+                    </ul>
+                </div>
+
+                <!-- Navigator Path -->
+                <div class="card" style="text-align: left;">
+                    <div style="font-size: 0.8rem; color: #0ea5e9; font-weight: 800; margin-bottom: 1rem;">AGES 9-12
+                    </div>
+                    <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem;">🛰️ Navigator Terminal</h3>
+                    <ul style="list-style: none; padding: 0; color: #94a3b8; font-size: 0.9rem;">
+                        <li style="margin-bottom: 10px;">✨ Python Foundations</li>
+                        <li style="margin-bottom: 10px;">✨ Game Physics Engine</li>
+                        <li style="margin-bottom: 10px;">✨ Creative CSS Animation</li>
+                        <li style="margin-bottom: 10px;">✨ Computational Logic</li>
+                    </ul>
+                </div>
+
+                <!-- Commander Path -->
+                <div class="card" style="text-align: left;">
+                    <div style="font-size: 0.8rem; color: #6366f1; font-weight: 800; margin-bottom: 1rem;">AGES 13-15
+                    </div>
+                    <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem;">🛸 Commander IDE</h3>
+                    <ul style="list-style: none; padding: 0; color: #94a3b8; font-size: 0.9rem;">
+                        <li style="margin-bottom: 10px;">✨ Fullstack Web Dev</li>
+                        <li style="margin-bottom: 10px;">✨ OpenCV Vision Tech</li>
+                        <li style="margin-bottom: 10px;">✨ AI & Data Science</li>
+                        <li style="margin-bottom: 10px;">✨ 3D Game Engines</li>
+                    </ul>
+                </div>
+
+                <!-- Architect Path -->
+                <div class="card" style="text-align: left;">
+                    <div style="font-size: 0.8rem; color: #06b6d4; font-weight: 800; margin-bottom: 1rem;">AGES 15+
+                    </div>
+                    <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem;">🌌 Architect Systems</h3>
+                    <ul style="list-style: none; padding: 0; color: #94a3b8; font-size: 0.9rem;">
+                        <li style="margin-bottom: 10px;">✨ Advanced System Logic</li>
+                        <li style="margin-bottom: 10px;">✨ Python Core Architecture</li>
+                        <li style="margin-bottom: 10px;">✨ API & Server Design</li>
+                        <li style="margin-bottom: 10px;">✨ Machine Learning Ops</li>
+                    </ul>
+                </div>
+
+                <!-- Data Analytic Path -->
+                <div class="card" style="text-align: left;">
+                    <div style="font-size: 0.8rem; color: #f59e0b; font-weight: 800; margin-bottom: 1rem;">AGES 15+
+                    </div>
+                    <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem;">📊 Data Analytic</h3>
+                    <ul style="list-style: none; padding: 0; color: #94a3b8; font-size: 0.9rem;">
+                        <li style="margin-bottom: 10px;">✨ Intro to Datasets</li>
+                        <li style="margin-bottom: 10px;">✨ Visualizing Trends</li>
+                        <li style="margin-bottom: 10px;">✨ Array Manipulation</li>
+                        <li style="margin-bottom: 10px;">✨ Data Logic Basics</li>
+                    </ul>
+                </div>
+
+                <!-- AI & Machine Learning Path -->
+                <div class="card" style="text-align: left;">
+                    <div style="font-size: 0.8rem; color: #a78bfa; font-weight: 800; margin-bottom: 1rem;">AGES 15+
+                    </div>
+                    <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem;">🧠 AI & Machine Learning</h3>
+                    <ul style="list-style: none; padding: 0; color: #94a3b8; font-size: 0.9rem;">
+                        <li style="margin-bottom: 10px;">✨ Neural Networks</li>
+                        <li style="margin-bottom: 10px;">✨ Model Training</li>
+                        <li style="margin-bottom: 10px;">✨ Deep Learning</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer
+        style="padding: 4rem 2rem; border-top: 1px solid rgba(255,255,255,0.1); text-align: center; color: #64748b;">
+        <p>&copy; 2026 CodeVerse Academy. Empowering the next generation of engineers.</p>
+    </footer>
+
+    <!-- Mock Google Login Modal -->
+    <div id="loginModal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
+        <div
+            style="background: white; color: #333; padding: 2rem; border-radius: 12px; width: 400px; max-width: 90%; text-align: center; font-family: 'Arial', sans-serif;">
+            <div style="font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem; color: #1e293b;">Welcome, Cadet!
+            </div>
+            <div style="font-size: 1rem; color: #64748b; margin-bottom: 2rem;">Sign in with your Google account to sync
+                your progress to the stars.</div>
+
+            <div id="g_id_onload"
+                data-client_id="1049203742621-85p09ruvq6kr2m1bnu1kg933ajhbjen3.apps.googleusercontent.com"
+                data-callback="handleCredentialResponse" data-auto_prompt="false">
+            </div>
+            <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline"
+                data-text="sign_in_with" data-shape="rectangular" data-logo_alignment="left"
+                style="display: flex; justify-content: center; margin-bottom: 1.5rem;">
+            </div>
+
+            <button id="closeLoginBtn"
+                style="margin-top: 1rem; background: none; border: none; color: #64748b; cursor: pointer; font-weight: 600; font-size: 0.9rem;">Maybe
+                Later</button>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="profileModal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
+        <div
+            style="background: white; padding: 2rem; border-radius: 24px; border: 4px solid #6366f1; width: 350px; font-family: 'Outfit', sans-serif; color: #0f172a;">
+            <h2 style="margin-top: 0; font-size: 1.8rem; font-weight: 800;">Edit Profile</h2>
+            <div style="margin-bottom: 1rem;">
+                <label style="font-weight: 600; display: block; margin-bottom: 0.5rem; color: #475569;">Commander
+                    Name</label>
+                <input type="text" id="editName"
+                    style="width: 100%; padding: 0.8rem; border: 2px solid #e2e8f0; border-radius: 12px; font-family: 'Outfit', sans-serif; box-sizing: border-box; font-size: 1rem;">
+            </div>
+            <div style="margin-bottom: 1.5rem;">
+                <label style="font-weight: 600; display: block; margin-bottom: 0.5rem; color: #475569;">Avatar
+                    Color</label>
+                <input type="color" id="editColor" value="#FF9F1C"
+                    style="width: 100%; height: 40px; border: none; border-radius: 12px; cursor: pointer;">
+            </div>
+            <div style="margin-bottom: 1.5rem;">
+                <label style="font-weight: 600; display: block; margin-bottom: 0.5rem; color: #475569;">Choose
+                    Avatar</label>
+                <div id="avatarPicker"
+                    style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 0.5rem;">
+                    <!-- Animals will be injected here -->
+                </div>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <button onclick="saveProfile()"
+                    style="flex: 1; background: #10b981; color: white; border: none; padding: 0.8rem; border-radius: 12px; font-weight: 800; cursor: pointer;">Save</button>
+                <button onclick="document.getElementById('profileModal').style.display='none'"
+                    style="flex: 1; background: #e2e8f0; color: #475569; border: none; padding: 0.8rem; border-radius: 12px; font-weight: 800; cursor: pointer;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="progress.js"></script>
+    <script src="app.js"></script>
+    <script>
+        const authContainer = document.getElementById('authContainer');
+        const dashLink = document.getElementById('dashLink');
+        const loginModal = document.getElementById('loginModal');
+        const loginBtn = document.getElementById('loginBtn');
+        const closeLoginBtn = document.getElementById('closeLoginBtn');
+        const googleSignInBtn = document.getElementById('googleSignInBtn');
+
+        const animals = ['🦁', '🐼', '🐨', '🐰', '🦊', '🐯', '🐸', '🐧', '🦄', '🐵'];
+        let selectedAnimal = '🦁';
+
+        function initAvatarPicker() {
+            const picker = document.getElementById('avatarPicker');
+            picker.innerHTML = '';
+            animals.forEach(ani => {
+                const div = document.createElement('div');
+                div.innerText = ani;
+                div.style.cssText = `
+                    font-size: 1.5rem;
+                    padding: 8px;
+                    border: 2px solid #e2e8f0;
+                    border-radius: 12px;
+                    cursor: pointer;
+                    text-align: center;
+                    transition: all 0.2s;
+                `;
+                if (ani === selectedAnimal) {
+                    div.style.borderColor = '#6366f1';
+                    div.style.background = 'rgba(99, 102, 241, 0.1)';
+                }
+                div.onclick = () => {
+                    selectedAnimal = ani;
+                    initAvatarPicker();
+                };
+                picker.appendChild(div);
+            });
+        }
+
+        function updateUI() {
+            const user = getUserProfile();
+            const p = getProgress();
+
+            if (user) {
+                // Logged In
+                authContainer.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 100px;">
+                        <img src="${user.avatar}" alt="Avatar" style="width: 24px; height: 24px; border-radius: 50%;">
+                        <span style="font-size: 0.9rem; font-weight: 600;">${user.name}</span>
+                        <button onclick="document.getElementById('profileModal').style.display='flex'" style="background: none; border: none; color: #6366f1; font-size: 0.8rem; cursor: pointer; margin-left: 10px; font-weight: 600;">Edit Profile</button>
+                        <button onclick="logoutUser()" style="background: none; border: none; color: #ef4444; font-size: 0.8rem; cursor: pointer; margin-left: 5px; font-weight: 600;">Logout</button>
+                    </div>
+                `;
+                dashLink.style.display = 'inline-block';
+
+                // Populate Modal Fields
+                document.getElementById('editName').value = user.name;
+
+                // Try to extract animal and color from avatar URL
+                const colorMatch = user.avatar.match(/background=([a-f0-9]{6})/i);
+                if (colorMatch) {
+                    document.getElementById('editColor').value = '#' + colorMatch[1];
+                }
+                const animalMatch = user.avatar.match(/name=([^&]+)/i);
+                if (animalMatch) {
+                    const decoded = decodeURIComponent(animalMatch[1]);
+                    if (animals.includes(decoded)) {
+                        selectedAnimal = decoded;
+                    }
+                }
+                initAvatarPicker();
+            } else {
+                // Logged Out
+                authContainer.innerHTML = `<a href="#" class="btn btn-primary" id="loginBtn" style="padding: 0.5rem 1.5rem; font-size: 0.9rem;">Join Now</a>`;
+
+                document.getElementById('loginBtn').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    loginModal.style.display = 'flex';
+                });
+                if (p.xp > 0) {
+                    dashLink.style.display = 'inline-block';
+                } else {
+                    dashLink.style.display = 'none';
+                }
+            }
+        }
+
+        if (loginBtn) {
+            loginBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                loginModal.style.display = 'flex';
+            });
+        }
+
+        closeLoginBtn.addEventListener('click', () => {
+            loginModal.style.display = 'none';
+        });
+
+        async function handleCredentialResponse(response) {
+            // Decode JWT Token
+            const base64Url = response.credential.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+
+            const user = JSON.parse(jsonPayload);
+
+            // Login with Real Data
+            await loginUser(user.name, user.email, user.picture);
+
+            loginModal.style.display = 'none';
+        }
+
+        function saveProfile() {
+            const newName = document.getElementById('editName').value.trim();
+            let newColor = document.getElementById('editColor').value;
+            newColor = newColor.replace('#', ''); // strip hash
+
+            if (newName) {
+                const user = getUserProfile();
+                if (user) {
+                    user.name = newName;
+                    user.color = newColor;
+                    user.avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedAnimal)}&background=${newColor}&color=fff&size=128&font-size=0.6`;
+                    localStorage.setItem('codeverse_user', JSON.stringify(user));
+                    window.dispatchEvent(new Event('userStateChanged'));
+                    document.getElementById('profileModal').style.display = 'none';
+                    syncNow(); // Auto-sync after edit
+                }
+            }
+        }
+
+        window.addEventListener('userStateChanged', updateUI);
+        window.addEventListener('progressUpdated', updateUI);
+
+        // Initial load
+        updateUI();
+    </script>
+</body>
+
+</html>
