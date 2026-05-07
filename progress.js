@@ -208,17 +208,18 @@ async function loginUser(name, email, avatar) {
 async function logoutUser() {
     const user = getUserProfile();
     if (user && user.email) {
-        console.log("Transmitting Logout Postcard to Cloud...");
-        
-        // The "Postcard" Strategy: Send data in the URL itself
-        const logoutUrl = `${SHEETS_API_URL}?action=logout&email=${encodeURIComponent(user.email)}&name=${encodeURIComponent(user.name)}&status=Logout`;
+        // Safe URL builder (handles existing '?' if any)
+        const separator = SHEETS_API_URL.includes('?') ? '&' : '?';
+        const logoutUrl = `${SHEETS_API_URL}${separator}action=logout&email=${encodeURIComponent(user.email)}&name=${encodeURIComponent(user.name)}&status=Logout`;
 
-        try {
-            // A simple image-style fetch that never gets blocked
-            await fetch(logoutUrl, { mode: 'no-cors' });
-        } catch (e) {
-            console.warn("Logout transmission failed.", e);
-        }
+        console.log("🌌 DEEP SPACE SIGNAL SENT:", logoutUrl);
+        
+        // THE ULTIMATE PING: Browsers will NEVER block an image-style request
+        const ping = new Image();
+        ping.src = logoutUrl;
+        
+        // Wait a tiny moment for the signal to leave the ship
+        await new Promise(resolve => setTimeout(resolve, 300));
     }
     localStorage.removeItem(USER_KEY);
     window.dispatchEvent(new Event('userStateChanged'));
