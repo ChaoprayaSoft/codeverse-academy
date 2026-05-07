@@ -14,6 +14,7 @@ async function syncWithSheets(action, extraData = {}) {
     try {
         const response = await fetch(SHEETS_API_URL, {
             method: 'POST',
+            keepalive: true, // Crucial for logout logs during page redirect
             body: JSON.stringify({
                 action,
                 email,

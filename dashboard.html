@@ -332,7 +332,10 @@
         });
         async function handleLogout() {
             await logoutUser();
-            location.href = 'index.html';
+            // Give a tiny moment for the beacon to clear
+            setTimeout(() => {
+                location.href = 'index.html';
+            }, 500);
         }
 
         window.addEventListener('userStateChanged', updateDashboard);
