@@ -145,22 +145,41 @@ const ship = {
 function initGame() {
     initElements();
     
-    // Give the cloud a moment to sync if the user just logged in
-    setTimeout(() => {
+    let attempts = 0;
+    const maxAttempts = 8;
+
+    function tryLoadProgress() {
+        attempts++;
         let progress;
         try {
             progress = getProgress();
-            // Deep-safety check for navigator levels
             if (!progress.levels) progress.levels = {};
             if (progress.levels.navigator === undefined) progress.levels.navigator = 1;
         } catch (e) {
-            console.error("Navigator Data Error, defaulting...", e);
             progress = { levels: { navigator: 1 } };
         }
 
-        const startLevel = (progress.levels.navigator || 1) - 1;
-        loadLevel(startLevel);
-    }, 100);
+        // Wait until USER_KEY is confirmed set in localStorage, or give up after maxAttempts
+        const user = typeof getUserProfile === 'function' ? getUserProfile() : null;
+        const userReady = !user || !user.email || localStorage.getItem('codeverse_user') !== null;
+
+        if (!userReady && attempts < maxAttempts) {
+            console.log(`⏳ Waiting for user session... attempt ${attempts}`);
+            setTimeout(tryLoadProgress, 200);
+            return;
+        }
+
+        // Re-read progress after confirming user is set
+        try { progress = getProgress(); } catch(e) {}
+        if (!progress.levels) progress.levels = {};
+        if (progress.levels.navigator === undefined) progress.levels.navigator = 1;
+
+        console.log(`✅ Navigator ready (attempt ${attempts}). Level: ${progress.levels.navigator}`);
+        const startLevel = Math.max(0, (progress.levels.navigator || 1) - 1);
+        loadLevel(Math.min(startLevel, LEVELS.length - 1));
+    }
+    
+    setTimeout(tryLoadProgress, 300);
 }
 
 function renderLevelIndicators() {

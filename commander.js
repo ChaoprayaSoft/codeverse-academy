@@ -137,9 +137,19 @@ function updatePreview() {
 }
 
 function initGame() {
-    const progress = getProgress();
-    const startLevel = (progress.levels.commander || 1) - 1;
-    loadLevel(startLevel);
+    let attempts = 0;
+    function tryLoad() {
+        attempts++;
+        const userReady = localStorage.getItem('codeverse_user') !== null || attempts >= 8;
+        if (!userReady) { setTimeout(tryLoad, 200); return; }
+        const progress = getProgress();
+        if (!progress.levels) progress.levels = {};
+        if (!progress.levels.commander) progress.levels.commander = 1;
+        const startLevel = Math.min(Math.max(0, progress.levels.commander - 1), LEVELS.length - 1);
+        console.log(`✅ Commander ready. Level: ${progress.levels.commander}`);
+        loadLevel(startLevel);
+    }
+    setTimeout(tryLoad, 300);
 }
 
 function renderLevelIndicators() {

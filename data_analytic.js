@@ -161,10 +161,20 @@ const editor = document.getElementById('pythonEditor');
 const outputDisplay = document.getElementById('outputDisplay');
 
 function init() {
-    const progress = getProgress();
-    const startLevel = (progress.levels.data_analytic || 1) - 1;
-    loadModule(startLevel);
     editor.addEventListener('input', validateCode);
+    let attempts = 0;
+    function tryLoad() {
+        attempts++;
+        const userReady = localStorage.getItem('codeverse_user') !== null || attempts >= 8;
+        if (!userReady) { setTimeout(tryLoad, 200); return; }
+        const progress = getProgress();
+        if (!progress.levels) progress.levels = {};
+        if (!progress.levels.data_analytic) progress.levels.data_analytic = 1;
+        const startLevel = Math.min(Math.max(0, progress.levels.data_analytic - 1), modules.length - 1);
+        console.log(`✅ Data Analytic ready. Level: ${progress.levels.data_analytic}`);
+        loadModule(startLevel);
+    }
+    setTimeout(tryLoad, 300);
 }
 
 function loadModule(index) {

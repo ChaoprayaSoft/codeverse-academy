@@ -273,11 +273,7 @@ const outputDisplay = document.getElementById('outputDisplay');
 const diagnostics = document.getElementById('diagnostics');
 
 function init() {
-    const progress = getProgress();
-    const startLevel = (progress.levels.architect || 1) - 1;
-    loadModule(startLevel);
-    updateLineNumbers();
-
+    // Register event listeners once
     editor.addEventListener('input', () => {
         updateLineNumbers();
         validateCode();
@@ -294,7 +290,6 @@ function init() {
         }
     });
 
-    // Terminal logic
     document.getElementById('terminalInput').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             const input = e.target.value;
@@ -304,6 +299,22 @@ function init() {
     });
 
     updateSystemMap();
+
+    // Smart polling: wait for user session before loading saved level
+    let attempts = 0;
+    function tryLoad() {
+        attempts++;
+        const userReady = localStorage.getItem('codeverse_user') !== null || attempts >= 8;
+        if (!userReady) { setTimeout(tryLoad, 200); return; }
+        const progress = getProgress();
+        if (!progress.levels) progress.levels = {};
+        if (!progress.levels.architect) progress.levels.architect = 1;
+        const startLevel = Math.min(Math.max(0, progress.levels.architect - 1), modules.length - 1);
+        console.log(`✅ Architect ready. Level: ${progress.levels.architect}`);
+        loadModule(startLevel);
+        updateLineNumbers();
+    }
+    setTimeout(tryLoad, 300);
 }
 
 function switchTab(tabId) {

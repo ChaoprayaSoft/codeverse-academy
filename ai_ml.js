@@ -245,12 +245,20 @@ const feedbackEl = document.getElementById('visualFeedback');
 const interactiveZone = document.getElementById('interactiveZone');
 
 function init() {
-    setTimeout(() => {
+    editor.addEventListener('input', validateCode);
+    let attempts = 0;
+    function tryLoad() {
+        attempts++;
+        const userReady = localStorage.getItem('codeverse_user') !== null || attempts >= 8;
+        if (!userReady) { setTimeout(tryLoad, 200); return; }
         const progress = getProgress();
-        const startLevel = (progress.levels.ai_ml || 1) - 1;
+        if (!progress.levels) progress.levels = {};
+        if (!progress.levels.ai_ml) progress.levels.ai_ml = 1;
+        const startLevel = Math.min(Math.max(0, progress.levels.ai_ml - 1), modules.length - 1);
+        console.log(`✅ AI/ML ready. Level: ${progress.levels.ai_ml}`);
         loadModule(startLevel);
-        editor.addEventListener('input', validateCode);
-    }, 100);
+    }
+    setTimeout(tryLoad, 300);
 }
 
 function loadModule(index) {

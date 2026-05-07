@@ -176,11 +176,19 @@ function renderCharGrid() {} // kept for compatibility
 function confirmCharacter() {} // kept for compatibility
 
 function initGame() {
-    setTimeout(() => {
+    let attempts = 0;
+    function tryLoad() {
+        attempts++;
+        const userReady = localStorage.getItem('codeverse_user') !== null || attempts >= 8;
+        if (!userReady) { setTimeout(tryLoad, 200); return; }
         const progress = getProgress();
-        const startLevel = (progress.levels.explorer || 1) - 1;
+        if (!progress.levels) progress.levels = {};
+        if (!progress.levels.explorer) progress.levels.explorer = 1;
+        const startLevel = Math.min(Math.max(0, progress.levels.explorer - 1), LEVELS.length - 1);
+        console.log(`✅ Explorer ready. Level: ${progress.levels.explorer}`);
         loadLevel(startLevel);
-    }, 100);
+    }
+    setTimeout(tryLoad, 300);
 }
 
 function renderLevelIndicators() {

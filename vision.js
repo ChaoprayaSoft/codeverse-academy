@@ -168,31 +168,29 @@ let progressData, currentLevel;
 let score = 0;
 
 function initLevel() {
-    setTimeout(() => {
+    let attempts = 0;
+    function tryLoad() {
+        attempts++;
+        const userReady = localStorage.getItem('codeverse_user') !== null || attempts >= 8;
+        if (!userReady) { setTimeout(tryLoad, 200); return; }
         progressData = getProgress();
-        currentLevel = (progressData.levels.vision || 1) - 1;
-        
-        // Clamp to available levels
-        if (currentLevel < 0) currentLevel = 0;
-        if (currentLevel >= levels.length) currentLevel = levels.length - 1;
+        if (!progressData.levels) progressData.levels = {};
+        if (!progressData.levels.vision) progressData.levels.vision = 1;
+        currentLevel = Math.min(Math.max(0, progressData.levels.vision - 1), levels.length - 1);
+        console.log(`✅ Vision ready. Level: ${progressData.levels.vision}`);
 
         const level = levels[currentLevel];
-    document.getElementById('levelTitle').innerText = level.title;
-    document.getElementById('levelNum').innerText = `Level ${level.id} / 15`;
-    document.getElementById('question').innerText = level.question;
-    
-    // Update Progress Bar
-    renderProgressBar();
+        document.getElementById('levelTitle').innerText = level.title;
+        document.getElementById('levelNum').innerText = `Level ${level.id} / 15`;
+        document.getElementById('question').innerText = level.question;
+        renderProgressBar();
 
-    const challengeArea = document.getElementById('challengeArea');
-    challengeArea.innerHTML = '';
-    
-    // Visuals: BEFORE stays clean, AFTER shows the target process
-    const beforeImg = document.getElementById('beforeImage');
-    const afterImg = document.getElementById('afterImage');
-    
-    beforeImg.style.filter = 'none';
-    beforeImg.style.transform = 'none';
+        const challengeArea = document.getElementById('challengeArea');
+        challengeArea.innerHTML = '';
+        const beforeImg = document.getElementById('beforeImage');
+        const afterImg = document.getElementById('afterImage');
+        beforeImg.style.filter = 'none';
+        beforeImg.style.transform = 'none';
     beforeImg.style.clipPath = 'none';
 
     afterImg.style.filter = level.filter || 'none';
@@ -265,6 +263,8 @@ function initLevel() {
         challengeArea.appendChild(snippet);
         challengeArea.appendChild(btn);
     }
+    } // close tryLoad
+    setTimeout(tryLoad, 300);
 }
 
 function renderProgressBar() {
