@@ -428,16 +428,16 @@ function nextLevel() {
 
 
 // Bootstrap: show character picker, or skip for returning users
-(function bootstrap() {
-    const savedChar = localStorage.getItem(getCharKey());
-    if (savedChar) {
-        // Returning user — restore their character and start immediately
-        const found = CHARACTERS.find(c => c.id === savedChar);
-        activeCharEmoji = found ? found.emoji : '👨‍🚀';
-        astronaut.innerText = activeCharEmoji;
-        initGame();
-    } else {
-        // First visit — show the character selection screen
-        showCharPicker();
-    }
-})();
+document.addEventListener('DOMContentLoaded', () => {
+    (function bootstrap() {
+        const savedChar = localStorage.getItem(getCharKey());
+        if (savedChar) {
+            const found = CHARACTERS.find(c => c.id === savedChar);
+            activeCharEmoji = found ? found.emoji : '👨‍🚀';
+            astronaut.innerText = activeCharEmoji;
+            initGame();
+        } else {
+            showCharPicker();
+        }
+    })();
+});

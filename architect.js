@@ -664,4 +664,6 @@ function triggerGraduation() {
     completeMission('architect', 1000);
 }
 
-init();
+document.addEventListener('DOMContentLoaded', () => {
+    init();
+});

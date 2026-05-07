@@ -226,4 +226,6 @@ function nextLevel() {
     }
 }
 
-initGame();
+document.addEventListener('DOMContentLoaded', () => {
+    initGame();
+});

@@ -672,4 +672,6 @@ function showCompletion() {
     `;
 }
 
-init();
+document.addEventListener('DOMContentLoaded', () => {
+    init();
+});

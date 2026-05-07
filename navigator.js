@@ -246,4 +246,6 @@ function nextLevel() {
     else location.href = 'dashboard.html';
 }
 
-initGame();
+document.addEventListener('DOMContentLoaded', () => {
+    initGame();
+});

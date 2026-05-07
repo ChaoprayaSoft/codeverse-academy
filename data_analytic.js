@@ -301,4 +301,6 @@ function triggerGraduation() {
     `;
 }
 
-init();
+document.addEventListener('DOMContentLoaded', () => {
+    init();
+});

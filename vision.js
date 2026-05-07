@@ -164,11 +164,11 @@ const levels = [
     }
 ];
 
+let progressData = getProgress();
 let currentLevel = (progressData.levels.vision || 1) - 1;
 if (currentLevel >= levels.length) currentLevel = levels.length - 1; // Clamp if mission complete
 
 let score = 0;
-let progressData = getProgress();
 
 function initLevel() {
     const level = levels[currentLevel];
