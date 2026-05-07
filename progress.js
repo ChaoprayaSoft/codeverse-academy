@@ -165,7 +165,7 @@ function saveProgress(progress) {
     // Sync to Google Sheets in background
     const user = getUserProfile();
     if (user && user.email && SHEETS_API_URL) {
-        syncWithSheets('sync_progress', {
+        syncWithSheets('sync', {
             progress,
             name: user.name,
             avatar: user.avatar,
