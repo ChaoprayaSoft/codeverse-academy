@@ -1,25 +1,29 @@
-const consoleEl = document.getElementById('console');
-const codeEditor = document.getElementById('codeEditor');
-const shipImage = document.getElementById('shipImage');
-const winModal = document.getElementById('winModal');
-const levelIndicators = document.getElementById('levelIndicators');
-const missionTitle = document.getElementById('missionTitle');
-const missionDesc = document.getElementById('missionDesc');
+let consoleEl, codeEditor, shipImage, winModal, levelIndicators, missionTitle, missionDesc;
+let lifeSupportBar, lifeSupportText, enginePowerBar, enginePowerText, energyBar, energyText, velocityBar, velocityText, fuelBar, fuelText, shieldBar, shieldText, distanceText;
 
-// Status Elements
-const lifeSupportBar = document.getElementById('lifeSupportBar');
-const lifeSupportText = document.getElementById('lifeSupportText');
-const enginePowerBar = document.getElementById('enginePowerBar');
-const enginePowerText = document.getElementById('enginePowerText');
-const energyBar = document.getElementById('energyBar');
-const energyText = document.getElementById('energyText');
-const velocityBar = document.getElementById('velocityBar');
-const velocityText = document.getElementById('velocityText');
-const fuelBar = document.getElementById('fuelBar');
-const fuelText = document.getElementById('fuelText');
-const shieldBar = document.getElementById('shieldBar');
-const shieldText = document.getElementById('shieldText');
-const distanceText = document.getElementById('distanceText');
+function initElements() {
+    consoleEl = document.getElementById('console');
+    codeEditor = document.getElementById('codeEditor');
+    shipImage = document.getElementById('shipImage');
+    winModal = document.getElementById('winModal');
+    levelIndicators = document.getElementById('levelIndicators');
+    missionTitle = document.getElementById('missionTitle');
+    missionDesc = document.getElementById('missionDesc');
+    
+    lifeSupportBar = document.getElementById('lifeSupportBar');
+    lifeSupportText = document.getElementById('lifeSupportText');
+    enginePowerBar = document.getElementById('enginePowerBar');
+    enginePowerText = document.getElementById('enginePowerText');
+    energyBar = document.getElementById('energyBar');
+    energyText = document.getElementById('energyText');
+    velocityBar = document.getElementById('velocityBar');
+    velocityText = document.getElementById('velocityText');
+    fuelBar = document.getElementById('fuelBar');
+    fuelText = document.getElementById('fuelText');
+    shieldBar = document.getElementById('shieldBar');
+    shieldText = document.getElementById('shieldText');
+    distanceText = document.getElementById('distanceText');
+}
 
 let currentLevelIndex = 0;
 let shipStatus = {
@@ -139,6 +143,7 @@ const ship = {
 };
 
 function initGame() {
+    initElements();
     const progress = getProgress();
     const startLevel = (progress.levels.navigator || 1) - 1;
     loadLevel(startLevel);
