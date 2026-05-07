@@ -12,15 +12,22 @@ async function syncWithSheets(action, extraData = {}) {
     const email = user ? user.email : 'guest';
 
     try {
+        // Use 'no-cors' mode if you experience browser blocking, 
+        // but for a JSON response, the Apps Script must handle it.
         const response = await fetch(SHEETS_API_URL, {
             method: 'POST',
+            mode: 'no-cors', // Helps with cross-domain Google Script issues
+            cache: 'no-cache',
+            headers: {
+                'Content-Type': 'text/plain', // Prevents CORS preflight
+            },
             body: JSON.stringify({
                 action,
                 email,
                 ...extraData
             })
         });
-        return response;
+        return { status: 'success' }; // no-cors doesn't allow reading body, but confirms send
     } catch (error) {
         console.error('Sheets Sync Error:', error);
         return null;
@@ -33,13 +40,14 @@ async function syncNow() {
     if (!user || !user.email || !SHEETS_API_URL) return { status: 'error', message: 'Sync unavailable' };
     
     try {
-        const response = await syncWithSheets('sync_progress', { 
+        const result = await syncWithSheets('sync', { 
             progress,
             name: user.name,
             avatar: user.avatar,
             color: user.color || ""
         });
-        if (response) {
+        
+        if (result && result.status === 'success') {
             return { status: 'success', message: 'Cloud Synced' };
         }
     } catch (e) {
@@ -51,28 +59,17 @@ async function syncNow() {
 // Function to specifically load progress (needs a regular fetch, not no-cors)
 async function loadProgressFromSheets(email) {
     if (!SHEETS_API_URL || !email || email === 'guest') return null;
-
     try {
         const response = await fetch(SHEETS_API_URL, {
             method: 'POST',
-            body: JSON.stringify({
-                action: 'load_progress',
-                email: email
-            })
+            body: JSON.stringify({ action: 'load', email })
         });
         const result = await response.json();
-        if (result.status === 'success') {
-            return {
-                progress: result.progress,
-                name: result.name,
-                avatar: result.avatar,
-                color: result.color
-            };
-        }
-    } catch (error) {
-        console.warn('Could not load progress from sheets:', error);
+        return result.status === 'success' ? result : null;
+    } catch (e) {
+        console.error('Progress Load Error:', e);
+        return null;
     }
-    return null;
 }
 
 // --- User Profile Logic ---
