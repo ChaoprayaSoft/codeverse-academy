@@ -14,6 +14,7 @@ async function syncWithSheets(action, extraData = {}) {
     try {
         const response = await fetch(SHEETS_API_URL, {
             method: 'POST',
+            mode: 'no-cors', // Force simple request to bypass CORS blocks
             keepalive: true,
             headers: {
                 'Content-Type': 'text/plain'
@@ -207,23 +208,12 @@ async function loginUser(name, email, avatar) {
 async function logoutUser() {
     const user = getUserProfile();
     if (user && user.email) {
-        const payload = JSON.stringify({
-            action: 'logout',
-            email: user.email,
-            name: user.name,
-            status: 'Logout'
+        // Use the same robust sync for logout
+        await syncWithSheets('logout', { 
+            email: user.email, 
+            name: user.name, 
+            status: 'Logout' 
         });
-        
-        // Use sendBeacon for logout - it's much more reliable during page exit
-        if (navigator.sendBeacon) {
-            navigator.sendBeacon(SHEETS_API_URL, payload);
-        } else {
-            await syncWithSheets('logout', { 
-                email: user.email, 
-                name: user.name, 
-                status: 'Logout' 
-            });
-        }
     }
     localStorage.removeItem(USER_KEY);
     window.dispatchEvent(new Event('userStateChanged'));
