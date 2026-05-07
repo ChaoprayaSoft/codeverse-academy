@@ -38,15 +38,15 @@ async function syncNow() {
     const user = getUserProfile();
     const progress = getProgress();
     if (!user || !user.email || !SHEETS_API_URL) return { status: 'error', message: 'Sync unavailable' };
-    
+
     try {
-        const result = await syncWithSheets('sync', { 
+        const result = await syncWithSheets('sync', {
             progress,
             name: user.name,
             avatar: user.avatar,
             color: user.color || ""
         });
-        
+
         if (result && result.status === 'success') {
             return { status: 'success', message: 'Cloud Synced' };
         }
@@ -122,17 +122,17 @@ function getProgress() {
     try {
         const data = localStorage.getItem(getProgressKey());
         if (!data) return JSON.parse(JSON.stringify(defaultProgress));
-        
+
         const parsed = JSON.parse(data);
-        
+
         // --- DEEP MERGE FAILSAFE ---
         // This ensures that even if the user has old data, 
         // the new 'levels' object and all course fields will always exist.
         const safeProgress = JSON.parse(JSON.stringify(defaultProgress));
-        
+
         if (parsed.xp !== undefined) safeProgress.xp = parsed.xp;
         if (parsed.badges) safeProgress.badges = parsed.badges;
-        
+
         // Merge Missions
         if (parsed.missions) {
             for (const key in safeProgress.missions) {
@@ -141,7 +141,7 @@ function getProgress() {
                 }
             }
         }
-        
+
         // Merge Levels (Crucial for fixing the 'broken UI' bug)
         if (parsed.levels) {
             for (const key in safeProgress.levels) {
@@ -150,7 +150,7 @@ function getProgress() {
                 }
             }
         }
-        
+
         return safeProgress;
     } catch (e) {
         console.error("Progress Corruption Detected. Resetting to defaults.", e);
@@ -165,7 +165,7 @@ function saveProgress(progress) {
     // Sync to Google Sheets in background
     const user = getUserProfile();
     if (user && user.email && SHEETS_API_URL) {
-        syncWithSheets('sync_progress', { 
+        syncWithSheets('sync_progress', {
             progress,
             name: user.name,
             avatar: user.avatar,
