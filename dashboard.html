@@ -112,7 +112,7 @@
         </section>
 
         <footer style="margin-top: 5rem; text-align: center; border-top: 3px dashed var(--border); padding-top: 2rem;">
-            <a href="index.html" style="color: var(--muted); text-decoration: none; font-size: 1.1rem; font-weight: 800;">&larr; Return to Spaceport</a>
+            <button onclick="handleLogout()" style="background: none; border: none; color: var(--muted); text-decoration: none; font-size: 1.1rem; font-weight: 800; cursor: pointer;">&larr; LOGOUT & RETURN TO SPACEPORT</button>
         </footer>
     </div>
 
@@ -330,6 +330,11 @@
             updateDashboard();
             handleManualSync(); // Auto-sync on load
         });
+        async function handleLogout() {
+            await logoutUser();
+            location.href = 'index.html';
+        }
+
         window.addEventListener('userStateChanged', updateDashboard);
     </script>
 </body>

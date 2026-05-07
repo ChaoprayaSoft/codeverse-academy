@@ -12,22 +12,15 @@ async function syncWithSheets(action, extraData = {}) {
     const email = user ? user.email : 'guest';
 
     try {
-        // Use 'no-cors' mode if you experience browser blocking, 
-        // but for a JSON response, the Apps Script must handle it.
         const response = await fetch(SHEETS_API_URL, {
             method: 'POST',
-            mode: 'no-cors', // Helps with cross-domain Google Script issues
-            cache: 'no-cache',
-            headers: {
-                'Content-Type': 'text/plain', // Prevents CORS preflight
-            },
             body: JSON.stringify({
                 action,
                 email,
                 ...extraData
             })
         });
-        return { status: 'success' }; // no-cors doesn't allow reading body, but confirms send
+        return { status: 'success' }; 
     } catch (error) {
         console.error('Sheets Sync Error:', error);
         return null;
@@ -180,32 +173,43 @@ async function loginUser(name, email, avatar) {
     const profile = { name, email, avatar };
     localStorage.setItem(USER_KEY, JSON.stringify(profile));
 
-    // 1. Try to load progress and profile from Sheets
+    // 1. Load progress from Sheets
     const remoteData = await loadProgressFromSheets(email);
     if (remoteData) {
-        // Restore Name, Avatar, Color
         if (remoteData.name) profile.name = remoteData.name;
         if (remoteData.avatar) profile.avatar = remoteData.avatar;
         if (remoteData.color) profile.color = remoteData.color;
         localStorage.setItem(USER_KEY, JSON.stringify(profile));
 
-        // Restore Progress
         const localProgress = getProgress();
         if (remoteData.progress && remoteData.progress.xp >= localProgress.xp) {
-            console.log('Restoring progress from Google Sheets...');
             localStorage.setItem(`codeverse_progress_${email.replace(/[^a-zA-Z0-9]/g, '')}`, JSON.stringify(remoteData.progress));
         }
     }
 
-    // 2. IMMEDIATE SYNC: Record this user in the sheet right now
-    await syncNow();
+    // 2. Record LOGIN in Logs and ensure User exists with initial JSON
+    await syncWithSheets('login', { 
+        name, 
+        avatar, 
+        status: 'Login',
+        progress: getProgress() // Send current progress to initialize if new
+    });
 
     window.dispatchEvent(new Event('userStateChanged'));
     window.dispatchEvent(new Event('progressUpdated'));
     return profile;
 }
 
-function logoutUser() {
+async function logoutUser() {
+    const user = getUserProfile();
+    if (user && user.email) {
+        // Log the LOGOUT event before clearing local storage
+        await syncWithSheets('logout', { 
+            email: user.email, 
+            name: user.name, 
+            status: 'Logout' 
+        });
+    }
     localStorage.removeItem(USER_KEY);
     window.dispatchEvent(new Event('userStateChanged'));
 }
