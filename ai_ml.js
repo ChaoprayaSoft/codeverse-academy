@@ -316,21 +316,18 @@ function renderLevelIndicators() {
         dot.style.transition = 'all 0.3s';
         dot.style.border = '1px solid rgba(255,255,255,0.1)';
         
-        const isActive = i === currentModuleIndex;
-        const isUnlocked = i <= maxUnlocked;
-        
+        dot.style.cursor = 'pointer';
+        dot.onclick = () => loadModule(i);
+
         if (isActive) {
             dot.style.background = '#8b5cf6';
             dot.style.width = '30px';
             dot.style.boxShadow = '0 0 10px #8b5cf6';
-        } else if (isUnlocked) {
+        } else if (i < (progress.levels.ai_ml || 1)) {
             dot.style.background = '#d8b4fe';
-            dot.style.cursor = 'pointer';
-            dot.onclick = () => loadModule(i);
         } else {
             dot.style.background = '#334155';
-            dot.style.cursor = 'not-allowed';
-            dot.style.opacity = '0.5';
+            dot.style.opacity = '0.8';
         }
         
         dotsContainer.appendChild(dot);

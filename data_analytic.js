@@ -209,17 +209,16 @@ function renderLevelIndicators() {
     
     modules.forEach((_, i) => {
         const dot = document.createElement('div');
-        dot.style.width = '14px';
-        dot.style.height = '14px';
-        dot.style.borderRadius = '50%';
-        dot.style.background = i === currentModuleIndex ? '#FF9F1C' : (i <= maxUnlocked ? '#F6E05E' : '#E2E8F0');
+        dot.style.cursor = 'pointer';
+        dot.onclick = () => loadModule(i);
         
-        if (i <= maxUnlocked) {
-            dot.style.cursor = 'pointer';
-            dot.onclick = () => loadModule(i);
+        if (i === currentModuleIndex) {
+            dot.style.background = '#FF9F1C';
+        } else if (i < (progress.levels.data_analytic || 1)) {
+            dot.style.background = '#F6E05E';
         } else {
-            dot.style.cursor = 'not-allowed';
-            dot.style.opacity = '0.5';
+            dot.style.background = '#E2E8F0';
+            dot.style.opacity = '0.8';
         }
         dotsContainer.appendChild(dot);
     });

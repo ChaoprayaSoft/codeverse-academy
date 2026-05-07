@@ -432,18 +432,13 @@ function updateSystemMap() {
         `;
         node.textContent = isCurrent ? 'NOW' : `M${(i + 1).toString().padStart(2, '0')}`;
 
-        if (i <= maxUnlocked) {
-            node.style.cursor = 'pointer';
-            node.onclick = () => {
-                currentModuleIndex = i;
-                loadModule(i);
-                switchTab('editor');
-                updateSystemMap();
-            };
-        } else {
-            node.style.cursor = 'not-allowed';
-            node.style.opacity = '0.5';
-        }
+        node.style.cursor = 'pointer';
+        node.onclick = () => {
+            currentModuleIndex = i;
+            loadModule(i);
+            switchTab('editor');
+            updateSystemMap();
+        };
 
         map.appendChild(node);
 
@@ -503,26 +498,28 @@ function renderLevelIndicators() {
     const dotsContainer = document.getElementById('levelDots');
     if (!dotsContainer) return;
     dotsContainer.innerHTML = '';
-    const maxUnlocked = parseInt(localStorage.getItem(getLevelKey('architect')) || '0');
-    
+    const progress = getProgress();
+
     modules.forEach((_, i) => {
         const dot = document.createElement('div');
         dot.style.width = '14px';
         dot.style.height = '14px';
         dot.style.borderRadius = '50%';
-        dot.style.background = i === currentModuleIndex ? 'var(--arch-primary)' : (i <= maxUnlocked ? 'rgba(6, 182, 212, 0.4)' : '#1e293b');
-        
-        if (i <= maxUnlocked) {
-            dot.style.cursor = 'pointer';
-            dot.onclick = () => {
-                currentModuleIndex = i;
-                loadModule(i);
-                switchTab('editor');
-                updateSystemMap();
-            };
+        dot.style.cursor = 'pointer';
+        dot.onclick = () => {
+            currentModuleIndex = i;
+            loadModule(i);
+            switchTab('editor');
+            updateSystemMap();
+        };
+
+        if (i === currentModuleIndex) {
+            dot.style.background = 'var(--arch-primary)';
+        } else if (i < (progress.levels.architect || 1)) {
+            dot.style.background = 'rgba(6, 182, 212, 0.6)';
         } else {
-            dot.style.cursor = 'not-allowed';
-            dot.style.opacity = '0.5';
+            dot.style.background = '#1e293b';
+            dot.style.opacity = '0.8';
         }
         dotsContainer.appendChild(dot);
     });

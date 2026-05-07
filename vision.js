@@ -266,26 +266,15 @@ function renderProgressBar() {
     const container = document.getElementById('progressBar');
     container.innerHTML = '';
     
-    const highest = progressData.levels.vision || 1;
-
     levels.forEach((lvl, idx) => {
         const dot = document.createElement('div');
-        dot.className = 'level-dot';
-        dot.setAttribute('data-level', lvl.id);
+        dot.className = 'progress-dot';
+        if (idx === currentLevel) dot.classList.add('active');
+        if (idx + 1 < (progressData.levels.vision || 1)) dot.classList.add('completed');
         
-        if (idx === currentLevel) {
-            dot.classList.add('active');
-        } else if (lvl.id < highest) {
-            dot.classList.add('completed');
-        } else if (lvl.id > highest) {
-            dot.classList.add('locked');
-        }
-
         dot.onclick = () => {
-            if (lvl.id <= highest) {
-                currentLevel = idx;
-                initLevel();
-            }
+            currentLevel = idx;
+            initLevel();
         };
         
         container.appendChild(dot);

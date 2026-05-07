@@ -122,8 +122,43 @@ const defaultProgress = {
 
 // --- Progress Logic ---
 function getProgress() {
-    const data = localStorage.getItem(getProgressKey());
-    return data ? JSON.parse(data) : defaultProgress;
+    try {
+        const data = localStorage.getItem(getProgressKey());
+        if (!data) return JSON.parse(JSON.stringify(defaultProgress));
+        
+        const parsed = JSON.parse(data);
+        
+        // --- DEEP MERGE FAILSAFE ---
+        // This ensures that even if the user has old data, 
+        // the new 'levels' object and all course fields will always exist.
+        const safeProgress = JSON.parse(JSON.stringify(defaultProgress));
+        
+        if (parsed.xp !== undefined) safeProgress.xp = parsed.xp;
+        if (parsed.badges) safeProgress.badges = parsed.badges;
+        
+        // Merge Missions
+        if (parsed.missions) {
+            for (const key in safeProgress.missions) {
+                if (parsed.missions[key] !== undefined) {
+                    safeProgress.missions[key] = parsed.missions[key];
+                }
+            }
+        }
+        
+        // Merge Levels (Crucial for fixing the 'broken UI' bug)
+        if (parsed.levels) {
+            for (const key in safeProgress.levels) {
+                if (parsed.levels[key] !== undefined) {
+                    safeProgress.levels[key] = parsed.levels[key];
+                }
+            }
+        }
+        
+        return safeProgress;
+    } catch (e) {
+        console.error("Progress Corruption Detected. Resetting to defaults.", e);
+        return JSON.parse(JSON.stringify(defaultProgress));
+    }
 }
 
 function saveProgress(progress) {
