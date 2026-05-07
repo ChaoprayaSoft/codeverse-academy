@@ -254,13 +254,6 @@ function init() {
 function loadModule(index) {
     currentModuleIndex = index;
     
-    // Save progress: only update if we reached a NEW level
-    const progress = getProgress();
-    if (index + 1 > progress.levels.ai_ml) {
-        progress.levels.ai_ml = index + 1;
-        saveProgress(progress);
-    }
-    
     const m = modules[index];
     document.getElementById('currentModuleName').textContent = `Module: ${m.name}`;
     document.getElementById('moduleStepIndicator').textContent = `${(index + 1).toString().padStart(2, '0')} / ${modules.length}`;
@@ -457,6 +450,11 @@ function checkDragComplete(m) {
 }
 
 function handleSuccess(msg) {
+    const progress = getProgress();
+    if (currentModuleIndex + 2 > progress.levels.ai_ml) {
+        progress.levels.ai_ml = currentModuleIndex + 2;
+        saveProgress(progress);
+    }
     outputDisplay.innerHTML = `<div style="color:#10b981;">> SUCCESS: ${msg}</div>`;
     feedbackEl.textContent = msg;
     document.getElementById('nextModuleBtn').style.display = 'block';

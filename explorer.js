@@ -196,12 +196,6 @@ function renderLevelIndicators() {
 function loadLevel(index) {
     currentLevelIndex = index;
     
-    // Save progress: only update if we reached a NEW level
-    const progress = getProgress();
-    if (index + 1 > progress.levels.explorer) {
-        progress.levels.explorer = index + 1;
-        saveProgress(progress);
-    }
     const level = LEVELS[index];
     missionTitle.innerHTML = `Mission ${index + 1}: <span style="color: var(--accent);">${level.title}</span>`;
     missionDesc.innerText = level.desc;
@@ -416,6 +410,11 @@ function move(direction, walls) {
 }
 
 function showWin() {
+    const progress = getProgress();
+    if (currentLevelIndex + 2 > progress.levels.explorer) {
+        progress.levels.explorer = currentLevelIndex + 2;
+        saveProgress(progress);
+    }
     if (currentLevelIndex === LEVELS.length - 1) completeMission('explorer', 250);
     winModal.classList.add('active');
 }

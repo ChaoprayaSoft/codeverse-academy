@@ -170,13 +170,6 @@ function init() {
 function loadModule(index) {
     currentModuleIndex = index;
     
-    // Save progress: only update if we reached a NEW level
-    const progress = getProgress();
-    if (index + 1 > progress.levels.data_analytic) {
-        progress.levels.data_analytic = index + 1;
-        saveProgress(progress);
-    }
-    
     const m = modules[index];
     document.getElementById('currentModuleName').textContent = `Module: ${m.name}`;
     document.getElementById('moduleStepIndicator').textContent = `${(index + 1).toString().padStart(2, '0')} / ${modules.length}`;
@@ -266,6 +259,11 @@ function executeCode() {
     
     setTimeout(() => {
         if (results.all) {
+            const progress = getProgress();
+            if (currentModuleIndex + 2 > progress.levels.data_analytic) {
+                progress.levels.data_analytic = currentModuleIndex + 2;
+                saveProgress(progress);
+            }
             outputDisplay.innerHTML += '<div style="color: #48BB78;">> Analysis Complete. Results valid.</div>';
             renderChart(m.chartData);
             document.getElementById('nextModuleBtn').style.display = 'inline-block';

@@ -464,12 +464,6 @@ function updateSystemMap() {
 function loadModule(index) {
     currentModuleIndex = index;
     
-    // Save progress: only update if we reached a NEW level
-    const progress = getProgress();
-    if (index + 1 > progress.levels.architect) {
-        progress.levels.architect = index + 1;
-        saveProgress(progress);
-    }
     const m = modules[index];
     document.getElementById('currentModuleName').textContent = `Module: ${m.name}`;
     document.getElementById('moduleStepIndicator').textContent = `${(index + 1).toString().padStart(2, '0')} / ${modules.length}`;
@@ -561,6 +555,11 @@ function executeCode() {
 
     setTimeout(() => {
         if (results.all) {
+            const progress = getProgress();
+            if (currentModuleIndex + 2 > progress.levels.architect) {
+                progress.levels.architect = currentModuleIndex + 2;
+                saveProgress(progress);
+            }
             addTerminalLine("Python Core: Execution Successful", "success");
             addTerminalLine("Variables mapped correctly.", "success");
             addTerminalLine("Memory allocation: 1.2MB", "success");

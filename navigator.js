@@ -170,12 +170,6 @@ function renderLevelIndicators() {
 function loadLevel(index) {
     currentLevelIndex = index;
     
-    // Save progress: only update if we reached a NEW level
-    const progress = getProgress();
-    if (index + 1 > progress.levels.navigator) {
-        progress.levels.navigator = index + 1;
-        saveProgress(progress);
-    }
     const level = LEVELS[index];
     missionTitle.innerHTML = `Mission: <span style="color: #10b981;">${level.title}</span>`;
     missionDesc.innerText = level.desc;
@@ -238,6 +232,11 @@ function executeCode() {
 }
 
 function showWin() {
+    const progress = getProgress();
+    if (currentLevelIndex + 2 > progress.levels.navigator) {
+        progress.levels.navigator = currentLevelIndex + 2;
+        saveProgress(progress);
+    }
     if (currentLevelIndex === LEVELS.length - 1) completeMission('navigator', 500);
     winModal.style.display = 'flex';
 }
