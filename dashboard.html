@@ -331,11 +331,8 @@
             handleManualSync(); // Auto-sync on load
         });
         async function handleLogout() {
-            await logoutUser();
-            // Give a tiny moment for the beacon to clear
-            setTimeout(() => {
-                location.href = 'index.html';
-            }, 500);
+            // We redirect to index.html with a logout flag so it can log the exit safely
+            location.href = 'index.html?logout=true';
         }
 
         window.addEventListener('userStateChanged', updateDashboard);
