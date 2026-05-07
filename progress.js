@@ -21,7 +21,7 @@ async function syncWithSheets(action, extraData = {}) {
                 ...extraData
             })
         });
-        return { status: 'success' }; 
+        return { status: 'success' };
     } catch (error) {
         console.error('Sheets Sync Error:', error);
         return null;
@@ -189,9 +189,9 @@ async function loginUser(name, email, avatar) {
     }
 
     // 2. Record LOGIN in Logs and ensure User exists with initial JSON
-    await syncWithSheets('login', { 
-        name, 
-        avatar, 
+    await syncWithSheets('login', {
+        name,
+        avatar,
         status: 'Login',
         progress: getProgress() // Send current progress to initialize if new
     });
@@ -205,10 +205,10 @@ async function logoutUser() {
     const user = getUserProfile();
     if (user && user.email) {
         // Log the LOGOUT event before clearing local storage
-        await syncWithSheets('logout', { 
-            email: user.email, 
-            name: user.name, 
-            status: 'Logout' 
+        await syncWithSheets('logout', {
+            email: user.email,
+            name: user.name,
+            status: 'Logout'
         });
     }
     localStorage.removeItem(USER_KEY);
