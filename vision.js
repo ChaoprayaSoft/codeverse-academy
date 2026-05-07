@@ -164,14 +164,19 @@ const levels = [
     }
 ];
 
-let progressData = getProgress();
-let currentLevel = (progressData.levels.vision || 1) - 1;
-if (currentLevel >= levels.length) currentLevel = levels.length - 1; // Clamp if mission complete
-
+let progressData, currentLevel;
 let score = 0;
 
 function initLevel() {
-    const level = levels[currentLevel];
+    setTimeout(() => {
+        progressData = getProgress();
+        currentLevel = (progressData.levels.vision || 1) - 1;
+        
+        // Clamp to available levels
+        if (currentLevel < 0) currentLevel = 0;
+        if (currentLevel >= levels.length) currentLevel = levels.length - 1;
+
+        const level = levels[currentLevel];
     document.getElementById('levelTitle').innerText = level.title;
     document.getElementById('levelNum').innerText = `Level ${level.id} / 15`;
     document.getElementById('question').innerText = level.question;

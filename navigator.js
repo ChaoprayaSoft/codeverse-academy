@@ -144,9 +144,23 @@ const ship = {
 
 function initGame() {
     initElements();
-    const progress = getProgress();
-    const startLevel = (progress.levels.navigator || 1) - 1;
-    loadLevel(startLevel);
+    
+    // Give the cloud a moment to sync if the user just logged in
+    setTimeout(() => {
+        let progress;
+        try {
+            progress = getProgress();
+            // Deep-safety check for navigator levels
+            if (!progress.levels) progress.levels = {};
+            if (progress.levels.navigator === undefined) progress.levels.navigator = 1;
+        } catch (e) {
+            console.error("Navigator Data Error, defaulting...", e);
+            progress = { levels: { navigator: 1 } };
+        }
+
+        const startLevel = (progress.levels.navigator || 1) - 1;
+        loadLevel(startLevel);
+    }, 100);
 }
 
 function renderLevelIndicators() {
@@ -168,8 +182,11 @@ function renderLevelIndicators() {
 }
 
 function loadLevel(index) {
-    currentLevelIndex = index;
+    // Clamp index to available levels
+    if (index < 0) index = 0;
+    if (index >= LEVELS.length) index = LEVELS.length - 1;
     
+    currentLevelIndex = index;
     const level = LEVELS[index];
     missionTitle.innerHTML = `Mission: <span style="color: #10b981;">${level.title}</span>`;
     missionDesc.innerText = level.desc;

@@ -176,9 +176,11 @@ function renderCharGrid() {} // kept for compatibility
 function confirmCharacter() {} // kept for compatibility
 
 function initGame() {
-    const progress = getProgress();
-    const startLevel = (progress.levels.explorer || 1) - 1;
-    loadLevel(startLevel);
+    setTimeout(() => {
+        const progress = getProgress();
+        const startLevel = (progress.levels.explorer || 1) - 1;
+        loadLevel(startLevel);
+    }, 100);
 }
 
 function renderLevelIndicators() {
@@ -194,6 +196,8 @@ function renderLevelIndicators() {
 }
 
 function loadLevel(index) {
+    if (index < 0) index = 0;
+    if (index >= LEVELS.length) index = LEVELS.length - 1;
     currentLevelIndex = index;
     
     const level = LEVELS[index];

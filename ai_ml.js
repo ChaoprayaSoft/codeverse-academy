@@ -245,13 +245,17 @@ const feedbackEl = document.getElementById('visualFeedback');
 const interactiveZone = document.getElementById('interactiveZone');
 
 function init() {
-    const progress = getProgress();
-    const startLevel = (progress.levels.ai_ml || 1) - 1;
-    loadModule(startLevel);
-    editor.addEventListener('input', validateCode);
+    setTimeout(() => {
+        const progress = getProgress();
+        const startLevel = (progress.levels.ai_ml || 1) - 1;
+        loadModule(startLevel);
+        editor.addEventListener('input', validateCode);
+    }, 100);
 }
 
 function loadModule(index) {
+    if (index < 0) index = 0;
+    if (index >= modules.length) index = modules.length - 1;
     currentModuleIndex = index;
     
     const m = modules[index];
