@@ -14,7 +14,10 @@ async function syncWithSheets(action, extraData = {}) {
     try {
         const response = await fetch(SHEETS_API_URL, {
             method: 'POST',
-            keepalive: true, // Crucial for logout logs during page redirect
+            keepalive: true,
+            headers: {
+                'Content-Type': 'text/plain'
+            },
             body: JSON.stringify({
                 action,
                 email,
@@ -204,12 +207,23 @@ async function loginUser(name, email, avatar) {
 async function logoutUser() {
     const user = getUserProfile();
     if (user && user.email) {
-        // Log the LOGOUT event before clearing local storage
-        await syncWithSheets('logout', {
+        const payload = JSON.stringify({
+            action: 'logout',
             email: user.email,
             name: user.name,
             status: 'Logout'
         });
+        
+        // Use sendBeacon for logout - it's much more reliable during page exit
+        if (navigator.sendBeacon) {
+            navigator.sendBeacon(SHEETS_API_URL, payload);
+        } else {
+            await syncWithSheets('logout', { 
+                email: user.email, 
+                name: user.name, 
+                status: 'Logout' 
+            });
+        }
     }
     localStorage.removeItem(USER_KEY);
     window.dispatchEvent(new Event('userStateChanged'));
