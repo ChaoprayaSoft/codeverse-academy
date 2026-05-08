@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | CodeVerse Academy</title>
+    <meta name="description" content="Admin-only dashboard for managing CodeVerse Academy users, roles, and course progress.">
+    <link rel="stylesheet" href="admin.css">
+    <link rel="icon" href="assets/mascot.png">
+</head>
+<body>
+
+    <!-- Access Denied (shown if not admin) -->
+    <div class="access-denied" id="accessDenied">
+        <div class="icon">🔒</div>
+        <h2>Access Restricted</h2>
+        <p>This page is only accessible to Academy Admins. Your role does not have permission to view this area.</p>
+        <a href="index.html">← Return to Spaceport</a>
+    </div>
+
+    <!-- Main page (hidden until admin verified) -->
+    <div class="page-wrapper" id="adminPage" style="display:none;">
+
+        <!-- Top Bar -->
+        <div class="topbar">
+            <div class="topbar-logo">CODE<span>VERSE</span></div>
+            <div class="topbar-right">
+                <span class="admin-badge">🛡️ ADMIN PANEL</span>
+                <div class="topbar-user">
+                    <img id="adminAvatar" src="" alt="Admin Avatar">
+                    <span id="adminName">Admin</span>
+                </div>
+                <a href="dashboard.html" class="btn-back">← My Dashboard</a>
+            </div>
+        </div>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>Academy <span>Command Center</span></h1>
+            <p>Full visibility into every cadet's progress across all missions.</p>
+        </div>
+
+        <!-- Stat Cards -->
+        <div class="stats-grid">
+            <div class="stat-card" style="--stat-color: #f1f5f9;">
+                <div class="stat-icon">👥</div>
+                <div class="stat-value" id="statTotal">—</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+            <div class="stat-card" style="--stat-color: #f59e0b;">
+                <div class="stat-icon">🛡️</div>
+                <div class="stat-value" id="statAdmins">—</div>
+                <div class="stat-label">Admins</div>
+            </div>
+            <div class="stat-card" style="--stat-color: #6366f1;">
+                <div class="stat-icon">👩‍🏫</div>
+                <div class="stat-value" id="statTeachers">—</div>
+                <div class="stat-label">Teachers</div>
+            </div>
+            <div class="stat-card" style="--stat-color: #10b981;">
+                <div class="stat-icon">🧑‍🚀</div>
+                <div class="stat-value" id="statStudents">—</div>
+                <div class="stat-label">Students</div>
+            </div>
+            <div class="stat-card" style="--stat-color: #f59e0b;">
+                <div class="stat-icon">⚡</div>
+                <div class="stat-value" id="statXp">—</div>
+                <div class="stat-label">Total XP Earned</div>
+            </div>
+            <div class="stat-card" style="--stat-color: #06b6d4;">
+                <div class="stat-icon">🏅</div>
+                <div class="stat-value" id="statBadges">—</div>
+                <div class="stat-label">Badges Awarded</div>
+            </div>
+            <div class="stat-card" style="--stat-color: #8b5cf6;">
+                <div class="stat-icon">✅</div>
+                <div class="stat-value" id="statMissions">—</div>
+                <div class="stat-label">Missions Completed</div>
+            </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <div style="display:flex; align-items:center; gap:1rem; flex-wrap:wrap;">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="searchInput" placeholder="Search by name or email…" oninput="renderTable()">
+                </div>
+                <div class="filter-group">
+                    <button class="filter-btn active" data-role="All"     onclick="setFilter('All')">All</button>
+                    <button class="filter-btn"         data-role="Admin"   onclick="setFilter('Admin')">🛡️ Admin</button>
+                    <button class="filter-btn"         data-role="Teacher" onclick="setFilter('Teacher')">👩‍🏫 Teacher</button>
+                    <button class="filter-btn"         data-role="Student" onclick="setFilter('Student')">🧑‍🚀 Student</button>
+                </div>
+            </div>
+            <span class="total-count" id="countLabel">Loading…</span>
+        </div>
+
+        <!-- User Table -->
+        <div class="table-wrap">
+            <table class="user-table" id="userTable">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Role</th>
+                        <th>XP</th>
+                        <th>Badges</th>
+                        <th>Course Progress</th>
+                        <th>Last Active</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr class="state-row">
+                        <td colspan="6">
+                            <span class="spinner"></span> Loading cadets from the stars…
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div><!-- /page-wrapper -->
+
+    <script src="progress.js"></script>
+    <script>
+        // ── Constants ─────────────────────────────────────────────
+        const COURSES = [
+            { key: 'explorer',     label: '🚀 Explorer',  },
+            { key: 'navigator',    label: '🛰️ Navigator'  },
+            { key: 'commander',    label: '🛸 Commander'  },
+            { key: 'architect',    label: '🌌 Architect'  },
+            { key: 'data_analytic',label: '📊 Data'       },
+            { key: 'ai_ml',        label: '🧠 AI/ML'      },
+            { key: 'vision',       label: '🖥️ Vision'     },
+        ];
+
+        let allUsers   = [];
+        let filterRole = 'All';
+
+        // ── Boot ───────────────────────────────────────────────────
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = getUserProfile();
+
+            // Wait a tick for refreshRoleFromSheets if role not yet in cache
+            if (user && !user.role) {
+                await new Promise(r => setTimeout(r, 2500));
+            }
+
+            const fresh = getUserProfile();
+            const role  = fresh ? (fresh.role || '') : '';
+
+            if (!fresh || role !== 'Admin') {
+                document.getElementById('accessDenied').style.display = 'flex';
+                return;
+            }
+
+            // Show page & populate top bar
+            document.getElementById('adminPage').style.display = 'block';
+            document.getElementById('adminName').textContent   = fresh.name || 'Admin';
+            document.getElementById('adminAvatar').src         = fresh.avatar || '';
+
+            await loadUsers(fresh.email);
+        });
+
+        // ── Fetch all users from Sheets ────────────────────────────
+        async function loadUsers(adminEmail) {
+            try {
+                const res = await fetch(SHEETS_API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'getUsers', email: adminEmail })
+                });
+                const data = await res.json();
+
+                if (data.status === 'success' && Array.isArray(data.users)) {
+                    allUsers = data.users;
+                    updateStats();
+                    renderTable();
+                } else {
+                    showError('Could not load users. Check Apps Script permissions.');
+                }
+            } catch (e) {
+                showError('Network error: ' + e.message);
+            }
+        }
+
+        // ── Stats ──────────────────────────────────────────────────
+        function updateStats() {
+            const admins   = allUsers.filter(u => u.role === 'Admin').length;
+            const teachers = allUsers.filter(u => u.role === 'Teacher').length;
+            const students = allUsers.filter(u => !u.role || u.role === 'Student').length;
+
+            let totalXp = 0, totalBadges = 0, totalMissions = 0;
+            allUsers.forEach(u => {
+                const p = u.progress || {};
+                totalXp      += (p.xp || 0);
+                totalBadges  += (p.badges  || []).length;
+                totalMissions+= Object.values(p.missions || {}).filter(Boolean).length;
+            });
+
+            setText('statTotal',    allUsers.length);
+            setText('statAdmins',   admins);
+            setText('statTeachers', teachers);
+            setText('statStudents', students);
+            setText('statXp',       totalXp.toLocaleString());
+            setText('statBadges',   totalBadges);
+            setText('statMissions', totalMissions);
+        }
+
+        // ── Filter ─────────────────────────────────────────────────
+        function setFilter(role) {
+            filterRole = role;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.role === role);
+            });
+            renderTable();
+        }
+
+        // ── Render table ───────────────────────────────────────────
+        function renderTable() {
+            const query   = (document.getElementById('searchInput').value || '').toLowerCase();
+            const tbody   = document.getElementById('tableBody');
+
+            let filtered = allUsers.filter(u => {
+                const matchRole   = filterRole === 'All' || (u.role || 'Student') === filterRole;
+                const matchSearch = !query
+                    || (u.name  || '').toLowerCase().includes(query)
+                    || (u.email || '').toLowerCase().includes(query);
+                return matchRole && matchSearch;
+            });
+
+            document.getElementById('countLabel').textContent =
+                `Showing ${filtered.length} of ${allUsers.length} users`;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr class="state-row"><td colspan="6">No users match your search.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(u => buildRow(u)).join('');
+        }
+
+        // ── Build one row ──────────────────────────────────────────
+        function buildRow(u) {
+            const p       = u.progress || {};
+            const role    = u.role || 'Student';
+            const badges  = p.badges  || [];
+            const missions= p.missions || {};
+            const xp      = p.xp || 0;
+
+            const avatarSrc = u.avatar && u.avatar.startsWith('http')
+                ? u.avatar
+                : `https://ui-avatars.com/api/?name=${encodeURIComponent(u.name||'?')}&background=6366f1&color=fff&size=80`;
+
+            // Badges cell
+            const badgeHtml = badges.length
+                ? badges.slice(0, 4).map(b => `<span class="mini-badge">${b}</span>`).join('')
+                  + (badges.length > 4 ? `<span class="mini-badge">+${badges.length - 4}</span>` : '')
+                : `<span style="color:var(--muted);font-size:.75rem;">None yet</span>`;
+
+            // Course chips
+            const courseHtml = COURSES.map(c => {
+                const done = missions[c.key] === true;
+                return `<span class="course-chip ${done ? 'course-done' : 'course-todo'}">${c.label}</span>`;
+            }).join('');
+
+            // Last updated
+            const lastActive = u.lastUpdated
+                ? new Date(u.lastUpdated).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' })
+                : '—';
+
+            return `
+            <tr>
+                <td>
+                    <div class="user-cell">
+                        <img class="user-avatar" src="${avatarSrc}" alt="${u.name || '?'}"
+                             onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(u.name||'?')}&background=6366f1&color=fff&size=80'">
+                        <div>
+                            <div class="user-name">${u.name || '(unnamed)'}</div>
+                            <div class="user-email">${u.email}</div>
+                        </div>
+                    </div>
+                </td>
+                <td><span class="role-pill role-${role}">${roleIcon(role)} ${role}</span></td>
+                <td><span class="xp-value">⚡ ${xp.toLocaleString()}</span></td>
+                <td><div class="badges-cell">${badgeHtml}</div></td>
+                <td><div class="courses-cell">${courseHtml}</div></td>
+                <td style="color:var(--muted);font-size:.8rem;white-space:nowrap;">${lastActive}</td>
+            </tr>`;
+        }
+
+        // ── Helpers ────────────────────────────────────────────────
+        function roleIcon(role) {
+            return role === 'Admin' ? '🛡️' : role === 'Teacher' ? '👩‍🏫' : '🧑‍🚀';
+        }
+
+        function setText(id, val) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = val;
+        }
+
+        function showError(msg) {
+            document.getElementById('tableBody').innerHTML =
+                `<tr class="state-row"><td colspan="6">⚠️ ${msg}</td></tr>`;
+        }
+    </script>
+</body>
+</html>

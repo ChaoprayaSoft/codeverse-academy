@@ -19,6 +19,8 @@
                         <button id="syncBtn" onclick="handleManualSync()" style="background: #e2e8f0; color: #475569; border: none; padding: 0.5rem 1rem; border-radius: 12px; font-weight: bold; cursor: pointer; font-family: 'Nunito', sans-serif; display: flex; align-items: center; gap: 5px;">
                             <span id="syncIcon">☁️</span> <span id="syncText">Sync Cloud</span>
                         </button>
+                        <!-- Admin-only link (injected by JS) -->
+                        <span id="adminLinkSlot"></span>
                         <button onclick="logoutUser(); location.href='index.html'" style="background: #fee2e2; color: #ef4444; border: none; padding: 0.5rem 1rem; border-radius: 12px; font-weight: bold; cursor: pointer; font-family: 'Nunito', sans-serif;">Logout</button>
                     </div>
                 </div>
@@ -202,6 +204,14 @@
             welcomeMsg.innerHTML = `Welcome back, <strong>${user.name}</strong>. Ready for your next mission? &nbsp;<span style="font-size:0.8rem;font-weight:700;background:${roleColor}22;color:${roleColor};border:1px solid ${roleColor}55;padding:3px 10px;border-radius:100px;vertical-align:middle;">${roleIcon} ${role}</span>`;
             avatar.src = user.avatar;
             avatar.style.display = 'block';
+
+            // Admin-only button
+            const adminSlot = document.getElementById('adminLinkSlot');
+            if (adminSlot) {
+                adminSlot.innerHTML = role === 'Admin'
+                    ? `<a href="admin.html" style="background:#f59e0b;color:#fff;border:none;padding:0.5rem 1rem;border-radius:12px;font-weight:bold;cursor:pointer;font-family:'Nunito',sans-serif;text-decoration:none;display:inline-block;">🛡️ Admin Panel</a>`
+                    : '';
+            }
 
             // Populate Modal Fields
             document.getElementById('editName').value = user.name;
