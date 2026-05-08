@@ -86,21 +86,26 @@ const LEVELS = [
     },
     {
         id: 9,
-        title: "Conversation Flow",
-        type: "drag-drop",
-        description: "Design a standard Chat Loop order: Start with System rules, then User query, then Assistant response.",
-        pool: ["System", "User", "Assistant"],
-        answer: ["System", "User", "Assistant"],
-        hint: "The 'System' message is like the AI's constitution and must come first."
+        title: "The Creativity Dial",
+        type: "multiple-choice",
+        description: "Which parameter in a Large Language Model controls the 'randomness' or 'creativity' of the generated text?",
+        options: [
+            "Token Count",
+            "Temperature",
+            "Model Version",
+            "System Prompt"
+        ],
+        answer: 1,
+        hint: "Higher values make the AI more creative/random, lower values make it more predictable."
     },
     {
         id: 10,
-        title: "Deep Guard",
-        type: "coding",
-        description: "Hardening a prompt! Add a security instruction to prevent 'Prompt Injection' (when a user tries to override your instructions).",
-        starter: "System: You are a helpful assistant. Instruction: ",
-        answer: "Ignore all previous instructions",
-        hint: "Think about what a hacker might say to trick the AI."
+        title: "The Master Strategy",
+        type: "drag-drop",
+        description: "Arrange the components of a professional prompt in the most effective logical sequence.",
+        pool: ["Role/Persona", "Task Instruction", "Context/Data", "Formatting Rules"],
+        answer: ["Role/Persona", "Task Instruction", "Context/Data", "Formatting Rules"],
+        hint: "Start with who the AI is, then what it must do, then the data, and finally how to show the result."
     }
 ];
 
