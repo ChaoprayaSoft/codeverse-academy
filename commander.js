@@ -248,11 +248,19 @@ function showWin() {
             const revBtn = document.createElement('button');
             revBtn.id = 'revisitBtn';
             revBtn.className = 'run-btn';
-            revBtn.style.background = 'rgba(255,255,255,0.1)';
+            revBtn.style.background = '#1e293b';
+            revBtn.style.border = '2px solid #6366f1';
             revBtn.style.marginRight = '10px';
             revBtn.innerText = "Revisit Missions";
             revBtn.onclick = () => { document.getElementById('winModal').style.display = 'none'; };
             document.querySelector('#winModal button[onclick="nextLevel()"]').parentNode.insertBefore(revBtn, document.querySelector('#winModal button[onclick="nextLevel()"]'));
+            
+            const closeX = document.createElement('button');
+            closeX.innerText = '✕';
+            closeX.style.cssText = "position:absolute; top:20px; right:20px; background:transparent; border:none; color:white; font-size:2rem; cursor:pointer;";
+            closeX.onclick = () => { document.getElementById('winModal').style.display = 'none'; };
+            document.querySelector('#winModal > div').style.position = 'relative';
+            document.querySelector('#winModal > div').appendChild(closeX);
         }
     }
 

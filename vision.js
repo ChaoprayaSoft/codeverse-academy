@@ -358,9 +358,11 @@ async function finishGame() {
             <p style="font-size: 1.2rem; margin-bottom: 2rem;">You are now a certified Computer Vision Specialist!</p>
             <div style="font-size: 5rem; margin-bottom: 2rem;">🖥️</div>
             <div style="display: flex; gap: 1rem; justify-content: center;">
-                <button onclick="location.reload()" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid #334155; padding: 1rem 2rem; border-radius: 12px; cursor: pointer; font-weight: bold;">Revisit Challenges</button>
+                <button onclick="location.reload()" style="background: #0f172a; color: white; border: 2px solid var(--primary); padding: 1rem 2rem; border-radius: 12px; cursor: pointer; font-weight: bold;">Revisit Challenges</button>
                 <button onclick="location.href='dashboard.html'" style="background: var(--primary); color: white; border: none; padding: 1rem 2rem; border-radius: 12px; cursor: pointer; font-weight: bold;">Return to Dashboard</button>
             </div>
+            <button onclick="location.reload()" style="position: absolute; top: 20px; right: 20px; background: transparent; border: none; color: white; font-size: 2rem; cursor: pointer;">✕</button>
+        </div>
         </div>
     `;
     

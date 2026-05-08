@@ -318,10 +318,18 @@ function showWin() {
             const revBtn = document.createElement('button');
             revBtn.id = 'revisitBtn';
             revBtn.className = 'run-btn';
-            revBtn.style.background = 'rgba(255,255,255,0.1)';
+            revBtn.style.background = '#1e293b';
+            revBtn.style.border = '2px solid #10b981';
             revBtn.innerText = "Revisit Missions";
             revBtn.onclick = () => { winModal.style.display = 'none'; };
             document.getElementById('nextLevelBtn').parentNode.insertBefore(revBtn, document.getElementById('nextLevelBtn'));
+            
+            const closeX = document.createElement('button');
+            closeX.innerText = '✕';
+            closeX.style.cssText = "position:absolute; top:20px; right:20px; background:transparent; border:none; color:white; font-size:2rem; cursor:pointer;";
+            closeX.onclick = () => { winModal.style.display = 'none'; };
+            winModal.querySelector('div').style.position = 'relative';
+            winModal.querySelector('div').appendChild(closeX);
         }
     }
     

@@ -311,9 +311,10 @@ function triggerGraduation() {
             <p>You've successfully completed the Data Analytic course!</p>
             <p style="margin-bottom: 2rem;">You unlocked the Panda Stamp and earned 300 XP.</p>
             <div style="display: flex; gap: 1rem; width: 100%;">
-                <button class="run-btn" style="flex: 1; background: rgba(255,255,255,0.1); border: 1px solid #334155; box-shadow: 0 5px 0 #1e293b;" onclick="document.getElementById('completionOverlay').style.display='none'">REVISIT MODULES</button>
+                <button class="run-btn" style="flex: 1; background: #1a202c; border: 2px solid #FF9F1C; box-shadow: 0 5px 0 #1e293b;" onclick="document.getElementById('completionOverlay').style.display='none'">REVISIT MODULES</button>
                 <button class="run-btn" style="flex: 1;" onclick="location.href='dashboard.html'">VIEW DASHBOARD</button>
             </div>
+            <button onclick="document.getElementById('completionOverlay').style.display='none'" style="position: absolute; top: 20px; right: 20px; background: transparent; border: none; color: white; font-size: 2rem; cursor: pointer;">✕</button>
         </div>
     `;
 }

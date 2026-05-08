@@ -675,9 +675,10 @@ function triggerGraduation() {
             </div>
             <p style="font-size: 0.9rem; margin-bottom: 2rem;">Your expertise in Python logic, neural systems, and distributed architecture is now certified.</p>
             <div style="display: flex; gap: 1rem; justify-content: center;">
-                <button class="run-btn" style="background: rgba(255,255,255,0.1);" onclick="document.getElementById('completionOverlay').style.display='none'">REVISIT MODULES</button>
+                <button class="run-btn" style="background: #0f172a; border: 2px solid #f59e0b;" onclick="document.getElementById('completionOverlay').style.display='none'">REVISIT MODULES</button>
                 <button class="run-btn" style="background: #f59e0b;" onclick="location.href='index.html'">RETURN TO COMMAND CENTER</button>
             </div>
+            <button onclick="document.getElementById('completionOverlay').style.display='none'" style="position: absolute; top: 20px; right: 20px; background: transparent; border: none; color: white; font-size: 2rem; cursor: pointer;">✕</button>
         </div>
     `;
 
