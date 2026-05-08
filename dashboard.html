@@ -1,31 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Academy Dashboard | CodeVerse</title>
     <link rel="stylesheet" href="dashboard.css">
 </head>
+
 <body>
     <div class="dashboard-container">
         <div class="header">
             <div style="display: flex; align-items: center; gap: 1.5rem;">
-                <img src="https://ui-avatars.com/api/?name=Commander&background=6366f1&color=fff" id="dashboardAvatar" alt="Avatar" style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid #6366f1; display: none;">
+                <img src="https://ui-avatars.com/api/?name=Commander&background=6366f1&color=fff" id="dashboardAvatar"
+                    alt="Avatar"
+                    style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid #6366f1; display: none;">
                 <div>
-                    <h1 style="font-size: 3rem; margin: 0;">Academy <span style="color: var(--primary);">Dashboard</span></h1>
-                    <p style="color: var(--muted); margin-top: 0.5rem; font-size: 1.1rem;" id="welcomeMsg">Welcome back, Commander. Ready for your next mission?</p>
+                    <h1 style="font-size: 3rem; margin: 0;">Academy <span
+                            style="color: var(--primary);">Dashboard</span></h1>
+                    <p style="color: var(--muted); margin-top: 0.5rem; font-size: 1.1rem;" id="welcomeMsg">Welcome back,
+                        Commander. Ready for your next mission?</p>
                     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;">
-                        <button onclick="document.getElementById('profileModal').style.display='flex'" style="background: var(--secondary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 12px; font-weight: bold; cursor: pointer; font-family: 'Nunito', sans-serif;">✎ Edit Profile</button>
-                        <button id="syncBtn" onclick="handleManualSync()" style="background: #e2e8f0; color: #475569; border: none; padding: 0.5rem 1rem; border-radius: 12px; font-weight: bold; cursor: pointer; font-family: 'Nunito', sans-serif; display: flex; align-items: center; gap: 5px;">
+                        <button onclick="document.getElementById('profileModal').style.display='flex'"
+                            style="background: var(--secondary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 12px; font-weight: bold; cursor: pointer; font-family: 'Nunito', sans-serif;">✎
+                            Edit Profile</button>
+                        <button id="syncBtn" onclick="handleManualSync()"
+                            style="background: #e2e8f0; color: #475569; border: none; padding: 0.5rem 1rem; border-radius: 12px; font-weight: bold; cursor: pointer; font-family: 'Nunito', sans-serif; display: flex; align-items: center; gap: 5px;">
                             <span id="syncIcon">☁️</span> <span id="syncText">Sync Cloud</span>
                         </button>
                         <!-- Admin-only link (injected by JS) -->
                         <span id="adminLinkSlot"></span>
-                        <button onclick="logoutUser(); location.href='index.html'" style="background: #fee2e2; color: #ef4444; border: none; padding: 0.5rem 1rem; border-radius: 12px; font-weight: bold; cursor: pointer; font-family: 'Nunito', sans-serif;">Logout</button>
+
                     </div>
                 </div>
             </div>
-            
+
             <div class="xp-card">
                 <div style="display: flex; justify-content: space-between; align-items: baseline;">
                     <span style="font-weight: 800; font-size: 1.5rem;" id="totalXp">0</span>
@@ -52,7 +61,8 @@
                 <div class="status-card" id="card-explorer">
                     <div>
                         <h3 style="margin: 0;">Explorer Path</h3>
-                        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;" id="status-explorer">Path Unlocked</p>
+                        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;" id="status-explorer">Path
+                            Unlocked</p>
                     </div>
                     <a href="explorer.html" class="btn-continue">Launch Mission</a>
                 </div>
@@ -61,7 +71,8 @@
                 <div class="status-card" id="card-navigator">
                     <div>
                         <h3 style="margin: 0;">Navigator Path</h3>
-                        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;" id="status-navigator">Path Unlocked</p>
+                        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;" id="status-navigator">Path
+                            Unlocked</p>
                     </div>
                     <a href="navigator.html" class="btn-continue">Launch Mission</a>
                 </div>
@@ -70,7 +81,8 @@
                 <div class="status-card" id="card-commander">
                     <div>
                         <h3 style="margin: 0;">Commander Path</h3>
-                        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;" id="status-commander">Path Unlocked</p>
+                        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;" id="status-commander">Path
+                            Unlocked</p>
                     </div>
                     <a href="commander.html" class="btn-continue">Launch Mission</a>
                 </div>
@@ -79,7 +91,8 @@
                 <div class="status-card" id="card-architect">
                     <div>
                         <h3 style="margin: 0;">Architect Path</h3>
-                        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;" id="status-architect">Path Unlocked</p>
+                        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;" id="status-architect">Path
+                            Unlocked</p>
                     </div>
                     <a href="architect.html" class="btn-continue">Launch Mission</a>
                 </div>
@@ -88,7 +101,8 @@
                 <div class="status-card" id="card-data_analytic">
                     <div>
                         <h3 style="margin: 0;">Data Analytic</h3>
-                        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;" id="status-data_analytic">Path Unlocked</p>
+                        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;" id="status-data_analytic">Path
+                            Unlocked</p>
                     </div>
                     <a href="data_analytic.html" class="btn-continue">Launch Mission</a>
                 </div>
@@ -97,7 +111,8 @@
                 <div class="status-card" id="card-ai_ml">
                     <div>
                         <h3 style="margin: 0;">AI & Machine Learning</h3>
-                        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;" id="status-ai_ml">Path Unlocked</p>
+                        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;" id="status-ai_ml">Path Unlocked
+                        </p>
                     </div>
                     <a href="ai_ml.html" class="btn-continue">Launch Mission</a>
                 </div>
@@ -106,7 +121,8 @@
                 <div class="status-card" id="card-vision">
                     <div>
                         <h3 style="margin: 0;">Computer Vision</h3>
-                        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;" id="status-vision">Path Unlocked</p>
+                        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;" id="status-vision">Path Unlocked
+                        </p>
                     </div>
                     <a href="vision.html" class="btn-continue">Launch Mission</a>
                 </div>
@@ -114,31 +130,43 @@
         </section>
 
         <footer style="margin-top: 5rem; text-align: center; border-top: 3px dashed var(--border); padding-top: 2rem;">
-            <a href="index.html" style="background: none; border: none; color: var(--muted); text-decoration: none; font-size: 1.1rem; font-weight: 800; cursor: pointer;">&larr; Return to Spaceport</a>
+            <a href="index.html"
+                style="background: none; border: none; color: var(--muted); text-decoration: none; font-size: 1.1rem; font-weight: 800; cursor: pointer;">&larr;
+                Return to Spaceport</a>
         </footer>
     </div>
 
     <!-- Edit Profile Modal -->
-    <div id="profileModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
-        <div style="background: white; padding: 2rem; border-radius: 24px; border: 4px solid var(--border); width: 350px; font-family: 'Nunito', sans-serif;">
+    <div id="profileModal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
+        <div
+            style="background: white; padding: 2rem; border-radius: 24px; border: 4px solid var(--border); width: 350px; font-family: 'Nunito', sans-serif;">
             <h2 style="margin-top: 0;">Edit Profile</h2>
             <div style="margin-bottom: 1rem;">
-                <label style="font-weight: bold; color: var(--text); display: block; margin-bottom: 0.5rem;">Commander Name</label>
-                <input type="text" id="editName" style="width: 100%; padding: 0.8rem; border: 2px solid var(--border); border-radius: 12px; font-family: 'Nunito', sans-serif; box-sizing: border-box;">
+                <label style="font-weight: bold; color: var(--text); display: block; margin-bottom: 0.5rem;">Commander
+                    Name</label>
+                <input type="text" id="editName"
+                    style="width: 100%; padding: 0.8rem; border: 2px solid var(--border); border-radius: 12px; font-family: 'Nunito', sans-serif; box-sizing: border-box;">
             </div>
             <div style="margin-bottom: 1.5rem;">
-                <label style="font-weight: bold; color: var(--text); display: block; margin-bottom: 0.5rem;">Avatar Color</label>
-                <input type="color" id="editColor" value="#FF9F1C" style="width: 100%; height: 40px; border: none; border-radius: 12px; cursor: pointer;">
+                <label style="font-weight: bold; color: var(--text); display: block; margin-bottom: 0.5rem;">Avatar
+                    Color</label>
+                <input type="color" id="editColor" value="#FF9F1C"
+                    style="width: 100%; height: 40px; border: none; border-radius: 12px; cursor: pointer;">
             </div>
             <div style="margin-bottom: 1.5rem;">
-                <label style="font-weight: bold; color: var(--text); display: block; margin-bottom: 0.5rem;">Choose Avatar</label>
-                <div id="avatarPicker" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 0.5rem;">
+                <label style="font-weight: bold; color: var(--text); display: block; margin-bottom: 0.5rem;">Choose
+                    Avatar</label>
+                <div id="avatarPicker"
+                    style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 0.5rem;">
                     <!-- Animals will be injected here -->
                 </div>
             </div>
             <div style="display: flex; gap: 1rem;">
-                <button onclick="saveProfile()" style="flex: 1; background: #10b981; color: white; border: none; padding: 0.8rem; border-radius: 12px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 0 #2F855A;">Save</button>
-                <button onclick="document.getElementById('profileModal').style.display='none'" style="flex: 1; background: var(--border); color: var(--text); border: none; padding: 0.8rem; border-radius: 12px; font-weight: bold; cursor: pointer;">Cancel</button>
+                <button onclick="saveProfile()"
+                    style="flex: 1; background: #10b981; color: white; border: none; padding: 0.8rem; border-radius: 12px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 0 #2F855A;">Save</button>
+                <button onclick="document.getElementById('profileModal').style.display='none'"
+                    style="flex: 1; background: var(--border); color: var(--text); border: none; padding: 0.8rem; border-radius: 12px; font-weight: bold; cursor: pointer;">Cancel</button>
             </div>
         </div>
     </div>
@@ -178,7 +206,7 @@
 
         function updateDashboard() {
             const user = getUserProfile();
-            
+
             // Empty state if not logged in
             if (!user) {
                 document.querySelector('.dashboard-container').innerHTML = `
@@ -192,15 +220,15 @@
             }
 
             const progress = getProgress();
-            
+
             // Personalize Dashboard
             const welcomeMsg = document.getElementById('welcomeMsg');
             const avatar = document.getElementById('dashboardAvatar');
             const role = user.role || 'Student';
             const roleColors = { Admin: '#f59e0b', Teacher: '#6366f1', Student: '#10b981' };
-            const roleIcons  = { Admin: '\uD83D\uDEE1\uFE0F', Teacher: '\uD83D\uDC69\u200D\uD83C\uDFEB', Student: '\uD83E\uDDD1\u200D\uD83D\uDE80' };
-            const roleColor  = roleColors[role] || '#10b981';
-            const roleIcon   = roleIcons[role]  || '\uD83E\uDDD1\u200D\uD83D\uDE80';
+            const roleIcons = { Admin: '\uD83D\uDEE1\uFE0F', Teacher: '\uD83D\uDC69\u200D\uD83C\uDFEB', Student: '\uD83E\uDDD1\u200D\uD83D\uDE80' };
+            const roleColor = roleColors[role] || '#10b981';
+            const roleIcon = roleIcons[role] || '\uD83E\uDDD1\u200D\uD83D\uDE80';
             welcomeMsg.innerHTML = `Welcome back, <strong>${user.name}</strong>. Ready for your next mission? &nbsp;<span style="font-size:0.8rem;font-weight:700;background:${roleColor}22;color:${roleColor};border:1px solid ${roleColor}55;padding:3px 10px;border-radius:100px;vertical-align:middle;">${roleIcon} ${role}</span>`;
             avatar.src = user.avatar;
             avatar.style.display = 'block';
@@ -236,7 +264,7 @@
             // Update Badges
             const badgeGrid = document.getElementById('badgeGrid');
             badgeGrid.innerHTML = '';
-            
+
             function getAnimalStamp(badgeName) {
                 const name = badgeName.toLowerCase();
                 let emoji = "🌟";
@@ -249,7 +277,7 @@
                 else if (name.includes("data")) { emoji = "🐼"; color = "#ED8936"; }
                 else if (name.includes("ai")) { emoji = "🧠"; color = "#A78BFA"; }
                 else if (name.includes("vision")) { emoji = "🖥️"; color = "#0EA5E9"; }
-                
+
                 const svg = `
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
                         <circle cx="50" cy="50" r="45" fill="none" stroke="${color}" stroke-width="6" stroke-dasharray="10 6"/>
@@ -291,7 +319,7 @@
             const newName = document.getElementById('editName').value.trim();
             let newColor = document.getElementById('editColor').value;
             newColor = newColor.replace('#', ''); // strip hash
-            
+
             if (newName) {
                 const user = getUserProfile();
                 if (user) {
@@ -311,14 +339,14 @@
             const btn = document.getElementById('syncBtn');
             const icon = document.getElementById('syncIcon');
             const text = document.getElementById('syncText');
-            
+
             btn.disabled = true;
             btn.style.opacity = '0.7';
             icon.innerText = '⏳';
             text.innerText = 'Syncing...';
-            
+
             const result = await syncNow();
-            
+
             if (result.status === 'success') {
                 icon.innerText = '✅';
                 text.innerText = 'Synced!';
@@ -330,7 +358,7 @@
                 btn.style.background = '#fee2e2';
                 btn.style.color = '#ef4444';
             }
-            
+
             setTimeout(() => {
                 icon.innerText = '☁️';
                 text.innerText = 'Sync Cloud';
@@ -353,4 +381,5 @@
         window.addEventListener('userStateChanged', updateDashboard);
     </script>
 </body>
+
 </html>
