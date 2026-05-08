@@ -60,7 +60,7 @@
                 <!-- Explorer -->
                 <div class="status-card" id="card-explorer">
                     <div>
-                        <h3 style="margin: 0;">Explorer Path</h3>
+                        <h3 style="margin: 0;" id="title-explorer">Explorer Path</h3>
                         <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;" id="status-explorer">Path
                             Unlocked</p>
                     </div>
@@ -70,7 +70,7 @@
                 <!-- Navigator -->
                 <div class="status-card" id="card-navigator">
                     <div>
-                        <h3 style="margin: 0;">Navigator Path</h3>
+                        <h3 style="margin: 0;" id="title-navigator">Navigator Path</h3>
                         <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;" id="status-navigator">Path
                             Unlocked</p>
                     </div>
@@ -80,7 +80,7 @@
                 <!-- Commander -->
                 <div class="status-card" id="card-commander">
                     <div>
-                        <h3 style="margin: 0;">Commander Path</h3>
+                        <h3 style="margin: 0;" id="title-commander">Commander Path</h3>
                         <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;" id="status-commander">Path
                             Unlocked</p>
                     </div>
@@ -90,7 +90,7 @@
                 <!-- Architect -->
                 <div class="status-card" id="card-architect">
                     <div>
-                        <h3 style="margin: 0;">Architect Path</h3>
+                        <h3 style="margin: 0;" id="title-architect">Architect Path</h3>
                         <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;" id="status-architect">Path
                             Unlocked</p>
                     </div>
@@ -100,7 +100,7 @@
                 <!-- Data Analytic -->
                 <div class="status-card" id="card-data_analytic">
                     <div>
-                        <h3 style="margin: 0;">Data Analytic</h3>
+                        <h3 style="margin: 0;" id="title-data_analytic">Data Analytic</h3>
                         <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;" id="status-data_analytic">Path
                             Unlocked</p>
                     </div>
@@ -110,7 +110,7 @@
                 <!-- AI & Machine Learning -->
                 <div class="status-card" id="card-ai_ml">
                     <div>
-                        <h3 style="margin: 0;">AI & Machine Learning</h3>
+                        <h3 style="margin: 0;" id="title-ai_ml">AI & Machine Learning</h3>
                         <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;" id="status-ai_ml">Path Unlocked
                         </p>
                     </div>
@@ -120,7 +120,7 @@
                 <!-- Computer Vision -->
                 <div class="status-card" id="card-vision">
                     <div>
-                        <h3 style="margin: 0;">Computer Vision</h3>
+                        <h3 style="margin: 0;" id="title-vision">Computer Vision</h3>
                         <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;" id="status-vision">Path Unlocked
                         </p>
                     </div>
@@ -203,6 +203,16 @@
                 picker.appendChild(div);
             });
         }
+
+        const COURSES = [
+            { key: 'explorer',      label: 'Explorer Path',   total: 5  },
+            { key: 'navigator',     label: 'Navigator Path',  total: 6  },
+            { key: 'commander',     label: 'Commander Path',  total: 5  },
+            { key: 'architect',     label: 'Architect Path',  total: 12 },
+            { key: 'data_analytic', label: 'Data Analytic',   total: 10 },
+            { key: 'ai_ml',         label: 'AI & Machine Learning', total: 20 },
+            { key: 'vision',        label: 'Computer Vision', total: 15 },
+        ];
 
         function updateDashboard() {
             const user = getUserProfile();
@@ -302,17 +312,25 @@
                 });
             }
 
-            // Update Mission Status
-            for (const [mission, completed] of Object.entries(progress.missions)) {
-                const card = document.getElementById(`card-${mission}`);
-                if (!card) continue;
-                const statusText = document.getElementById(`status-${mission}`);
+            // Update Mission Status & Levels
+            COURSES.forEach(c => {
+                const card = document.getElementById(`card-${c.key}`);
+                const title = document.getElementById(`title-${c.key}`);
+                const statusText = document.getElementById(`status-${c.key}`);
+                if (!card || !title || !statusText) return;
+
+                const completed = progress.missions[c.key] === true;
+                const currentLv = (progress.levels && progress.levels[c.key]) || 1;
+
+                // Update Title with Progress
+                title.innerHTML = `${c.label} <span style="font-size:0.8rem; opacity:0.7; font-weight:normal;">(${currentLv}/${c.total})</span>`;
+
                 if (completed) {
                     card.classList.add('completed');
                     statusText.innerText = 'MISSION COMPLETE';
                     statusText.style.color = 'var(--success)';
                 }
-            }
+            });
         }
 
         function saveProfile() {
