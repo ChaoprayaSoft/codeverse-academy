@@ -113,7 +113,8 @@ const defaultProgress = {
         architect: false,
         data_analytic: false,
         ai_ml: false,
-        vision: false
+        vision: false,
+        prompt_eng: false
     },
     levels: {
         explorer: 1,
@@ -122,7 +123,8 @@ const defaultProgress = {
         architect: 1,
         data_analytic: 1,
         ai_ml: 1,
-        vision: 1
+        vision: 1,
+        prompt_eng: 1
     },
     badges: []
 };

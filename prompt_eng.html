@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Engineering | CodeVerse Academy</title>
+    <link rel="stylesheet" href="prompt_eng.css">
+</head>
+<body>
+    <div class="course-container">
+        <header class="header">
+            <div class="logo" onclick="location.href='dashboard.html'" style="cursor:pointer;">CODE<span>VERSE</span></div>
+            <div class="stats">
+                <div class="stat-item">
+                    <span>🧠</span> <span id="levelValue">1/10</span>
+                </div>
+                <div class="stat-item">
+                    <span style="color:var(--gold);">✨</span> <span id="xpValue">0</span> XP
+                </div>
+                <button class="btn btn-glass" onclick="location.href='dashboard.html'" style="padding: 0.5rem 1rem;">Back</button>
+            </div>
+        </header>
+
+        <div class="level-map" id="levelMap">
+            <!-- Levels will be injected here -->
+        </div>
+
+        <main class="mission-card" id="missionCard">
+            <span class="badge-tag">Neural Interface Active</span>
+            <h2>Mission Title</h2>
+            <p class="description">Mission description goes here...</p>
+
+            <div class="interaction-area" id="interactionArea">
+                <!-- Dynamic content (quiz, drag-drop, matching, coding) -->
+            </div>
+
+            <div id="feedback"></div>
+
+            <div class="action-bar" style="margin-top: 2rem;">
+                <button class="btn btn-primary" id="submitBtn" onclick="checkAnswer()">Validate Prompt</button>
+                <button class="btn btn-primary" id="nextBtn" onclick="nextLevel()" style="display:none; background: var(--success);">Next Signal &rarr;</button>
+            </div>
+        </main>
+    </div>
+
+    <div class="overlay" id="completionOverlay">
+        <div class="completion-badge">
+            <svg viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" fill="none" stroke="#ec4899" stroke-width="5" stroke-dasharray="10 5"/>
+                <text x="50" y="65" font-size="40" text-anchor="middle">💬</text>
+            </svg>
+        </div>
+        <h1 style="font-size: 3rem; margin-bottom: 1rem;">Course Complete!</h1>
+        <p style="color: var(--text-muted); font-size: 1.2rem; margin-bottom: 2rem;">You are now a certified Prompt Engineer.<br>Your communication with AI is flawless.</p>
+        <button class="btn btn-primary" onclick="location.href='dashboard.html'">Return to Dashboard</button>
+    </div>
+
+    <script src="progress.js"></script>
+    <script src="prompt_eng.js"></script>
+</body>
+</html>

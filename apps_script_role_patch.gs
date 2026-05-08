@@ -41,7 +41,12 @@ function doPost(e) {
 
   // ── sync / login ─────────────────────────────────────────────
   if (action === "sync" || action === "login") {
-    var initialProgress = { xp: 0, missions: {}, levels: {}, badges: [] };
+    var initialProgress = { 
+      xp: 0, 
+      missions: { explorer:false, navigator:false, commander:false, architect:false, data_analytic:false, ai_ml:false, vision:false, prompt_eng:false }, 
+      levels: { explorer:1, navigator:1, commander:1, architect:1, data_analytic:1, ai_ml:1, vision:1, prompt_eng:1 }, 
+      badges: [] 
+    };
     var progressJson = data.progress ? JSON.stringify(data.progress) : JSON.stringify(initialProgress);
 
     if (userRow === -1) {
