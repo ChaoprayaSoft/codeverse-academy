@@ -44,7 +44,8 @@ async function syncNow() {
             progress,
             name: user.name,
             avatar: user.avatar,
-            color: user.color || ""
+            color: user.color || "",
+            role: user.role || ""
         });
 
         if (result && result.status === 'success') {
@@ -57,6 +58,7 @@ async function syncNow() {
 }
 
 // Function to specifically load progress (needs a regular fetch, not no-cors)
+// Returns: { status, name, avatar, color, role, progress } or null
 async function loadProgressFromSheets(email) {
     if (!SHEETS_API_URL || !email || email === 'guest') return null;
     try {
@@ -76,6 +78,14 @@ async function loadProgressFromSheets(email) {
 function getUserProfile() {
     const data = localStorage.getItem(USER_KEY);
     return data ? JSON.parse(data) : null;
+}
+
+/**
+ * Returns the current user's role: 'Admin', 'Teacher', 'Student', or null.
+ */
+function getUserRole() {
+    const user = getUserProfile();
+    return user ? (user.role || null) : null;
 }
 
 function getUserId() {
@@ -250,17 +260,32 @@ document.addEventListener('DOMContentLoaded', initSessionTimeout);
 
 // =============================================================
 
-async function loginUser(name, email, avatar) {
-    const profile = { name, email, avatar };
+/**
+ * Logs in a user. On first login (no existing role in Sheets), `role` will be
+ * null — the caller (index.html) must then prompt with the Role Selection Modal
+ * and call setUserRole() once the user picks.
+ *
+ * @param {string} name
+ * @param {string} email
+ * @param {string} avatar
+ * @param {string|null} [role=null]  – Optional: pre-supply if already known
+ * @returns {{ profile, isNewUser: boolean }}
+ */
+async function loginUser(name, email, avatar, role = null) {
+    const profile = { name, email, avatar, role: role || null };
     localStorage.setItem(USER_KEY, JSON.stringify(profile));
     _refreshActivityTimestamp(); // Start the inactivity clock on login
 
-    // 1. Load progress from Sheets
+    // 1. Load progress + role from Sheets
     const remoteData = await loadProgressFromSheets(email);
+    let isNewUser = true;
     if (remoteData) {
-        if (remoteData.name) profile.name = remoteData.name;
+        isNewUser = false;
+        if (remoteData.name)  profile.name  = remoteData.name;
         if (remoteData.avatar) profile.avatar = remoteData.avatar;
-        if (remoteData.color) profile.color = remoteData.color;
+        if (remoteData.color)  profile.color  = remoteData.color;
+        // Respect the server-side role (Admins are assigned server-side only)
+        if (remoteData.role)  profile.role   = remoteData.role;
         localStorage.setItem(USER_KEY, JSON.stringify(profile));
 
         const localProgress = getProgress();
@@ -274,12 +299,27 @@ async function loginUser(name, email, avatar) {
         name,
         avatar,
         status: 'Login',
+        role: profile.role || "",
         progress: getProgress() // Send current progress to initialize if new
     });
 
     window.dispatchEvent(new Event('userStateChanged'));
     window.dispatchEvent(new Event('progressUpdated'));
-    return profile;
+    return { profile, isNewUser: isNewUser && !profile.role };
+}
+
+/**
+ * Saves a newly chosen role for the current user and syncs it to Sheets.
+ * Should only be called once per new user (from the role-selection modal).
+ * @param {'Teacher'|'Student'} role
+ */
+async function setUserRole(role) {
+    const user = getUserProfile();
+    if (!user) return;
+    user.role = role;
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+    await syncNow(); // Push the role to Sheets immediately
+    window.dispatchEvent(new Event('userStateChanged'));
 }
 
 async function logoutUser() {

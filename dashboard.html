@@ -194,7 +194,12 @@
             // Personalize Dashboard
             const welcomeMsg = document.getElementById('welcomeMsg');
             const avatar = document.getElementById('dashboardAvatar');
-            welcomeMsg.innerText = `Welcome back, ${user.name}. Ready for your next mission?`;
+            const role = user.role || 'Student';
+            const roleColors = { Admin: '#f59e0b', Teacher: '#6366f1', Student: '#10b981' };
+            const roleIcons  = { Admin: '\uD83D\uDEE1\uFE0F', Teacher: '\uD83D\uDC69\u200D\uD83C\uDFEB', Student: '\uD83E\uDDD1\u200D\uD83D\uDE80' };
+            const roleColor  = roleColors[role] || '#10b981';
+            const roleIcon   = roleIcons[role]  || '\uD83E\uDDD1\u200D\uD83D\uDE80';
+            welcomeMsg.innerHTML = `Welcome back, <strong>${user.name}</strong>. Ready for your next mission? &nbsp;<span style="font-size:0.8rem;font-weight:700;background:${roleColor}22;color:${roleColor};border:1px solid ${roleColor}55;padding:3px 10px;border-radius:100px;vertical-align:middle;">${roleIcon} ${role}</span>`;
             avatar.src = user.avatar;
             avatar.style.display = 'block';
 

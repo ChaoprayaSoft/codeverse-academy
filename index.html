@@ -353,6 +353,33 @@
         </div>
     </div>
 
+    <!-- Role Selection Modal (first-time login) -->
+    <div id="roleModal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(8px);">
+        <div style="background: #0f172a; border: 2px solid rgba(99,102,241,0.4); padding: 2.5rem; border-radius: 24px; width: 480px; max-width: 92%; text-align: center; font-family: 'Outfit', sans-serif; color: #f1f5f9; box-shadow: 0 0 60px rgba(99,102,241,0.2);">
+            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🚀</div>
+            <h2 style="font-size: 1.9rem; font-weight: 800; margin: 0 0 0.5rem;">Welcome to <span style="background: linear-gradient(90deg,#6366f1,#38bdf8); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">CodeVerse!</span></h2>
+            <p style="color: #94a3b8; font-size: 1rem; margin-bottom: 2rem;">Before we launch, tell us who you are. This helps us personalise your experience.</p>
+
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <!-- Teacher Card -->
+                <button id="roleTeacherBtn" onclick="chooseRole('Teacher')" style="flex: 1; background: rgba(99,102,241,0.08); border: 2px solid rgba(99,102,241,0.3); border-radius: 20px; padding: 1.5rem 1rem; cursor: pointer; color: #f1f5f9; font-family: 'Outfit', sans-serif; transition: all 0.25s;" onmouseover="this.style.borderColor='#6366f1';this.style.background='rgba(99,102,241,0.18)'" onmouseout="this.style.borderColor='rgba(99,102,241,0.3)';this.style.background='rgba(99,102,241,0.08)'">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">👩‍🏫</div>
+                    <div style="font-size: 1.2rem; font-weight: 800; margin-bottom: 0.3rem;">Teacher</div>
+                    <div style="font-size: 0.8rem; color: #94a3b8;">Manage missions &amp; track student progress</div>
+                </button>
+                <!-- Student Card -->
+                <button id="roleStudentBtn" onclick="chooseRole('Student')" style="flex: 1; background: rgba(16,185,129,0.08); border: 2px solid rgba(16,185,129,0.3); border-radius: 20px; padding: 1.5rem 1rem; cursor: pointer; color: #f1f5f9; font-family: 'Outfit', sans-serif; transition: all 0.25s;" onmouseover="this.style.borderColor='#10b981';this.style.background='rgba(16,185,129,0.18)'" onmouseout="this.style.borderColor='rgba(16,185,129,0.3)';this.style.background='rgba(16,185,129,0.08)'">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🧑‍🚀</div>
+                    <div style="font-size: 1.2rem; font-weight: 800; margin-bottom: 0.3rem;">Student</div>
+                    <div style="font-size: 0.8rem; color: #94a3b8;">Explore courses &amp; complete missions</div>
+                </button>
+            </div>
+
+            <p style="margin-top: 1.5rem; font-size: 0.75rem; color: #475569;">You can't change this later. Admins are assigned by the academy team.</p>
+        </div>
+    </div>
+
     <script src="progress.js"></script>
     <script src="app.js"></script>
     <script>
@@ -393,16 +420,23 @@
             });
         }
 
+        const ROLE_COLORS = { Admin: '#f59e0b', Teacher: '#6366f1', Student: '#10b981' };
+        const ROLE_ICONS  = { Admin: '🛡️', Teacher: '👩‍🏫', Student: '🧑‍🚀' };
+
         function updateUI() {
             const user = getUserProfile();
             const p = getProgress();
 
             if (user) {
+                const role = user.role || 'Student';
+                const roleColor = ROLE_COLORS[role] || '#10b981';
+                const roleIcon  = ROLE_ICONS[role]  || '🧑‍🚀';
                 // Logged In
                 authContainer.innerHTML = `
                     <div style="display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 100px;">
                         <img src="${user.avatar}" alt="Avatar" style="width: 24px; height: 24px; border-radius: 50%;">
                         <span style="font-size: 0.9rem; font-weight: 600;">${user.name}</span>
+                        <span style="font-size: 0.7rem; font-weight: 700; background: ${roleColor}22; color: ${roleColor}; border: 1px solid ${roleColor}55; padding: 2px 8px; border-radius: 100px;">${roleIcon} ${role}</span>
                         <button onclick="document.getElementById('profileModal').style.display='flex'" style="background: none; border: none; color: #6366f1; font-size: 0.8rem; cursor: pointer; margin-left: 10px; font-weight: 600;">Edit Profile</button>
                         <button onclick="logoutUser()" style="background: none; border: none; color: #ef4444; font-size: 0.8rem; cursor: pointer; margin-left: 5px; font-weight: 600;">Logout</button>
                     </div>
@@ -460,12 +494,25 @@
                 return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
             }).join(''));
 
-            const user = JSON.parse(jsonPayload);
+            const googleUser = JSON.parse(jsonPayload);
 
-            // Login with Real Data
-            await loginUser(user.name, user.email, user.picture);
+            // Login with Real Data – returns { profile, isNewUser }
+            const result = await loginUser(googleUser.name, googleUser.email, googleUser.picture);
 
             loginModal.style.display = 'none';
+
+            // First-time user: no role yet → show role selection modal
+            if (result && result.isNewUser) {
+                document.getElementById('roleModal').style.display = 'flex';
+            } else {
+                updateUI();
+            }
+        }
+
+        async function chooseRole(role) {
+            document.getElementById('roleModal').style.display = 'none';
+            await setUserRole(role);
+            updateUI();
         }
 
         function saveProfile() {
