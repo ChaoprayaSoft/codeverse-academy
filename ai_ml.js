@@ -309,32 +309,36 @@ function renderLevelIndicators() {
     if (!dotsContainer) return;
     dotsContainer.innerHTML = '';
     dotsContainer.style.flexWrap = 'wrap';
-    
+
     const progress = getProgress();
-    const maxUnlocked = (progress.levels.ai_ml || 1) - 1;
-    
+    const maxLevel = progress.levels && progress.levels.ai_ml ? progress.levels.ai_ml : 1;
+
     modules.forEach((_, i) => {
+        const isLocked = i >= maxLevel;
+        const isActive = i === currentModuleIndex;
         const dot = document.createElement('div');
-        dot.style.width = '20px';
+        dot.style.width = isActive ? '30px' : '20px';
         dot.style.height = '10px';
         dot.style.borderRadius = '4px';
         dot.style.transition = 'all 0.3s';
         dot.style.border = '1px solid rgba(255,255,255,0.1)';
-        
-        dot.style.cursor = 'pointer';
-        dot.onclick = () => loadModule(i);
+        dot.style.cursor = isLocked ? 'not-allowed' : 'pointer';
+        dot.title = isLocked ? `Module ${i + 1} (Locked)` : `Module ${i + 1}`;
+
+        if (!isLocked) {
+            dot.onclick = () => loadModule(i);
+        }
 
         if (isActive) {
             dot.style.background = '#8b5cf6';
-            dot.style.width = '30px';
             dot.style.boxShadow = '0 0 10px #8b5cf6';
-        } else if (i < (progress.levels.ai_ml || 1)) {
+        } else if (!isLocked) {
             dot.style.background = '#d8b4fe';
         } else {
             dot.style.background = '#334155';
-            dot.style.opacity = '0.8';
+            dot.style.opacity = '0.5';
         }
-        
+
         dotsContainer.appendChild(dot);
     });
 }

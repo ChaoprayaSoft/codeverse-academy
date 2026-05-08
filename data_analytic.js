@@ -208,20 +208,25 @@ function renderLevelIndicators() {
     if (!dotsContainer) return;
     dotsContainer.innerHTML = '';
     const progress = getProgress();
-    const maxUnlocked = (progress.levels.data_analytic || 1) - 1;
-    
+    const maxLevel = progress.levels && progress.levels.data_analytic ? progress.levels.data_analytic : 1;
+
     modules.forEach((_, i) => {
+        const isLocked = i >= maxLevel;
         const dot = document.createElement('div');
-        dot.style.cursor = 'pointer';
-        dot.onclick = () => loadModule(i);
-        
+        dot.style.cursor = isLocked ? 'not-allowed' : 'pointer';
+        dot.title = isLocked ? `Module ${i + 1} (Locked)` : `Module ${i + 1}`;
+
+        if (!isLocked) {
+            dot.onclick = () => loadModule(i);
+        }
+
         if (i === currentModuleIndex) {
             dot.style.background = '#FF9F1C';
-        } else if (i < (progress.levels.data_analytic || 1)) {
+        } else if (!isLocked) {
             dot.style.background = '#F6E05E';
         } else {
-            dot.style.background = '#E2E8F0';
-            dot.style.opacity = '0.8';
+            dot.style.background = '#CBD5E0';
+            dot.style.opacity = '0.5';
         }
         dotsContainer.appendChild(dot);
     });

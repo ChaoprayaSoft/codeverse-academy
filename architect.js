@@ -504,27 +504,33 @@ function renderLevelIndicators() {
     if (!dotsContainer) return;
     dotsContainer.innerHTML = '';
     const progress = getProgress();
+    const maxLevel = progress.levels && progress.levels.architect ? progress.levels.architect : 1;
 
     modules.forEach((_, i) => {
+        const isLocked = i >= maxLevel;
         const dot = document.createElement('div');
         dot.style.width = '14px';
         dot.style.height = '14px';
         dot.style.borderRadius = '50%';
-        dot.style.cursor = 'pointer';
-        dot.onclick = () => {
-            currentModuleIndex = i;
-            loadModule(i);
-            switchTab('editor');
-            updateSystemMap();
-        };
+        dot.style.cursor = isLocked ? 'not-allowed' : 'pointer';
+        dot.title = isLocked ? `Module ${i + 1} (Locked)` : `Module ${i + 1}`;
+
+        if (!isLocked) {
+            dot.onclick = () => {
+                currentModuleIndex = i;
+                loadModule(i);
+                switchTab('editor');
+                updateSystemMap();
+            };
+        }
 
         if (i === currentModuleIndex) {
             dot.style.background = 'var(--arch-primary)';
-        } else if (i < (progress.levels.architect || 1)) {
+        } else if (!isLocked) {
             dot.style.background = 'rgba(6, 182, 212, 0.6)';
         } else {
             dot.style.background = '#1e293b';
-            dot.style.opacity = '0.8';
+            dot.style.opacity = '0.5';
         }
         dotsContainer.appendChild(dot);
     });
