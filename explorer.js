@@ -198,15 +198,22 @@ function renderLevelIndicators() {
         return;
     }
     
+    const progress = getProgress();
+    const maxLevel = progress.levels && progress.levels.explorer ? progress.levels.explorer : 1;
+
     indicators.innerHTML = '';
     LEVELS.forEach((_, i) => {
+        const isLocked = i >= maxLevel;
         const dot = document.createElement('div');
         dot.className = `level-dot ${i === currentLevelIndex ? 'active' : ''}`;
-        dot.innerText = i + 1;
-        dot.style.background = i === currentLevelIndex ? 'var(--accent)' : 'rgba(255,255,255,0.4)';
+        dot.innerText = isLocked ? '🔒' : (i + 1);
+        dot.style.background = i === currentLevelIndex ? 'var(--accent)' : (isLocked ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.4)');
         dot.style.color = i === currentLevelIndex ? 'white' : 'rgba(255,255,255,0.6)';
-        dot.style.cursor = 'pointer';
-        dot.onclick = () => loadLevel(i);
+        dot.style.cursor = isLocked ? 'not-allowed' : 'pointer';
+        
+        if (!isLocked) {
+            dot.onclick = () => loadLevel(i);
+        }
         indicators.appendChild(dot);
     });
 }

@@ -153,16 +153,29 @@ function initGame() {
 }
 
 function renderLevelIndicators() {
+    const progress = getProgress();
+    const maxLevel = progress.levels && progress.levels.commander ? progress.levels.commander : 1;
+
     levelIndicators.innerHTML = '';
     LEVELS.forEach((_, i) => {
+        const isLocked = i >= maxLevel;
         const dot = document.createElement('div');
         dot.className = `level-dot ${i === currentLevelIndex ? 'active' : ''}`;
         dot.style.width = '12px';
         dot.style.height = '12px';
         dot.style.borderRadius = '50%';
-        dot.style.background = i === currentLevelIndex ? '#6366f1' : '#2a2f3a';
-        dot.style.cursor = 'pointer';
-        dot.onclick = () => loadLevel(i);
+        dot.style.background = i === currentLevelIndex ? '#6366f1' : (isLocked ? 'rgba(0,0,0,0.5)' : '#2a2f3a');
+        dot.style.cursor = isLocked ? 'not-allowed' : 'pointer';
+        if (isLocked) {
+            dot.innerText = '🔒';
+            dot.style.fontSize = '8px';
+            dot.style.display = 'flex';
+            dot.style.alignItems = 'center';
+            dot.style.justifyContent = 'center';
+        }
+        if (!isLocked) {
+            dot.onclick = () => loadLevel(i);
+        }
         levelIndicators.appendChild(dot);
     });
 }

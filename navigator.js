@@ -190,19 +190,32 @@ function renderLevelIndicators() {
         return;
     }
     
+    const progress = getProgress();
+    const maxLevel = progress.levels && progress.levels.navigator ? progress.levels.navigator : 1;
+
     indicators.innerHTML = '';
     LEVELS.forEach((_, i) => {
+        const isLocked = i >= maxLevel;
         const dot = document.createElement('div');
         dot.className = `level-dot ${i === currentLevelIndex ? 'active' : ''}`;
         dot.style.width = '16px';
         dot.style.height = '16px';
         dot.style.borderRadius = '50%';
-        dot.style.background = i === currentLevelIndex ? '#10b981' : 'rgba(255,255,255,0.4)';
+        dot.style.background = i === currentLevelIndex ? '#10b981' : (isLocked ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.4)');
         dot.style.border = '2px solid ' + (i === currentLevelIndex ? '#10b981' : 'rgba(255,255,255,0.2)');
-        dot.style.cursor = 'pointer';
+        dot.style.cursor = isLocked ? 'not-allowed' : 'pointer';
         dot.style.transition = 'all 0.3s ease';
-        dot.onclick = () => loadLevel(i);
-        dot.title = `Mission ${i + 1}`;
+        if (isLocked) {
+            dot.innerText = '🔒';
+            dot.style.fontSize = '10px';
+            dot.style.display = 'flex';
+            dot.style.alignItems = 'center';
+            dot.style.justifyContent = 'center';
+        }
+        if (!isLocked) {
+            dot.onclick = () => loadLevel(i);
+        }
+        dot.title = isLocked ? `Mission ${i + 1} (Locked)` : `Mission ${i + 1}`;
         indicators.appendChild(dot);
     });
 }
