@@ -52,7 +52,10 @@
         </div>
         <h1 style="font-size: 3rem; margin-bottom: 1rem;">Course Complete!</h1>
         <p style="color: var(--text-muted); font-size: 1.2rem; margin-bottom: 2rem;">You are now a certified Prompt Engineer.<br>Your communication with AI is flawless.</p>
-        <button class="btn btn-primary" onclick="location.href='dashboard.html'">Return to Dashboard</button>
+        <div style="display: flex; gap: 1rem;">
+            <button class="btn btn-glass" onclick="document.getElementById('completionOverlay').style.display='none'">Revisit Missions</button>
+            <button class="btn btn-primary" onclick="location.href='dashboard.html'">Return to Dashboard</button>
+        </div>
     </div>
 
     <script src="progress.js"></script>

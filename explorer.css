@@ -286,3 +286,25 @@ body {
     transform: translate(-50%, -50%) scale(1);
     pointer-events: all;
 }
+
+/* Completion Overlay */
+.overlay-completion {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.9);
+    backdrop-filter: blur(10px);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: var(--card);
+    padding: 3rem;
+    border-radius: 30px;
+    text-align: center;
+    border: 2px solid var(--accent);
+    max-width: 500px;
+}
+

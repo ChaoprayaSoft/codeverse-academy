@@ -7,7 +7,17 @@
     <link rel="stylesheet" href="explorer.css">
 </head>
 <body>
-    <!-- Character overlay injected by explorer.js -->
+    <div id="completionOverlay" class="overlay-completion" style="display: none;">
+        <div class="modal-content">
+            <h1 style="font-size: 4rem;">🏆</h1>
+            <h2>EXPLORER GRADUATE</h2>
+            <p>You have mastered the foundations of logic and sequential thinking.</p>
+            <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+                <button class="run-btn" style="background: rgba(255,255,255,0.1); box-shadow: 0 5px 0 #334155;" onclick="document.getElementById('completionOverlay').style.display='none'">Revisit Levels</button>
+                <button class="run-btn" onclick="location.href='dashboard.html'">Return to Dashboard</button>
+            </div>
+        </div>
+    </div>
     <div class="level-nav">
         <div class="container" style="display: flex; align-items: center; justify-content: space-between; height: 60px;">
             <div style="font-weight: 800; font-size: 1.2rem; color: var(--accent);">EXPLORER <span style="color: white;">ACADEMY</span></div>

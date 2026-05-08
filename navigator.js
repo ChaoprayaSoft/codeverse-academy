@@ -288,20 +288,44 @@ function executeCode() {
     });
 }
 
+function nextLevel() {
+    winModal.style.display = 'none';
+    if (currentLevelIndex < LEVELS.length - 1) {
+        loadLevel(currentLevelIndex + 1);
+    } else {
+        // This shouldn't really be reachable if showWin handled it, 
+        // but let's make sure it goes back to dashboard if clicked again
+        location.href = 'dashboard.html';
+    }
+}
+
 function showWin() {
     const progress = getProgress();
     if (currentLevelIndex + 2 > progress.levels.navigator) {
         progress.levels.navigator = currentLevelIndex + 2;
         saveProgress(progress);
     }
-    if (currentLevelIndex === LEVELS.length - 1) completeMission('navigator', 500);
+    
+    const isFinal = currentLevelIndex === LEVELS.length - 1;
+    if (isFinal) {
+        completeMission('navigator', 500);
+        document.getElementById('winModalTitle').innerText = "NAVIGATOR GRADUATE! 🏆";
+        document.getElementById('winModalDesc').innerText = "You have mastered Python starship logic and celestial navigation.";
+        document.getElementById('nextLevelBtn').innerText = "Return to Dashboard";
+        
+        // Add Revisit Button if not already there
+        if (!document.getElementById('revisitBtn')) {
+            const revBtn = document.createElement('button');
+            revBtn.id = 'revisitBtn';
+            revBtn.className = 'run-btn';
+            revBtn.style.background = 'rgba(255,255,255,0.1)';
+            revBtn.innerText = "Revisit Missions";
+            revBtn.onclick = () => { winModal.style.display = 'none'; };
+            document.getElementById('nextLevelBtn').parentNode.insertBefore(revBtn, document.getElementById('nextLevelBtn'));
+        }
+    }
+    
     winModal.style.display = 'flex';
-}
-
-function nextLevel() {
-    winModal.style.display = 'none';
-    if (currentLevelIndex < LEVELS.length - 1) loadLevel(currentLevelIndex + 1);
-    else location.href = 'dashboard.html';
 }
 
 document.addEventListener('DOMContentLoaded', () => {

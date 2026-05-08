@@ -449,8 +449,11 @@ function showWin() {
 
 function nextLevel() {
     winModal.classList.remove('active');
-    if (currentLevelIndex < LEVELS.length - 1) loadLevel(currentLevelIndex + 1);
-    else location.href = 'dashboard.html';
+    if (currentLevelIndex < LEVELS.length - 1) {
+        loadLevel(currentLevelIndex + 1);
+    } else {
+        document.getElementById('completionOverlay').style.display = 'flex';
+    }
 }
 
 

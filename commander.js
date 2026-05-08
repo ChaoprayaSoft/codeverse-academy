@@ -235,6 +235,27 @@ function showWin() {
         progress.levels.commander = currentLevelIndex + 2;
         saveProgress(progress);
     }
+
+    const isFinal = currentLevelIndex === LEVELS.length - 1;
+    if (isFinal) {
+        completeMission('commander', 400);
+        document.querySelector('#winModal h1').innerText = "COMMANDER GRADUATE! 🏆";
+        document.querySelector('#winModal p').innerText = "You have mastered full-stack development and complex system orchestration.";
+        document.querySelector('#winModal button[onclick="nextLevel()"]').innerText = "Return to Dashboard";
+        
+        // Add Revisit Button if not already there
+        if (!document.getElementById('revisitBtn')) {
+            const revBtn = document.createElement('button');
+            revBtn.id = 'revisitBtn';
+            revBtn.className = 'run-btn';
+            revBtn.style.background = 'rgba(255,255,255,0.1)';
+            revBtn.style.marginRight = '10px';
+            revBtn.innerText = "Revisit Missions";
+            revBtn.onclick = () => { document.getElementById('winModal').style.display = 'none'; };
+            document.querySelector('#winModal button[onclick="nextLevel()"]').parentNode.insertBefore(revBtn, document.querySelector('#winModal button[onclick="nextLevel()"]'));
+        }
+    }
+
     winModal.style.display = 'flex';
 }
 
@@ -244,7 +265,6 @@ function nextLevel() {
     if (currentLevelIndex < LEVELS.length - 1) {
         loadLevel(currentLevelIndex + 1);
     } else {
-        completeMission('commander', 400);
         location.href = 'dashboard.html';
     }
 }

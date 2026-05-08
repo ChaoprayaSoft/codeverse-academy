@@ -681,6 +681,7 @@ function showCompletion() {
             <p>You have mastered the principles of AI through data, logic, and neural design!</p>
             <p style="color: #a78bfa; font-weight: bold; margin-top: 1rem;">+500 XP Earned</p>
             <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center;">
+                <button class="run-btn" style="background: rgba(255,255,255,0.1);" onclick="document.getElementById('completionOverlay').style.display='none'">Revisit Modules</button>
                 <button class="run-btn" onclick="location.href='dashboard.html'">Back to Dashboard</button>
             </div>
         </div>
