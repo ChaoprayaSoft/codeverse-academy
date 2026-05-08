@@ -79,6 +79,19 @@ body {
     transition: width 0.5s ease;
 }
 
+/* Level dot indicators in nav */
+#levelDots > div {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    display: inline-block;
+    transition: background 0.3s, transform 0.2s;
+}
+
+#levelDots > div:not([style*='not-allowed']):hover {
+    transform: scale(1.3);
+}
+
 .btn-exit {
     background: white;
     color: var(--muted);

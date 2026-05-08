@@ -270,18 +270,30 @@ function initLevel() {
 function renderProgressBar() {
     const container = document.getElementById('progressBar');
     container.innerHTML = '';
-    
+
+    const maxLevel = progressData.levels && progressData.levels.vision ? progressData.levels.vision : 1;
+
     levels.forEach((lvl, idx) => {
+        const isLocked = idx >= maxLevel;
         const dot = document.createElement('div');
-        dot.className = 'progress-dot';
-        if (idx === currentLevel) dot.classList.add('active');
-        if (idx + 1 < (progressData.levels.vision || 1)) dot.classList.add('completed');
-        
-        dot.onclick = () => {
-            currentLevel = idx;
-            initLevel();
-        };
-        
+        dot.className = 'level-dot';
+        dot.setAttribute('data-level', `Level ${idx + 1}`);
+
+        if (idx === currentLevel) {
+            dot.classList.add('active');
+        } else if (!isLocked) {
+            dot.classList.add('completed');
+        } else {
+            dot.classList.add('locked');
+        }
+
+        if (!isLocked) {
+            dot.onclick = () => {
+                currentLevel = idx;
+                initLevel();
+            };
+        }
+
         container.appendChild(dot);
     });
 }
