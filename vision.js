@@ -271,7 +271,8 @@ function renderProgressBar() {
     const container = document.getElementById('progressBar');
     container.innerHTML = '';
 
-    const maxLevel = progressData.levels && progressData.levels.vision ? progressData.levels.vision : 1;
+    const isCompleted = progressData.missions && progressData.missions.vision === true;
+    const maxLevel = isCompleted ? levels.length : (progressData.levels && progressData.levels.vision ? progressData.levels.vision : 1);
 
     levels.forEach((lvl, idx) => {
         const isLocked = idx >= maxLevel;

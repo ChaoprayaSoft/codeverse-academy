@@ -208,7 +208,8 @@ function renderLevelIndicators() {
     if (!dotsContainer) return;
     dotsContainer.innerHTML = '';
     const progress = getProgress();
-    const maxLevel = progress.levels && progress.levels.data_analytic ? progress.levels.data_analytic : 1;
+    const isCompleted = progress.missions && progress.missions.data_analytic === true;
+    const maxLevel = isCompleted ? modules.length : (progress.levels && progress.levels.data_analytic ? progress.levels.data_analytic : 1);
 
     modules.forEach((_, i) => {
         const isLocked = i >= maxLevel;

@@ -154,7 +154,8 @@ function initGame() {
 
 function renderLevelIndicators() {
     const progress = getProgress();
-    const maxLevel = progress.levels && progress.levels.commander ? progress.levels.commander : 1;
+    const isCompleted = progress.missions && progress.missions.commander === true;
+    const maxLevel = isCompleted ? LEVELS.length : (progress.levels && progress.levels.commander ? progress.levels.commander : 1);
 
     levelIndicators.innerHTML = '';
     LEVELS.forEach((_, i) => {

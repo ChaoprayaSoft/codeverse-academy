@@ -140,7 +140,8 @@ function renderMap() {
     map.innerHTML = '';
     
     const progress = getProgress();
-    const savedLevel = progress.levels[COURSE_ID] || 1;
+    const isCompleted = progress.missions && progress.missions.prompt_eng === true;
+    const savedLevel = isCompleted ? LEVELS.length : (progress.levels[COURSE_ID] || 1);
 
     LEVELS.forEach((lv, index) => {
         const node = document.createElement('div');

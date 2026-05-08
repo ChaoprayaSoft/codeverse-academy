@@ -419,7 +419,9 @@ function updateSystemMap() {
 
     // Ensure nodes fit in the container
     const spacing = Math.min(120, (map.clientWidth - 200) / (modules.length - 1));
-    const maxUnlocked = parseInt(localStorage.getItem(getLevelKey('architect')) || '0');
+    const progress = getProgress();
+    const isCompleted = progress.missions && progress.missions.architect === true;
+    const maxUnlocked = isCompleted ? modules.length : (progress.levels && progress.levels.architect ? progress.levels.architect : 1);
 
     modules.forEach((m, i) => {
         const isCurrent = i === currentModuleIndex;

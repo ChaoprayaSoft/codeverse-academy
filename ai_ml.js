@@ -311,7 +311,8 @@ function renderLevelIndicators() {
     dotsContainer.style.flexWrap = 'wrap';
 
     const progress = getProgress();
-    const maxLevel = progress.levels && progress.levels.ai_ml ? progress.levels.ai_ml : 1;
+    const isCompleted = progress.missions && progress.missions.ai_ml === true;
+    const maxLevel = isCompleted ? modules.length : (progress.levels && progress.levels.ai_ml ? progress.levels.ai_ml : 1);
 
     modules.forEach((_, i) => {
         const isLocked = i >= maxLevel;

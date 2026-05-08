@@ -191,7 +191,8 @@ function renderLevelIndicators() {
     }
     
     const progress = getProgress();
-    const maxLevel = progress.levels && progress.levels.navigator ? progress.levels.navigator : 1;
+    const isCompleted = progress.missions && progress.missions.navigator === true;
+    const maxLevel = isCompleted ? LEVELS.length : (progress.levels && progress.levels.navigator ? progress.levels.navigator : 1);
 
     indicators.innerHTML = '';
     LEVELS.forEach((_, i) => {
