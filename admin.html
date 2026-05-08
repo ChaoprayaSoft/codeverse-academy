@@ -257,10 +257,14 @@
                   + (badges.length > 4 ? `<span class="mini-badge">+${badges.length - 4}</span>` : '')
                 : `<span style="color:var(--muted);font-size:.75rem;">None yet</span>`;
 
-            // Course chips
+            // Course chips — show completion + current level
+            const levels  = p.levels || {};
             const courseHtml = COURSES.map(c => {
-                const done = missions[c.key] === true;
-                return `<span class="course-chip ${done ? 'course-done' : 'course-todo'}">${c.label}</span>`;
+                const done  = missions[c.key] === true;
+                const level = levels[c.key] || 1;
+                const cls   = done ? 'course-done' : 'course-todo';
+                const tick  = done ? ' ✓' : '';
+                return `<span class="course-chip ${cls}">${c.label}${tick}<span class="course-level">Lv.${level}</span></span>`;
             }).join('');
 
             // Last updated
