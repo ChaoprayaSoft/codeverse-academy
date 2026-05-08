@@ -1,5 +1,7 @@
 const PROGRESS_KEY = 'codeverse_progress';
 const USER_KEY = 'codeverse_user';
+const LAST_ACTIVITY_KEY = 'codeverse_last_activity';
+const SESSION_TIMEOUT_MS = 6 * 60 * 60 * 1000; // 6 hours in milliseconds
 
 // --- Google Sheets Sync Logic ---
 // IMPORTANT: Replace this with your Google Apps Script Web App URL after deployment
@@ -174,9 +176,84 @@ function saveProgress(progress) {
 
 // --- User Auth Logic ---
 
+// =============================================================
+// --- Session Timeout Logic (6-hour inactivity auto-logout) ---
+// =============================================================
+
+/**
+ * Stamps the current time as the last user-activity moment.
+ * Called on every meaningful user interaction.
+ */
+function _refreshActivityTimestamp() {
+    localStorage.setItem(LAST_ACTIVITY_KEY, Date.now().toString());
+}
+
+/**
+ * Returns true if the session has expired (no activity for SESSION_TIMEOUT_MS).
+ * Returns false if the user is not logged in (no action needed).
+ */
+function _isSessionExpired() {
+    const user = getUserProfile();
+    if (!user) return false; // Not logged in – nothing to expire
+
+    const lastActivity = parseInt(localStorage.getItem(LAST_ACTIVITY_KEY) || '0', 10);
+    if (!lastActivity) return false; // No timestamp recorded yet
+
+    return (Date.now() - lastActivity) >= SESSION_TIMEOUT_MS;
+}
+
+/**
+ * Checks for expiry and, if expired, logs the user out and redirects to the
+ * login page. Safe to call from any page.
+ */
+async function checkSessionTimeout() {
+    if (_isSessionExpired()) {
+        console.warn('⏰ Session expired after 6 hours of inactivity. Logging out.');
+        await logoutUser();
+        // Redirect to index/login page (works from any sub-page)
+        const loginPage = location.pathname.includes('index.html') ? 'index.html'
+            : location.pathname.split('/').map(() => '..').slice(1).join('/') + 'index.html';
+        window.location.href = 'index.html';
+    }
+}
+
+/**
+ * Bootstraps the session-timeout watcher. Call once on page load.
+ * - Attaches throttled activity listeners.
+ * - Runs a periodic check every 60 seconds.
+ * - Does an immediate check on load.
+ */
+function initSessionTimeout() {
+    // --- Immediate check on every page load ---
+    checkSessionTimeout();
+
+    // --- Throttled activity listeners (refresh at most once per 30 seconds) ---
+    let _throttleTimer = null;
+    const THROTTLE_MS = 30 * 1000;
+
+    const _onActivity = () => {
+        if (_throttleTimer) return; // Already scheduled
+        _refreshActivityTimestamp();
+        _throttleTimer = setTimeout(() => { _throttleTimer = null; }, THROTTLE_MS);
+    };
+
+    ['mousemove', 'keydown', 'mousedown', 'touchstart', 'scroll', 'click'].forEach(event => {
+        document.addEventListener(event, _onActivity, { passive: true });
+    });
+
+    // --- Periodic check every 60 seconds ---
+    setInterval(checkSessionTimeout, 60 * 1000);
+}
+
+// Auto-init as soon as this script is loaded
+document.addEventListener('DOMContentLoaded', initSessionTimeout);
+
+// =============================================================
+
 async function loginUser(name, email, avatar) {
     const profile = { name, email, avatar };
     localStorage.setItem(USER_KEY, JSON.stringify(profile));
+    _refreshActivityTimestamp(); // Start the inactivity clock on login
 
     // 1. Load progress from Sheets
     const remoteData = await loadProgressFromSheets(email);
@@ -222,6 +299,7 @@ async function logoutUser() {
         await new Promise(resolve => setTimeout(resolve, 300));
     }
     localStorage.removeItem(USER_KEY);
+    localStorage.removeItem(LAST_ACTIVITY_KEY); // Clear timeout clock on logout
     window.dispatchEvent(new Event('userStateChanged'));
 }
 
