@@ -279,7 +279,7 @@ function checkAnswer() {
         document.getElementById('nextBtn').style.display = 'block';
         
         const progress = getProgress();
-        const nextLv = currentLevelIndex + 2;
+        const nextLv = Math.min(currentLevelIndex + 2, LEVELS.length);
         if (nextLv > progress.levels[COURSE_ID]) {
             progress.levels[COURSE_ID] = nextLv;
             progress.xp += XP_PER_LEVEL;

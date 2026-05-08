@@ -330,7 +330,8 @@
                 if (!card || !title || !statusText) return;
 
                 const completed = progress.missions[c.key] === true;
-                const currentLv = (progress.levels && progress.levels[c.key]) || 1;
+                let currentLv = (progress.levels && progress.levels[c.key]) || 1;
+                currentLv = Math.min(currentLv, c.total);
 
                 // Update Title with Progress
                 title.innerHTML = `${c.label} <span style="font-size:0.8rem; opacity:0.7; font-weight:normal;">(${currentLv}/${c.total})</span>`;

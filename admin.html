@@ -262,7 +262,8 @@
             const levels  = p.levels || {};
             const courseHtml = COURSES.map(c => {
                 const done  = missions[c.key] === true;
-                const level = levels[c.key] || 1;
+                let level   = levels[c.key] || 1;
+                level = Math.min(level, c.total);
                 const cls   = done ? 'course-done' : 'course-todo';
                 const tick  = done ? ' ✓' : '';
                 return `<span class="course-chip ${cls}">${c.label}${tick}<span class="course-level">Lv.${level}/${c.total}</span></span>`;
