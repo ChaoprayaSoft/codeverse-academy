@@ -335,8 +335,8 @@ function showFeedback(success, text) {
 function closeFeedback(success) {
     document.getElementById('feedbackModal').style.display = 'none';
     if (success) {
-        currentLevel++;
-        if (currentLevel < levels.length) {
+        if (currentLevel < levels.length - 1) {
+            currentLevel++;
             initLevel();
         } else {
             finishGame();

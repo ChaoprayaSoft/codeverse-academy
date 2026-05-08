@@ -132,7 +132,8 @@ function init() {
 function updateStats() {
     const progress = getProgress();
     document.getElementById('xpValue').innerText = progress.xp;
-    document.getElementById('levelValue').innerText = `${currentLevelIndex + 1}/${LEVELS.length}`;
+    const displayLevel = Math.min(currentLevelIndex + 1, LEVELS.length);
+    document.getElementById('levelValue').innerText = `${displayLevel}/${LEVELS.length}`;
 }
 
 function renderMap() {
@@ -300,16 +301,17 @@ function checkAnswer() {
 }
 
 function nextLevel() {
-    currentLevelIndex++;
-    if (currentLevelIndex >= LEVELS.length) {
-        completeMission(COURSE_ID, 500); // Bonus for finishing
-        showCompletion();
-    } else {
+    if (currentLevelIndex < LEVELS.length - 1) {
+        currentLevelIndex++;
         document.getElementById('submitBtn').style.display = 'block';
         document.getElementById('nextBtn').style.display = 'none';
         loadLevel(currentLevelIndex);
         renderMap();
+    } else {
+        completeMission(COURSE_ID, 500); // Bonus for finishing
+        showCompletion();
     }
+    updateStats();
 }
 
 function showCompletion() {
