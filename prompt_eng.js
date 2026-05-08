@@ -38,13 +38,10 @@ const LEVELS = [
     {
         id: 4,
         title: "Shot Spectrum",
-        type: "matching",
-        description: "Match the prompting technique to its definition.",
-        pairs: [
-            { left: "Zero-shot", right: "Asking without examples" },
-            { left: "One-shot", right: "Providing exactly one example" },
-            { left: "Few-shot", right: "Providing several examples" }
-        ],
+        type: "drag-drop",
+        description: "Arrange the prompting techniques from simplest to most complex (lowest to highest number of examples).",
+        pool: ["Zero-shot", "One-shot", "Few-shot"],
+        answer: ["Zero-shot", "One-shot", "Few-shot"],
         hint: "The number in the name tells you how many examples are given."
     },
     {
@@ -90,14 +87,11 @@ const LEVELS = [
     {
         id: 9,
         title: "Conversation Flow",
-        type: "matching",
-        description: "Match the Chat Role to its typical function.",
-        pairs: [
-            { left: "System", right: "Sets global rules" },
-            { left: "User", right: "Provides instructions/queries" },
-            { left: "Assistant", right: "The AI's response" }
-        ],
-        hint: "The 'System' message is like the AI's constitution."
+        type: "drag-drop",
+        description: "Design a standard Chat Loop order: Start with System rules, then User query, then Assistant response.",
+        pool: ["System", "User", "Assistant"],
+        answer: ["System", "User", "Assistant"],
+        hint: "The 'System' message is like the AI's constitution and must come first."
     },
     {
         id: 10,
@@ -149,8 +143,8 @@ function renderMap() {
         node.innerText = lv.id;
         
         if (index === currentLevelIndex) node.classList.add('current', 'unlocked');
-        else if (index < savedLevel) node.classList.add('completed', 'unlocked');
-        else if (index < savedLevel) node.classList.add('unlocked');
+        else if (index < savedLevel - 1) node.classList.add('completed', 'unlocked');
+        else if (index <= savedLevel - 1) node.classList.add('unlocked');
         else node.classList.add('locked');
 
         node.onclick = () => {
@@ -158,6 +152,7 @@ function renderMap() {
                 currentLevelIndex = index;
                 loadLevel(index);
                 renderMap();
+                updateStats();
             }
         };
         map.appendChild(node);
@@ -233,54 +228,7 @@ function loadLevel(index) {
         interaction.appendChild(new Text("Your Prompt:"));
         interaction.appendChild(targetDiv);
     }
-    else if (level.type === 'matching') {
-        const container = document.createElement('div');
-        container.className = 'matching-container';
-        
-        const leftCol = document.createElement('div');
-        leftCol.className = 'matching-column';
-        const rightCol = document.createElement('div');
-        rightCol.className = 'matching-column';
 
-        const shuffledRight = [...level.pairs].sort(() => Math.random() - 0.5);
-
-        level.pairs.forEach((p, i) => {
-            const lItem = document.createElement('div');
-            lItem.className = 'match-item';
-            lItem.style.background = 'var(--primary)';
-            lItem.innerText = p.left;
-            leftCol.appendChild(lItem);
-
-            const rItem = document.createElement('div');
-            rItem.className = 'match-item';
-            rItem.innerText = shuffledRight[i].right;
-            rItem.draggable = true;
-            rItem.dataset.index = i;
-            rItem.ondragstart = (e) => e.dataTransfer.setData('text', i);
-            
-            // For simplicity in this demo, let's use click-to-select for matching too
-            rItem.onclick = () => {
-                if (rItem.classList.contains('selected')) {
-                    rItem.classList.remove('selected');
-                } else {
-                    document.querySelectorAll('.matching-column:last-child .match-item').forEach(el => el.classList.remove('selected'));
-                    rItem.classList.add('selected');
-                }
-            };
-            
-            rightCol.appendChild(rItem);
-        });
-
-        interaction.appendChild(container);
-        container.appendChild(leftCol);
-        container.appendChild(rightCol);
-        
-        const note = document.createElement('p');
-        note.style.fontSize = '0.8rem';
-        note.style.marginTop = '1rem';
-        note.innerText = "(Note: In this prototype, arrange them correctly. Just click 'Submit' to verify current order.)";
-        interaction.appendChild(note);
-    }
     else if (level.type === 'coding') {
         const editor = document.createElement('div');
         editor.className = 'prompt-editor';
@@ -315,12 +263,7 @@ function checkAnswer() {
         const items = Array.from(document.getElementById('dragTarget').querySelectorAll('.draggable')).map(el => el.innerText);
         isCorrect = JSON.stringify(items) === JSON.stringify(level.answer);
     }
-    else if (level.type === 'matching') {
-        // Simple logic: check if the right column matches the original pairs order
-        const items = Array.from(document.querySelectorAll('.matching-column:last-child .match-item')).map(el => el.innerText);
-        const correctOrder = level.pairs.map(p => p.right);
-        isCorrect = JSON.stringify(items) === JSON.stringify(correctOrder);
-    }
+
     else if (level.type === 'coding') {
         const input = document.getElementById('promptInput').value;
         isCorrect = input.toLowerCase().includes(level.answer.toLowerCase());
@@ -336,12 +279,14 @@ function checkAnswer() {
         document.getElementById('nextBtn').style.display = 'block';
         
         const progress = getProgress();
-        if (currentLevelIndex + 1 >= progress.levels[COURSE_ID]) {
-            progress.levels[COURSE_ID] = currentLevelIndex + 2;
+        const nextLv = currentLevelIndex + 2;
+        if (nextLv > progress.levels[COURSE_ID]) {
+            progress.levels[COURSE_ID] = nextLv;
             progress.xp += XP_PER_LEVEL;
             saveProgress(progress);
-            updateStats();
         }
+        updateStats();
+        renderMap();
     } else {
         feedback.className = 'feedback-error';
         feedback.innerText = "SIGNAL REJECTED: " + (level.hint || "Try again, Commander.");
