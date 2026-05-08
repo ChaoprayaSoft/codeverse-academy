@@ -376,3 +376,34 @@ function updateGlobalProgressUI() {
 document.addEventListener('DOMContentLoaded', updateGlobalProgressUI);
 window.addEventListener('progressUpdated', updateGlobalProgressUI);
 
+// =============================================================
+// --- Role Refresh (fixes "Admin shows as Student" for existing users) ---
+// =============================================================
+
+/**
+ * Called on every page load.
+ * If the user is logged in but their cached profile has no role,
+ * we silently fetch the role from Google Sheets and update localStorage.
+ * This handles users who logged in before the role feature was added.
+ */
+async function refreshRoleFromSheets() {
+    const user = getUserProfile();
+    if (!user || !user.email) return; // Not logged in, nothing to do
+    if (user.role) return;            // Role already cached, skip fetch
+
+    console.log('🔍 No role cached. Fetching role from Sheets for:', user.email);
+    try {
+        const remoteData = await loadProgressFromSheets(user.email);
+        if (remoteData && remoteData.role) {
+            user.role = remoteData.role;
+            localStorage.setItem(USER_KEY, JSON.stringify(user));
+            console.log(`✅ Role synced from Sheets: ${remoteData.role}`);
+            window.dispatchEvent(new Event('userStateChanged'));
+        }
+    } catch (e) {
+        console.warn('Role refresh failed silently:', e);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', refreshRoleFromSheets);
+
