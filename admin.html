@@ -125,13 +125,13 @@
     <script>
         // ── Constants ─────────────────────────────────────────────
         const COURSES = [
-            { key: 'explorer',     label: '🚀 Explorer',  },
-            { key: 'navigator',    label: '🛰️ Navigator'  },
-            { key: 'commander',    label: '🛸 Commander'  },
-            { key: 'architect',    label: '🌌 Architect'  },
-            { key: 'data_analytic',label: '📊 Data'       },
-            { key: 'ai_ml',        label: '🧠 AI/ML'      },
-            { key: 'vision',       label: '🖥️ Vision'     },
+            { key: 'explorer',      label: '🚀 Explorer',   total: 5  },
+            { key: 'navigator',     label: '🛰️ Navigator',  total: 6  },
+            { key: 'commander',     label: '🛸 Commander',  total: 5  },
+            { key: 'architect',     label: '🌌 Architect',  total: 12 },
+            { key: 'data_analytic', label: '📊 Data',       total: 10 },
+            { key: 'ai_ml',         label: '🧠 AI/ML',      total: 20 },
+            { key: 'vision',        label: '🖥️ Vision',     total: 15 },
         ];
 
         let allUsers   = [];
@@ -257,14 +257,14 @@
                   + (badges.length > 4 ? `<span class="mini-badge">+${badges.length - 4}</span>` : '')
                 : `<span style="color:var(--muted);font-size:.75rem;">None yet</span>`;
 
-            // Course chips — show completion + current level
+            // Course chips — show completion + current level / total
             const levels  = p.levels || {};
             const courseHtml = COURSES.map(c => {
                 const done  = missions[c.key] === true;
                 const level = levels[c.key] || 1;
                 const cls   = done ? 'course-done' : 'course-todo';
                 const tick  = done ? ' ✓' : '';
-                return `<span class="course-chip ${cls}">${c.label}${tick}<span class="course-level">Lv.${level}</span></span>`;
+                return `<span class="course-chip ${cls}">${c.label}${tick}<span class="course-level">${level}/${c.total}</span></span>`;
             }).join('');
 
             // Last updated
