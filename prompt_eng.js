@@ -117,13 +117,16 @@ let currentDragItems = [];
 function init() {
     const progress = getProgress();
     const currentLv = progress.levels[COURSE_ID] || 1;
-    currentLevelIndex = currentLv - 1;
+    
+    // Clamp index to valid range
+    currentLevelIndex = Math.min(currentLv - 1, LEVELS.length - 1);
 
-    if (currentLevelIndex >= LEVELS.length) {
+    renderMap();
+    loadLevel(currentLevelIndex);
+    
+    // If they already finished, show the completion overlay on load
+    if (progress.missions[COURSE_ID] || currentLv > LEVELS.length) {
         showCompletion();
-    } else {
-        renderMap();
-        loadLevel(currentLevelIndex);
     }
     
     updateStats();
