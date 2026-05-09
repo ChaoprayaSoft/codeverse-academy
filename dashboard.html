@@ -277,8 +277,8 @@
             const welcomeMsg = document.getElementById('welcomeMsg');
             const avatar = document.getElementById('dashboardAvatar');
             const role = user.role || 'Student';
-            const roleColors = { Admin: '#f59e0b', Teacher: '#6366f1', Student: '#10b981' };
-            const roleIcons = { Admin: '🛡️', Teacher: '👩‍🏫', Student: '🧑‍🚀' };
+            const roleColors = { Admin: '#f59e0b', Teacher: '#6366f1', Student: '#10b981', Guest: '#64748b' };
+            const roleIcons = { Admin: '🛡️', Teacher: '👩‍🏫', Student: '🧑‍🚀', Guest: '👤' };
             const roleColor = roleColors[role] || '#10b981';
             const roleIcon = roleIcons[role] || '🧑‍🚀';
             welcomeMsg.innerHTML = `Welcome back, <strong>${user.name}</strong>. Ready for your next mission? &nbsp;<span style="font-size:0.8rem;font-weight:700;background:${roleColor}22;color:${roleColor};border:1px solid ${roleColor}55;padding:3px 10px;border-radius:100px;vertical-align:middle;">${roleIcon} ${role}</span>`;

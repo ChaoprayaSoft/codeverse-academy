@@ -410,23 +410,29 @@
     <!-- Role Selection Modal (first-time login) -->
     <div id="roleModal"
         style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(8px);">
-        <div style="background: #0f172a; border: 2px solid rgba(99,102,241,0.4); padding: 2.5rem; border-radius: 24px; width: 480px; max-width: 92%; text-align: center; font-family: 'Outfit', sans-serif; color: #f1f5f9; box-shadow: 0 0 60px rgba(99,102,241,0.2);">
+        <div style="background: #0f172a; border: 2px solid rgba(99,102,241,0.4); padding: 2.5rem; border-radius: 24px; width: 550px; max-width: 92%; text-align: center; font-family: 'Outfit', sans-serif; color: #f1f5f9; box-shadow: 0 0 60px rgba(99,102,241,0.2);">
             <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🚀</div>
             <h2 style="font-size: 1.9rem; font-weight: 800; margin: 0 0 0.5rem;">Welcome to <span style="background: linear-gradient(90deg,#6366f1,#38bdf8); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">CodeVerse!</span></h2>
             <p style="color: #94a3b8; font-size: 1rem; margin-bottom: 2rem;">Before we launch, tell us who you are. This helps us personalise your experience.</p>
 
-            <div style="display: flex; gap: 1rem; justify-content: center;">
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; justify-content: center;">
                 <!-- Teacher Card -->
-                <button id="roleTeacherBtn" onclick="chooseRole('Teacher')" style="flex: 1; background: rgba(99,102,241,0.08); border: 2px solid rgba(99,102,241,0.3); border-radius: 20px; padding: 1.5rem 1rem; cursor: pointer; color: #f1f5f9; font-family: 'Outfit', sans-serif; transition: all 0.25s;" onmouseover="this.style.borderColor='#6366f1';this.style.background='rgba(99,102,241,0.18)'" onmouseout="this.style.borderColor='rgba(99,102,241,0.3)';this.style.background='rgba(99,102,241,0.08)'">
-                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">👩‍🏫</div>
-                    <div style="font-size: 1.2rem; font-weight: 800; margin-bottom: 0.3rem;">Teacher</div>
-                    <div style="font-size: 0.8rem; color: #94a3b8;">Manage missions &amp; track student progress</div>
+                <button onclick="chooseRole('Teacher')" style="background: rgba(99,102,241,0.08); border: 2px solid rgba(99,102,241,0.3); border-radius: 20px; padding: 1.5rem 0.5rem; cursor: pointer; color: #f1f5f9; font-family: 'Outfit', sans-serif; transition: all 0.25s;" onmouseover="this.style.borderColor='#6366f1';this.style.background='rgba(99,102,241,0.18)'" onmouseout="this.style.borderColor='rgba(99,102,241,0.3)';this.style.background='rgba(99,102,241,0.08)'">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">👩‍🏫</div>
+                    <div style="font-size: 1.1rem; font-weight: 800; margin-bottom: 0.3rem;">Teacher</div>
+                    <div style="font-size: 0.75rem; color: #94a3b8;">Manage missions</div>
                 </button>
                 <!-- Student Card -->
-                <button id="roleStudentBtn" onclick="chooseRole('Student')" style="flex: 1; background: rgba(16,185,129,0.08); border: 2px solid rgba(16,185,129,0.3); border-radius: 20px; padding: 1.5rem 1rem; cursor: pointer; color: #f1f5f9; font-family: 'Outfit', sans-serif; transition: all 0.25s;" onmouseover="this.style.borderColor='#10b981';this.style.background='rgba(16,185,129,0.18)'" onmouseout="this.style.borderColor='rgba(16,185,129,0.3)';this.style.background='rgba(16,185,129,0.08)'">
-                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🧑‍🚀</div>
-                    <div style="font-size: 1.2rem; font-weight: 800; margin-bottom: 0.3rem;">Student</div>
-                    <div style="font-size: 0.8rem; color: #94a3b8;">Explore courses &amp; complete missions</div>
+                <button onclick="chooseRole('Student')" style="background: rgba(16,185,129,0.08); border: 2px solid rgba(16,185,129,0.3); border-radius: 20px; padding: 1.5rem 0.5rem; cursor: pointer; color: #f1f5f9; font-family: 'Outfit', sans-serif; transition: all 0.25s;" onmouseover="this.style.borderColor='#10b981';this.style.background='rgba(16,185,129,0.18)'" onmouseout="this.style.borderColor='rgba(16,185,129,0.3)';this.style.background='rgba(16,185,129,0.08)'">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">🧑‍🚀</div>
+                    <div style="font-size: 1.1rem; font-weight: 800; margin-bottom: 0.3rem;">Student</div>
+                    <div style="font-size: 0.75rem; color: #94a3b8;">Explore &amp; learn</div>
+                </button>
+                <!-- Guest Card -->
+                <button onclick="chooseRole('Guest')" style="background: rgba(148,163,184,0.08); border: 2px solid rgba(148,163,184,0.3); border-radius: 20px; padding: 1.5rem 0.5rem; cursor: pointer; color: #f1f5f9; font-family: 'Outfit', sans-serif; transition: all 0.25s;" onmouseover="this.style.borderColor='#94a3b8';this.style.background='rgba(148,163,184,0.18)'" onmouseout="this.style.borderColor='rgba(148,163,184,0.3)';this.style.background='rgba(148,163,184,0.08)'">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">👤</div>
+                    <div style="font-size: 1.1rem; font-weight: 800; margin-bottom: 0.3rem;">Guest</div>
+                    <div style="font-size: 0.75rem; color: #94a3b8;">Observe &amp; browse</div>
                 </button>
             </div>
 
@@ -474,8 +480,8 @@
             });
         }
 
-        const ROLE_COLORS = { Admin: '#f59e0b', Teacher: '#6366f1', Student: '#10b981' };
-        const ROLE_ICONS  = { Admin: '🛡️', Teacher: '👩‍🏫', Student: '🧑‍🚀' };
+        const ROLE_COLORS = { Admin: '#f59e0b', Teacher: '#6366f1', Student: '#10b981', Guest: '#94a3b8' };
+        const ROLE_ICONS  = { Admin: '🛡️', Teacher: '👩‍🏫', Student: '🧑‍🚀', Guest: '👤' };
 
         function updateUI() {
             const user = getUserProfile();
@@ -593,15 +599,11 @@
 
         // Detect logout request from dashboard
         if (window.location.search.includes('logout=true')) {
-            console.log("Logout Flag Detected. Clearing session...");
             logoutUser().then(() => {
-                console.log("Session cleared. Finalizing UI...");
-                // Clean URL
                 window.history.replaceState({}, document.title, window.location.pathname);
                 updateUI();
             });
         } else {
-            // Initial load
             updateUI();
         }
     </script>

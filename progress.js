@@ -81,7 +81,7 @@ function getUserProfile() {
 }
 
 /**
- * Returns the current user's role: 'Admin', 'Teacher', 'Student', or null.
+ * Returns the current user's role: 'Admin', 'Teacher', 'Student', 'Guest', or null.
  */
 function getUserRole() {
     const user = getUserProfile();
@@ -140,8 +140,6 @@ function getProgress() {
         const parsed = JSON.parse(data);
 
         // --- DEEP MERGE FAILSAFE ---
-        // This ensures that even if the user has old data, 
-        // the new 'levels' object and all course fields will always exist.
         const safeProgress = JSON.parse(JSON.stringify(defaultProgress));
 
         if (parsed.xp !== undefined) safeProgress.xp = parsed.xp;
@@ -156,7 +154,7 @@ function getProgress() {
             }
         }
 
-        // Merge Levels (Crucial for fixing the 'broken UI' bug)
+        // Merge Levels
         if (parsed.levels) {
             for (const key in safeProgress.levels) {
                 if (parsed.levels[key] !== undefined) {
@@ -194,32 +192,20 @@ function saveProgress(progress) {
 // --- Session Timeout Logic (1-hour inactivity auto-logout) ---
 // =============================================================
 
-/**
- * Stamps the current time as the last user-activity moment.
- * Called on every meaningful user interaction.
- */
 function _refreshActivityTimestamp() {
     localStorage.setItem(LAST_ACTIVITY_KEY, Date.now().toString());
 }
 
-/**
- * Returns true if the session has expired (no activity for SESSION_TIMEOUT_MS).
- * Returns false if the user is not logged in (no action needed).
- */
 function _isSessionExpired() {
     const user = getUserProfile();
-    if (!user) return false; // Not logged in – nothing to expire
+    if (!user) return false;
 
     const lastActivity = parseInt(localStorage.getItem(LAST_ACTIVITY_KEY) || '0', 10);
-    if (!lastActivity) return false; // No timestamp recorded yet
+    if (!lastActivity) return false;
 
     return (Date.now() - lastActivity) >= SESSION_TIMEOUT_MS;
 }
 
-/**
- * Checks for expiry and, if expired, logs the user out and redirects to the
- * login page. Safe to call from any page.
- */
 async function checkSessionTimeout() {
     if (_isSessionExpired()) {
         console.warn('⏰ Session expired after 1 hour of inactivity. Logging out.');
@@ -228,9 +214,6 @@ async function checkSessionTimeout() {
     }
 }
 
-/**
- * Bootstraps the session-timeout watcher. Call once on page load.
- */
 function initSessionTimeout() {
     checkSessionTimeout();
     let _throttleTimer = null;

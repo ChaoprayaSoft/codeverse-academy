@@ -62,20 +62,25 @@
                 <div class="stat-value" id="statStudents">—</div>
                 <div class="stat-label">Students</div>
             </div>
+            <div class="stat-card" style="--stat-color: #94a3b8;">
+                <div class="stat-icon">👤</div>
+                <div class="stat-value" id="statGuests">—</div>
+                <div class="stat-label">Guests</div>
+            </div>
             <div class="stat-card" style="--stat-color: #f59e0b;">
                 <div class="stat-icon">⚡</div>
                 <div class="stat-value" id="statXp">—</div>
-                <div class="stat-label">Total XP Earned</div>
+                <div class="stat-label">Total XP</div>
             </div>
             <div class="stat-card" style="--stat-color: #06b6d4;">
                 <div class="stat-icon">🏅</div>
                 <div class="stat-value" id="statBadges">—</div>
-                <div class="stat-label">Badges Awarded</div>
+                <div class="stat-label">Badges</div>
             </div>
             <div class="stat-card" style="--stat-color: #8b5cf6;">
                 <div class="stat-icon">✅</div>
                 <div class="stat-value" id="statMissions">—</div>
-                <div class="stat-label">Missions Completed</div>
+                <div class="stat-label">Completed</div>
             </div>
         </div>
 
@@ -91,6 +96,7 @@
                     <button class="filter-btn"         data-role="Admin"   onclick="setFilter('Admin')">🛡️ Admin</button>
                     <button class="filter-btn"         data-role="Teacher" onclick="setFilter('Teacher')">👩‍🏫 Teacher</button>
                     <button class="filter-btn"         data-role="Student" onclick="setFilter('Student')">🧑‍🚀 Student</button>
+                    <button class="filter-btn"         data-role="Guest"   onclick="setFilter('Guest')">👤 Guest</button>
                 </div>
             </div>
             <span class="total-count" id="countLabel">Loading…</span>
@@ -190,6 +196,7 @@
             const admins   = allUsers.filter(u => u.role === 'Admin').length;
             const teachers = allUsers.filter(u => u.role === 'Teacher').length;
             const students = allUsers.filter(u => !u.role || u.role === 'Student').length;
+            const guests   = allUsers.filter(u => u.role === 'Guest').length;
 
             let totalXp = 0, totalBadges = 0, totalMissions = 0;
             allUsers.forEach(u => {
@@ -203,6 +210,7 @@
             setText('statAdmins',   admins);
             setText('statTeachers', teachers);
             setText('statStudents', students);
+            setText('statGuests',   guests);
             setText('statXp',       totalXp.toLocaleString());
             setText('statBadges',   totalBadges);
             setText('statMissions', totalMissions);
@@ -223,7 +231,8 @@
             const tbody   = document.getElementById('tableBody');
 
             let filtered = allUsers.filter(u => {
-                const matchRole   = filterRole === 'All' || (u.role || 'Student') === filterRole;
+                const actualRole = u.role || 'Student';
+                const matchRole   = filterRole === 'All' || actualRole === filterRole;
                 const matchSearch = !query
                     || (u.name  || '').toLowerCase().includes(query)
                     || (u.email || '').toLowerCase().includes(query);
@@ -253,13 +262,11 @@
                 ? u.avatar
                 : `https://ui-avatars.com/api/?name=${encodeURIComponent(u.name||'?')}&background=6366f1&color=fff&size=80`;
 
-            // Badges cell
             const badgeHtml = badges.length
                 ? badges.slice(0, 4).map(b => `<span class="mini-badge">${b}</span>`).join('')
                   + (badges.length > 4 ? `<span class="mini-badge">+${badges.length - 4}</span>` : '')
                 : `<span style="color:var(--muted);font-size:.75rem;">None yet</span>`;
 
-            // Course chips — show completion + current level / total
             const levels  = p.levels || {};
             const courseHtml = COURSES.map(c => {
                 const done  = missions[c.key] === true;
@@ -270,7 +277,6 @@
                 return `<span class="course-chip ${cls}">${c.label}${tick}<span class="course-level">Lv.${level}/${c.total}</span></span>`;
             }).join('');
 
-            // Last updated
             const lastActive = u.lastUpdated
                 ? new Date(u.lastUpdated).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' })
                 : '—';
@@ -297,7 +303,10 @@
 
         // ── Helpers ────────────────────────────────────────────────
         function roleIcon(role) {
-            return role === 'Admin' ? '🛡️' : role === 'Teacher' ? '👩‍🏫' : '🧑‍🚀';
+            if (role === 'Admin') return '🛡️';
+            if (role === 'Teacher') return '👩‍🏫';
+            if (role === 'Guest') return '👤';
+            return '🧑‍🚀';
         }
 
         function setText(id, val) {

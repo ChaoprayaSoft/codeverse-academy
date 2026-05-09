@@ -157,6 +157,7 @@ body {
 .filter-btn[data-role="Admin"].active   { background: var(--warn);    border-color: var(--warn); }
 .filter-btn[data-role="Teacher"].active { background: var(--primary); border-color: var(--primary); }
 .filter-btn[data-role="Student"].active { background: var(--success); border-color: var(--success); }
+.filter-btn[data-role="Guest"].active   { background: var(--text-mid); border-color: var(--text-mid); }
 
 .total-count { color: var(--muted); font-size: .8rem; font-weight: 600; }
 
@@ -205,6 +206,7 @@ body {
 .role-Admin   { background: var(--warn-soft);   color: #b45309; border: 1px solid rgba(245,158,11,.15); }
 .role-Teacher { background: var(--primary-soft); color: #4338ca; border: 1px solid rgba(99,102,241,.15); }
 .role-Student { background: var(--success-soft); color: #047857; border: 1px solid rgba(16,185,129,.15); }
+.role-Guest   { background: #f1f5f9;           color: #475569; border: 1px solid #e2e8f0; }
 
 /* XP */
 .xp-value { font-size: .9rem; font-weight: 800; color: #b45309; }
