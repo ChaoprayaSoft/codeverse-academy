@@ -45,6 +45,30 @@ function doPost(e) {
       return createResponse("new_user", "No progress found");
     }
 
+    // ACTION: GET USERS (Admin Only)
+    if (data.action === 'getUsers') {
+      if (rowIndex === -1 || rows[rowIndex - 1][4] !== 'Admin') {
+        return createResponse("error", "Unauthorized access");
+      }
+      
+      const users = [];
+      for (let i = 1; i < rows.length; i++) {
+        const r = rows[i];
+        if (!r[0]) continue; // Skip empty rows
+        users.push({
+          email: r[0],
+          name: r[1],
+          avatar: r[2],
+          color: r[3],
+          role: r[4] || "Student",
+          progress: r[5] ? JSON.parse(r[5]) : null,
+          lastUpdated: r[6],
+          status: r[7]
+        });
+      }
+      return createResponse("success", "Users fetched", { users });
+    }
+
     // ACTION: SYNC / LOGIN / LOGOUT
     const progressJson = data.progress ? JSON.stringify(data.progress) : (rowIndex > -1 ? rows[rowIndex-1][5] : "");
     const lastUpdated = new Date();
