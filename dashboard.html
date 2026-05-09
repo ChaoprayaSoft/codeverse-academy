@@ -43,7 +43,7 @@
                 <div class="xp-bar-container">
                     <div class="xp-bar-fill" id="xpBar"></div>
                 </div>
-                <div style="font-size: 0.75rem; color: #64748b; text-align: right;">Next Rank: Elite (1,500 XP)</div>
+                <div style="font-size: 0.75rem; color: #64748b; text-align: right;">Next Rank: Elite (5,000 XP)</div>
             </div>
         </div>
 
@@ -278,7 +278,7 @@
 
             // Update XP
             document.getElementById('totalXp').innerText = progress.xp.toLocaleString();
-            const xpPercentage = Math.min(100, (progress.xp / 2950) * 100);
+            const xpPercentage = Math.min(100, (progress.xp / 7000) * 100);
             document.getElementById('xpBar').style.width = xpPercentage + '%';
 
             // Update Badges
@@ -297,6 +297,7 @@
                 else if (name.includes("data")) { emoji = "🐼"; color = "#ED8936"; }
                 else if (name.includes("ai")) { emoji = "🧠"; color = "#A78BFA"; }
                 else if (name.includes("vision")) { emoji = "🖥️"; color = "#0EA5E9"; }
+                else if (name.includes("prompt")) { emoji = "✍️"; color = "#6366f1"; }
 
                 const svg = `
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">

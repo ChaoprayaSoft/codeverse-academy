@@ -439,10 +439,14 @@ function move(direction, walls) {
 
 function showWin() {
     const progress = getProgress();
-    if (currentLevelIndex + 2 > progress.levels.explorer) {
+    const isNewLevel = (currentLevelIndex + 2 > progress.levels.explorer);
+    
+    if (isNewLevel) {
         progress.levels.explorer = currentLevelIndex + 2;
         saveProgress(progress);
+        awardXP(20); // Award XP for first-time completion of this mission
     }
+    
     if (currentLevelIndex === LEVELS.length - 1) completeMission('explorer', 250);
     winModal.classList.add('active');
 }

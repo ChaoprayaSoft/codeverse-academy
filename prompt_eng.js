@@ -290,10 +290,11 @@ function checkAnswer() {
         
         const progress = getProgress();
         const nextLv = Math.min(currentLevelIndex + 2, LEVELS.length);
-        if (nextLv > progress.levels[COURSE_ID]) {
+        const isNewLevel = (nextLv > progress.levels[COURSE_ID]);
+        if (isNewLevel) {
             progress.levels[COURSE_ID] = nextLv;
-            progress.xp += XP_PER_LEVEL;
             saveProgress(progress);
+            awardXP(XP_PER_LEVEL);
         }
         updateStats();
         renderMap();

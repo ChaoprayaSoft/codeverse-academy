@@ -468,9 +468,11 @@ function checkDragComplete(m) {
 
 function handleSuccess(msg) {
     const progress = getProgress();
-    if (currentModuleIndex + 2 > progress.levels.ai_ml) {
+    const isNewLevel = (currentModuleIndex + 2 > progress.levels.ai_ml);
+    if (isNewLevel) {
         progress.levels.ai_ml = currentModuleIndex + 2;
         saveProgress(progress);
+        awardXP(15);
     }
     outputDisplay.innerHTML = `<div style="color:#10b981;">> SUCCESS: ${msg}</div>`;
     feedbackEl.textContent = msg;

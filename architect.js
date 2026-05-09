@@ -575,9 +575,11 @@ function executeCode() {
     setTimeout(() => {
         if (results.all) {
             const progress = getProgress();
-            if (currentModuleIndex + 2 > progress.levels.architect) {
+            const isNewLevel = (currentModuleIndex + 2 > progress.levels.architect);
+            if (isNewLevel) {
                 progress.levels.architect = currentModuleIndex + 2;
                 saveProgress(progress);
+                awardXP(40);
             }
             addTerminalLine("Python Core: Execution Successful", "success");
             addTerminalLine("Variables mapped correctly.", "success");
@@ -656,6 +658,7 @@ function nextModule() {
 }
 
 function triggerGraduation() {
+    awardXP(500); // Award graduation bonus first
     const overlay = document.getElementById('completionOverlay');
     overlay.style.display = 'flex';
     overlay.innerHTML = `
@@ -666,7 +669,7 @@ function triggerGraduation() {
             <div class="stats">
                 <div class="stat-card">
                     <span class="label">Total XP</span>
-                    <span class="value">${getProgress().xp + 1000}</span>
+                    <span class="value">${getProgress().xp}</span>
                 </div>
                 <div class="stat-card">
                     <span class="label">Rank</span>
@@ -681,9 +684,6 @@ function triggerGraduation() {
             <button onclick="document.getElementById('completionOverlay').style.display='none'" style="position: absolute; top: 20px; right: 20px; background: transparent; border: none; color: white; font-size: 2rem; cursor: pointer;">✕</button>
         </div>
     `;
-
-    // Final progress update
-    completeMission('architect', 1000);
 }
 
 document.addEventListener('DOMContentLoaded', () => {

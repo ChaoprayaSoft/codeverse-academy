@@ -301,9 +301,12 @@ function nextLevel() {
 
 function showWin() {
     const progress = getProgress();
-    if (currentLevelIndex + 2 > progress.levels.navigator) {
+    const isNewLevel = (currentLevelIndex + 2 > progress.levels.navigator);
+    
+    if (isNewLevel) {
         progress.levels.navigator = currentLevelIndex + 2;
         saveProgress(progress);
+        awardXP(25); // Award XP for first-time completion of this mission
     }
     
     const isFinal = currentLevelIndex === LEVELS.length - 1;

@@ -308,9 +308,11 @@ function checkAnswer(val) {
         score += 100;
         
         // Update Highest Level reached
-        if (currentLevel + 2 > (progressData.levels.vision || 1)) {
+        const isNewLevel = (currentLevel + 2 > (progressData.levels.vision || 1));
+        if (isNewLevel) {
             progressData.levels.vision = currentLevel + 2;
             saveProgress(progressData);
+            awardXP(50); // Award XP immediately
         }
     } else {
         showFeedback(false, "Not quite! " + level.hint);
@@ -345,12 +347,8 @@ function closeFeedback(success) {
 }
 
 async function finishGame() {
-    progressData.missions.vision = true;
-    progressData.xp += score;
-    if (!progressData.badges.includes("Vision Specialist")) {
-        progressData.badges.push("Vision Specialist");
-    }
-    saveProgress(progressData);
+    completeMission('vision', 250); // Standard final reward
+    const progressData = getProgress();
     
     document.querySelector('.mission-card').innerHTML = `
         <div style="text-align: center;">

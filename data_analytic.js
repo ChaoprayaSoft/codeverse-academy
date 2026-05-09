@@ -276,9 +276,11 @@ function executeCode() {
     setTimeout(() => {
         if (results.all) {
             const progress = getProgress();
-            if (currentModuleIndex + 2 > progress.levels.data_analytic) {
+            const isNewLevel = (currentModuleIndex + 2 > progress.levels.data_analytic);
+            if (isNewLevel) {
                 progress.levels.data_analytic = currentModuleIndex + 2;
                 saveProgress(progress);
+                awardXP(20);
             }
             outputDisplay.innerHTML += '<div style="color: #48BB78;">> Analysis Complete. Results valid.</div>';
             renderChart(m.chartData);

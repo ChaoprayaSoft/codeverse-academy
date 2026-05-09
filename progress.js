@@ -1,7 +1,7 @@
 const PROGRESS_KEY = 'codeverse_progress';
 const USER_KEY = 'codeverse_user';
 const LAST_ACTIVITY_KEY = 'codeverse_last_activity';
-const SESSION_TIMEOUT_MS = 6 * 60 * 60 * 1000; // 6 hours in milliseconds
+const SESSION_TIMEOUT_MS = 1 * 60 * 60 * 1000; // 1 hour in milliseconds
 
 // --- Google Sheets Sync Logic ---
 // IMPORTANT: Replace this with your Google Apps Script Web App URL after deployment
@@ -189,7 +189,7 @@ function saveProgress(progress) {
 // --- User Auth Logic ---
 
 // =============================================================
-// --- Session Timeout Logic (6-hour inactivity auto-logout) ---
+// --- Session Timeout Logic (1-hour inactivity auto-logout) ---
 // =============================================================
 
 /**
@@ -220,7 +220,7 @@ function _isSessionExpired() {
  */
 async function checkSessionTimeout() {
     if (_isSessionExpired()) {
-        console.warn('⏰ Session expired after 6 hours of inactivity. Logging out.');
+        console.warn('⏰ Session expired after 1 hour of inactivity. Logging out.');
         await logoutUser();
         // Redirect to index/login page (works from any sub-page)
         const loginPage = location.pathname.includes('index.html') ? 'index.html'
@@ -345,20 +345,34 @@ async function logoutUser() {
     window.dispatchEvent(new Event('userStateChanged'));
 }
 
+function awardXP(amount) {
+    const progress = getProgress();
+    progress.xp += amount;
+    saveProgress(progress);
+    console.log(`Earned ${amount} XP! Total: ${progress.xp}`);
+}
+
 function completeMission(missionId, xpReward) {
     const progress = getProgress();
+    let updated = false;
+
     if (!progress.missions[missionId]) {
         progress.missions[missionId] = true;
         progress.xp += xpReward;
-
-        // Add badge if not already there
-        const badgeName = missionId.charAt(0).toUpperCase() + missionId.slice(1) + " Wings";
-        if (!progress.badges.includes(badgeName)) {
-            progress.badges.push(badgeName);
-        }
-
-        saveProgress(progress);
+        updated = true;
         console.log(`Mission ${missionId} completed! Reward: ${xpReward} XP`);
+    }
+
+    // Add badge if not already there (independent of mission completion flag)
+    const badgeName = missionId.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') + " Wings";
+    if (!progress.badges.includes(badgeName)) {
+        progress.badges.push(badgeName);
+        updated = true;
+        console.log(`Badge earned: ${badgeName}`);
+    }
+
+    if (updated) {
+        saveProgress(progress);
     }
 }
 
@@ -370,7 +384,7 @@ function updateGlobalProgressUI() {
 
     const barElements = document.querySelectorAll('.global-xp-bar');
     barElements.forEach(bar => {
-        const percentage = Math.min(100, (progress.xp / 2950) * 100); // Max XP is 2950
+        const percentage = Math.min(100, (progress.xp / 7000) * 100); // Max XP is ~7000
         bar.style.width = percentage + '%';
     });
 }
