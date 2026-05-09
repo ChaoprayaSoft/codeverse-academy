@@ -165,11 +165,11 @@ body {
     background: #fff;
     border: 1px solid var(--border);
     border-radius: 16px;
-    overflow: hidden;
+    overflow-x: auto;
     box-shadow: var(--shadow-sm);
 }
 
-.user-table { width: 100%; border-collapse: collapse; }
+.user-table { width: 100%; border-collapse: collapse; min-width: 1000px; }
 
 .user-table thead th {
     background: var(--surface);
@@ -273,7 +273,7 @@ body {
     margin-top: .5rem;
     display: inline-block;
     background: var(--primary); color: #fff;
-    padding: .6rem 1.5rem; border-radius: 10px;
+    padding: .6rem 1.5rem; border-radius: 100px;
     text-decoration: none; font-weight: 700; font-size: .9rem;
     transition: var(--transition);
 }

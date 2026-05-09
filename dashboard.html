@@ -37,12 +37,13 @@
                 <div class="xp-card">
                     <div style="display: flex; justify-content: space-between; align-items: baseline;">
                         <span style="font-weight: 800; font-size: 1.5rem;" id="totalXp">0</span>
-                        <span style="color: #94a3b8; font-size: 0.8rem;">TOTAL XP</span>
+                        <span style="color: #94a3b8; font-size: 0.8rem;" id="rankLabel">Novice</span>
                     </div>
                     <div class="xp-bar-container">
                         <div class="xp-bar-fill" id="xpBar"></div>
                     </div>
-                    <div style="font-size: 0.75rem; color: #64748b; text-align: right;">Next Rank: Elite (8,000 XP)
+                    <div style="font-size: 0.75rem; color: #64748b; text-align: right;" id="nextRankMsg">
+                        Next Rank: Explorer (2,000 XP)
                     </div>
                 </div>
             </div>
@@ -239,10 +240,27 @@
             { key: 'robotics', label: 'Fundamentals of Robot', total: 20 },
         ];
 
+        function getRank(xp) {
+            if (xp >= 10000) return "Grandmaster";
+            if (xp >= 8000) return "Elite";
+            if (xp >= 6000) return "Commander";
+            if (xp >= 4000) return "Expert";
+            if (xp >= 2000) return "Explorer";
+            return "Novice";
+        }
+
+        function getNextRankInfo(xp) {
+            if (xp >= 10000) return { next: "Ultimate", goal: 15000 };
+            if (xp >= 8000) return { next: "Grandmaster", goal: 10000 };
+            if (xp >= 6000) return { next: "Elite", goal: 8000 };
+            if (xp >= 4000) return { next: "Commander", goal: 6000 };
+            if (xp >= 2000) return { next: "Expert", goal: 4000 };
+            return { next: "Explorer", goal: 2000 };
+        }
+
         function updateDashboard() {
             const user = getUserProfile();
 
-            // Empty state if not logged in
             if (!user) {
                 document.querySelector('.dashboard-container').innerHTML = `
                     <div style="text-align: center; margin-top: 10rem;">
@@ -256,19 +274,17 @@
 
             const progress = getProgress();
 
-            // Personalize Dashboard
             const welcomeMsg = document.getElementById('welcomeMsg');
             const avatar = document.getElementById('dashboardAvatar');
             const role = user.role || 'Student';
             const roleColors = { Admin: '#f59e0b', Teacher: '#6366f1', Student: '#10b981' };
-            const roleIcons = { Admin: '\uD83D\uDEE1\uFE0F', Teacher: '\uD83D\uDC69\u200D\uD83C\uDFEB', Student: '\uD83E\uDDD1\u200D\uD83D\uDE80' };
+            const roleIcons = { Admin: '🛡️', Teacher: '👩‍🏫', Student: '🧑‍🚀' };
             const roleColor = roleColors[role] || '#10b981';
-            const roleIcon = roleIcons[role] || '\uD83E\uDDD1\u200D\uD83D\uDE80';
+            const roleIcon = roleIcons[role] || '🧑‍🚀';
             welcomeMsg.innerHTML = `Welcome back, <strong>${user.name}</strong>. Ready for your next mission? &nbsp;<span style="font-size:0.8rem;font-weight:700;background:${roleColor}22;color:${roleColor};border:1px solid ${roleColor}55;padding:3px 10px;border-radius:100px;vertical-align:middle;">${roleIcon} ${role}</span>`;
             avatar.src = user.avatar;
             avatar.style.display = 'block';
 
-            // Admin-only button
             const adminSlot = document.getElementById('adminLinkSlot');
             if (adminSlot) {
                 adminSlot.innerHTML = role === 'Admin'
@@ -276,27 +292,26 @@
                     : '';
             }
 
-            // Populate Modal Fields
             document.getElementById('editName').value = user.name;
             const colorMatch = user.avatar.match(/background=([a-f0-9]{6})/i);
-            if (colorMatch) {
-                document.getElementById('editColor').value = '#' + colorMatch[1];
-            }
+            if (colorMatch) document.getElementById('editColor').value = '#' + colorMatch[1];
+            
             const animalMatch = user.avatar.match(/name=([^&]+)/i);
             if (animalMatch) {
                 const decoded = decodeURIComponent(animalMatch[1]);
-                if (animals.includes(decoded)) {
-                    selectedAnimal = decoded;
-                }
+                if (animals.includes(decoded)) selectedAnimal = decoded;
             }
             initAvatarPicker();
 
-            // Update XP
             document.getElementById('totalXp').innerText = progress.xp.toLocaleString();
-            const xpPercentage = Math.min(100, (progress.xp / 9000) * 100);
+            const xpPercentage = Math.min(100, (progress.xp / 11000) * 100);
             document.getElementById('xpBar').style.width = xpPercentage + '%';
 
-            // Update Badges
+            const currentRank = getRank(progress.xp);
+            const nextRank = getNextRankInfo(progress.xp);
+            document.getElementById('rankLabel').innerText = currentRank;
+            document.getElementById('nextRankMsg').innerText = `Next Rank: ${nextRank.next} (${nextRank.goal.toLocaleString()} XP)`;
+
             const badgeGrid = document.getElementById('badgeGrid');
             badgeGrid.innerHTML = '';
 
@@ -315,13 +330,7 @@
                 else if (name.includes("prompt")) { emoji = "✍️"; color = "#6366f1"; }
                 else if (name.includes("robot")) { emoji = "🤖"; color = "#ef4444"; }
 
-                const svg = `
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-                        <circle cx="50" cy="50" r="45" fill="none" stroke="${color}" stroke-width="6" stroke-dasharray="10 6"/>
-                        <circle cx="50" cy="50" r="38" fill="${color}" fill-opacity="0.15" stroke="${color}" stroke-width="2"/>
-                        <text x="50" y="65" font-size="40" text-anchor="middle">${emoji}</text>
-                    </svg>
-                `;
+                const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="none" stroke="${color}" stroke-width="6" stroke-dasharray="10 6"/><circle cx="50" cy="50" r="38" fill="${color}" fill-opacity="0.15" stroke="${color}" stroke-width="2"/><text x="50" y="65" font-size="40" text-anchor="middle">${emoji}</text></svg>`;
                 return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
             }
 
@@ -331,15 +340,11 @@
                 progress.badges.forEach(badge => {
                     const div = document.createElement('div');
                     div.className = 'badge-card';
-                    div.innerHTML = `
-                        <img src="${getAnimalStamp(badge)}" class="badge-icon" alt="${badge}">
-                        <div style="font-size: 0.9rem; font-weight: 800;">${badge}</div>
-                    `;
+                    div.innerHTML = `<img src="${getAnimalStamp(badge)}" class="badge-icon" alt="${badge}"><div style="font-size: 0.9rem; font-weight: 800;">${badge}</div>`;
                     badgeGrid.appendChild(div);
                 });
             }
 
-            // Update Mission Status & Levels
             COURSES.forEach(c => {
                 const card = document.getElementById(`card-${c.key}`);
                 const title = document.getElementById(`title-${c.key}`);
@@ -350,7 +355,6 @@
                 let currentLv = (progress.levels && progress.levels[c.key]) || 1;
                 currentLv = Math.min(currentLv, c.total);
 
-                // Update Title with Progress
                 if (completed) {
                     title.innerHTML = `${c.label} <span style="font-size:0.8rem; color:var(--success); font-weight:800;">(COMPLETE)</span>`;
                     card.classList.add('completed');
@@ -367,9 +371,7 @@
 
         function saveProfile() {
             const newName = document.getElementById('editName').value.trim();
-            let newColor = document.getElementById('editColor').value;
-            newColor = newColor.replace('#', ''); // strip hash
-
+            let newColor = document.getElementById('editColor').value.replace('#', '');
             if (newName) {
                 const user = getUserProfile();
                 if (user) {
@@ -380,7 +382,7 @@
                     window.dispatchEvent(new Event('userStateChanged'));
                     updateDashboard();
                     document.getElementById('profileModal').style.display = 'none';
-                    syncNow(); // Auto-sync after edit
+                    syncNow();
                 }
             }
         }
@@ -389,14 +391,11 @@
             const btn = document.getElementById('syncBtn');
             const icon = document.getElementById('syncIcon');
             const text = document.getElementById('syncText');
-
             btn.disabled = true;
             btn.style.opacity = '0.7';
             icon.innerText = '⏳';
             text.innerText = 'Syncing...';
-
             const result = await syncNow();
-
             if (result.status === 'success') {
                 icon.innerText = '✅';
                 text.innerText = 'Synced!';
@@ -408,7 +407,6 @@
                 btn.style.background = '#fee2e2';
                 btn.style.color = '#ef4444';
             }
-
             setTimeout(() => {
                 icon.innerText = '☁️';
                 text.innerText = 'Sync Cloud';
@@ -421,16 +419,11 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             updateDashboard();
-            handleManualSync(); // Auto-sync on load
+            handleManualSync();
         });
-        async function handleLogout() {
-            // We redirect to index.html with a logout flag so it can log the exit safely
-            location.href = 'index.html?logout=true';
-        }
 
         window.addEventListener('userStateChanged', updateDashboard);
         window.addEventListener('progressUpdated', updateDashboard);
     </script>
 </body>
-
 </html>

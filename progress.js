@@ -224,63 +224,38 @@ async function checkSessionTimeout() {
     if (_isSessionExpired()) {
         console.warn('⏰ Session expired after 1 hour of inactivity. Logging out.');
         await logoutUser();
-        // Redirect to index/login page (works from any sub-page)
-        const loginPage = location.pathname.includes('index.html') ? 'index.html'
-            : location.pathname.split('/').map(() => '..').slice(1).join('/') + 'index.html';
         window.location.href = 'index.html';
     }
 }
 
 /**
  * Bootstraps the session-timeout watcher. Call once on page load.
- * - Attaches throttled activity listeners.
- * - Runs a periodic check every 60 seconds.
- * - Does an immediate check on load.
  */
 function initSessionTimeout() {
-    // --- Immediate check on every page load ---
     checkSessionTimeout();
-
-    // --- Throttled activity listeners (refresh at most once per 30 seconds) ---
     let _throttleTimer = null;
     const THROTTLE_MS = 30 * 1000;
-
     const _onActivity = () => {
-        if (_throttleTimer) return; // Already scheduled
+        if (_throttleTimer) return;
         _refreshActivityTimestamp();
         _throttleTimer = setTimeout(() => { _throttleTimer = null; }, THROTTLE_MS);
     };
-
     ['mousemove', 'keydown', 'mousedown', 'touchstart', 'scroll', 'click'].forEach(event => {
         document.addEventListener(event, _onActivity, { passive: true });
     });
-
-    // --- Periodic check every 60 seconds ---
     setInterval(checkSessionTimeout, 60 * 1000);
 }
 
-// Auto-init as soon as this script is loaded
 document.addEventListener('DOMContentLoaded', initSessionTimeout);
 
-// =============================================================
-
 /**
- * Logs in a user. On first login (no existing role in Sheets), `role` will be
- * null — the caller (index.html) must then prompt with the Role Selection Modal
- * and call setUserRole() once the user picks.
- *
- * @param {string} name
- * @param {string} email
- * @param {string} avatar
- * @param {string|null} [role=null]  – Optional: pre-supply if already known
- * @returns {{ profile, isNewUser: boolean }}
+ * Logs in a user.
  */
 async function loginUser(name, email, avatar, role = null) {
     const profile = { name, email, avatar, role: role || null };
     localStorage.setItem(USER_KEY, JSON.stringify(profile));
-    _refreshActivityTimestamp(); // Start the inactivity clock on login
+    _refreshActivityTimestamp();
 
-    // 1. Load progress + role from Sheets
     const remoteData = await loadProgressFromSheets(email);
     let isNewUser = true;
     if (remoteData) {
@@ -288,23 +263,21 @@ async function loginUser(name, email, avatar, role = null) {
         if (remoteData.name) profile.name = remoteData.name;
         if (remoteData.avatar) profile.avatar = remoteData.avatar;
         if (remoteData.color) profile.color = remoteData.color;
-        // Respect the server-side role (Admins are assigned server-side only)
         if (remoteData.role) profile.role = remoteData.role;
         localStorage.setItem(USER_KEY, JSON.stringify(profile));
 
         const localProgress = getProgress();
         if (remoteData.progress && remoteData.progress.xp >= localProgress.xp) {
-            localStorage.setItem(`codeverse_progress_${email.replace(/[^a-zA-Z0-9]/g, '')}`, JSON.stringify(remoteData.progress));
+            localStorage.setItem(getProgressKey(), JSON.stringify(remoteData.progress));
         }
     }
 
-    // 2. Record LOGIN in Logs and ensure User exists with initial JSON
     await syncWithSheets('login', {
         name,
         avatar,
         status: 'Login',
         role: profile.role || "",
-        progress: getProgress() // Send current progress to initialize if new
+        progress: getProgress()
     });
 
     window.dispatchEvent(new Event('userStateChanged'));
@@ -312,38 +285,26 @@ async function loginUser(name, email, avatar, role = null) {
     return { profile, isNewUser: isNewUser && !profile.role };
 }
 
-/**
- * Saves a newly chosen role for the current user and syncs it to Sheets.
- * Should only be called once per new user (from the role-selection modal).
- * @param {'Teacher'|'Student'} role
- */
 async function setUserRole(role) {
     const user = getUserProfile();
     if (!user) return;
     user.role = role;
     localStorage.setItem(USER_KEY, JSON.stringify(user));
-    await syncNow(); // Push the role to Sheets immediately
+    await syncNow();
     window.dispatchEvent(new Event('userStateChanged'));
 }
 
 async function logoutUser() {
     const user = getUserProfile();
     if (user && user.email) {
-        // Safe URL builder (handles existing '?' if any)
         const separator = SHEETS_API_URL.includes('?') ? '&' : '?';
-        const logoutUrl = `${SHEETS_API_URL}${separator}action=logout&email=${encodeURIComponent(user.email)}&name=${encodeURIComponent(user.name)}&status=Logout`;
-
-        console.log("🌌 DEEP SPACE SIGNAL SENT:", logoutUrl);
-
-        // THE ULTIMATE PING: Browsers will NEVER block an image-style request
+        const logoutUrl = `${SHEETS_API_URL}${separator}action=logout&email=${encodeURIComponent(user.email)}`;
         const ping = new Image();
         ping.src = logoutUrl;
-
-        // Wait a tiny moment for the signal to leave the ship
         await new Promise(resolve => setTimeout(resolve, 300));
     }
     localStorage.removeItem(USER_KEY);
-    localStorage.removeItem(LAST_ACTIVITY_KEY); // Clear timeout clock on logout
+    localStorage.removeItem(LAST_ACTIVITY_KEY);
     window.dispatchEvent(new Event('userStateChanged'));
 }
 
@@ -351,7 +312,6 @@ function awardXP(amount) {
     const progress = getProgress();
     progress.xp += amount;
     saveProgress(progress);
-    console.log(`Earned ${amount} XP! Total: ${progress.xp}`);
 }
 
 function completeMission(missionId, xpReward) {
@@ -362,15 +322,12 @@ function completeMission(missionId, xpReward) {
         progress.missions[missionId] = true;
         progress.xp += xpReward;
         updated = true;
-        console.log(`Mission ${missionId} completed! Reward: ${xpReward} XP`);
     }
 
-    // Add badge if not already there (independent of mission completion flag)
     const badgeName = missionId.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') + " Wings";
     if (!progress.badges.includes(badgeName)) {
         progress.badges.push(badgeName);
         updated = true;
-        console.log(`Badge earned: ${badgeName}`);
     }
 
     if (updated) {
@@ -378,7 +335,6 @@ function completeMission(missionId, xpReward) {
     }
 }
 
-// Global UI Updater for progress bars (if they exist on the page)
 function updateGlobalProgressUI() {
     const progress = getProgress();
     const xpElements = document.querySelectorAll('.global-xp-value');
@@ -386,7 +342,7 @@ function updateGlobalProgressUI() {
 
     const barElements = document.querySelectorAll('.global-xp-bar');
     barElements.forEach(bar => {
-        const percentage = Math.min(100, (progress.xp / 9000) * 100); // Max XP is ~9000
+        const percentage = Math.min(100, (progress.xp / 11000) * 100);
         bar.style.width = percentage + '%';
     });
 }
@@ -394,34 +350,19 @@ function updateGlobalProgressUI() {
 document.addEventListener('DOMContentLoaded', updateGlobalProgressUI);
 window.addEventListener('progressUpdated', updateGlobalProgressUI);
 
-// =============================================================
-// --- Role Refresh (fixes "Admin shows as Student" for existing users) ---
-// =============================================================
-
-/**
- * Called on every page load.
- * If the user is logged in but their cached profile has no role,
- * we silently fetch the role from Google Sheets and update localStorage.
- * This handles users who logged in before the role feature was added.
- */
 async function refreshRoleFromSheets() {
     const user = getUserProfile();
-    if (!user || !user.email) return; // Not logged in, nothing to do
-    if (user.role) return;            // Role already cached, skip fetch
+    if (!user || !user.email) return;
+    if (user.role) return;
 
-    console.log('🔍 No role cached. Fetching role from Sheets for:', user.email);
     try {
         const remoteData = await loadProgressFromSheets(user.email);
         if (remoteData && remoteData.role) {
             user.role = remoteData.role;
             localStorage.setItem(USER_KEY, JSON.stringify(user));
-            console.log(`✅ Role synced from Sheets: ${remoteData.role}`);
             window.dispatchEvent(new Event('userStateChanged'));
         }
-    } catch (e) {
-        console.warn('Role refresh failed silently:', e);
-    }
+    } catch (e) {}
 }
 
 document.addEventListener('DOMContentLoaded', refreshRoleFromSheets);
-
