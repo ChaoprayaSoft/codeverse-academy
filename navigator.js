@@ -311,6 +311,7 @@ function showWin() {
     
     const isFinal = currentLevelIndex === LEVELS.length - 1;
     if (isFinal) {
+        console.log("🏁 Final Navigator mission reached. Awarding badge...");
         completeMission('navigator', 500);
         document.getElementById('winModalTitle').innerText = "NAVIGATOR GRADUATE! 🏆";
         document.getElementById('winModalDesc').innerText = "You have mastered Python starship logic and celestial navigation.";

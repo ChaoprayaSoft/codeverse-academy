@@ -33,18 +33,21 @@
 
                     </div>
                 </div>
+
+                <div class="xp-card">
+                    <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                        <span style="font-weight: 800; font-size: 1.5rem;" id="totalXp">0</span>
+                        <span style="color: #94a3b8; font-size: 0.8rem;">TOTAL XP</span>
+                    </div>
+                    <div class="xp-bar-container">
+                        <div class="xp-bar-fill" id="xpBar"></div>
+                    </div>
+                    <div style="font-size: 0.75rem; color: #64748b; text-align: right;">Next Rank: Elite (8,000 XP)
+                    </div>
+                </div>
             </div>
 
-            <div class="xp-card">
-                <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                    <span style="font-weight: 800; font-size: 1.5rem;" id="totalXp">0</span>
-                    <span style="color: #94a3b8; font-size: 0.8rem;">TOTAL XP</span>
-                </div>
-                <div class="xp-bar-container">
-                    <div class="xp-bar-fill" id="xpBar"></div>
-                </div>
-                <div style="font-size: 0.75rem; color: #64748b; text-align: right;">Next Rank: Elite (5,000 XP)</div>
-            </div>
+
         </div>
 
         <section>
@@ -131,9 +134,20 @@
                 <div class="status-card" id="card-prompt_eng">
                     <div>
                         <h3 style="margin: 0;" id="title-prompt_eng">Prompt Engineering</h3>
-                        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;" id="status-prompt_eng">Path Unlocked</p>
+                        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;" id="status-prompt_eng">Path
+                            Unlocked</p>
                     </div>
                     <a href="prompt_eng.html" class="btn-continue">Launch Mission</a>
+                </div>
+
+                <!-- Robotics -->
+                <div class="status-card" id="card-robotics">
+                    <div>
+                        <h3 style="margin: 0;" id="title-robotics">Fundamentals of Robot</h3>
+                        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;" id="status-robotics">Path
+                            Unlocked</p>
+                    </div>
+                    <a href="robotics.html" class="btn-continue">Launch Mission</a>
                 </div>
             </div>
         </section>
@@ -214,14 +228,15 @@
         }
 
         const COURSES = [
-            { key: 'explorer',      label: 'Explorer Path',   total: 5  },
-            { key: 'navigator',     label: 'Navigator Path',  total: 6  },
-            { key: 'commander',     label: 'Commander Path',  total: 5  },
-            { key: 'architect',     label: 'Architect Path',  total: 12 },
-            { key: 'data_analytic', label: 'Data Analytic',   total: 10 },
-            { key: 'ai_ml',         label: 'AI & Machine Learning', total: 20 },
-            { key: 'vision',        label: 'Computer Vision', total: 15 },
-            { key: 'prompt_eng',    label: 'Prompt Engineering', total: 10 },
+            { key: 'explorer', label: 'Explorer Path', total: 5 },
+            { key: 'navigator', label: 'Navigator Path', total: 6 },
+            { key: 'commander', label: 'Commander Path', total: 5 },
+            { key: 'architect', label: 'Architect Path', total: 12 },
+            { key: 'data_analytic', label: 'Data Analytic', total: 10 },
+            { key: 'ai_ml', label: 'AI & Machine Learning', total: 20 },
+            { key: 'vision', label: 'Computer Vision', total: 15 },
+            { key: 'prompt_eng', label: 'Prompt Engineering', total: 10 },
+            { key: 'robotics', label: 'Fundamentals of Robot', total: 20 },
         ];
 
         function updateDashboard() {
@@ -278,7 +293,7 @@
 
             // Update XP
             document.getElementById('totalXp').innerText = progress.xp.toLocaleString();
-            const xpPercentage = Math.min(100, (progress.xp / 7000) * 100);
+            const xpPercentage = Math.min(100, (progress.xp / 9000) * 100);
             document.getElementById('xpBar').style.width = xpPercentage + '%';
 
             // Update Badges
@@ -298,6 +313,7 @@
                 else if (name.includes("ai")) { emoji = "🧠"; color = "#A78BFA"; }
                 else if (name.includes("vision")) { emoji = "🖥️"; color = "#0EA5E9"; }
                 else if (name.includes("prompt")) { emoji = "✍️"; color = "#6366f1"; }
+                else if (name.includes("robot")) { emoji = "🤖"; color = "#ef4444"; }
 
                 const svg = `
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -335,12 +351,16 @@
                 currentLv = Math.min(currentLv, c.total);
 
                 // Update Title with Progress
-                title.innerHTML = `${c.label} <span style="font-size:0.8rem; opacity:0.7; font-weight:normal;">(${currentLv}/${c.total})</span>`;
-
                 if (completed) {
+                    title.innerHTML = `${c.label} <span style="font-size:0.8rem; color:var(--success); font-weight:800;">(COMPLETE)</span>`;
                     card.classList.add('completed');
                     statusText.innerText = 'MISSION COMPLETE';
                     statusText.style.color = 'var(--success)';
+                } else {
+                    title.innerHTML = `${c.label} <span style="font-size:0.8rem; opacity:0.7; font-weight:normal;">(Level ${currentLv}/${c.total})</span>`;
+                    card.classList.remove('completed');
+                    statusText.innerText = 'Path Unlocked';
+                    statusText.style.color = '#94a3b8';
                 }
             });
         }
@@ -409,6 +429,7 @@
         }
 
         window.addEventListener('userStateChanged', updateDashboard);
+        window.addEventListener('progressUpdated', updateDashboard);
     </script>
 </body>
 

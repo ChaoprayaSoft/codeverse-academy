@@ -114,7 +114,8 @@ const defaultProgress = {
         data_analytic: false,
         ai_ml: false,
         vision: false,
-        prompt_eng: false
+        prompt_eng: false,
+        robotics: false
     },
     levels: {
         explorer: 1,
@@ -124,7 +125,8 @@ const defaultProgress = {
         data_analytic: 1,
         ai_ml: 1,
         vision: 1,
-        prompt_eng: 1
+        prompt_eng: 1,
+        robotics: 1
     },
     badges: []
 };
@@ -283,11 +285,11 @@ async function loginUser(name, email, avatar, role = null) {
     let isNewUser = true;
     if (remoteData) {
         isNewUser = false;
-        if (remoteData.name)  profile.name  = remoteData.name;
+        if (remoteData.name) profile.name = remoteData.name;
         if (remoteData.avatar) profile.avatar = remoteData.avatar;
-        if (remoteData.color)  profile.color  = remoteData.color;
+        if (remoteData.color) profile.color = remoteData.color;
         // Respect the server-side role (Admins are assigned server-side only)
-        if (remoteData.role)  profile.role   = remoteData.role;
+        if (remoteData.role) profile.role = remoteData.role;
         localStorage.setItem(USER_KEY, JSON.stringify(profile));
 
         const localProgress = getProgress();
@@ -332,11 +334,11 @@ async function logoutUser() {
         const logoutUrl = `${SHEETS_API_URL}${separator}action=logout&email=${encodeURIComponent(user.email)}&name=${encodeURIComponent(user.name)}&status=Logout`;
 
         console.log("🌌 DEEP SPACE SIGNAL SENT:", logoutUrl);
-        
+
         // THE ULTIMATE PING: Browsers will NEVER block an image-style request
         const ping = new Image();
         ping.src = logoutUrl;
-        
+
         // Wait a tiny moment for the signal to leave the ship
         await new Promise(resolve => setTimeout(resolve, 300));
     }
@@ -384,7 +386,7 @@ function updateGlobalProgressUI() {
 
     const barElements = document.querySelectorAll('.global-xp-bar');
     barElements.forEach(bar => {
-        const percentage = Math.min(100, (progress.xp / 7000) * 100); // Max XP is ~7000
+        const percentage = Math.min(100, (progress.xp / 9000) * 100); // Max XP is ~9000
         bar.style.width = percentage + '%';
     });
 }
