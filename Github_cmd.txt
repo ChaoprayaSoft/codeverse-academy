@@ -2,4 +2,7 @@ git init
 git remote add origin https://github.com/ChaoprayaSoft/codeverse-academy.git
 git config user.email "tiawongsombat@gmail.com"
 git config user.name "ChaoprayaSoft"
-git commit -am "Update existing files
+git commit -am "Update existing files"
+git push origin main --force
+
+

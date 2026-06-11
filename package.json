@@ -1,0 +1,25 @@
+{
+  "dependencies": {
+    "firebase": "^12.14.0",
+    "google-auth-library": "^10.7.0"
+  },
+  "name": "codeverse",
+  "version": "1.0.0",
+  "description": "",
+  "main": "ai_ml.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChaoprayaSoft/codeverse-academy.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ChaoprayaSoft/codeverse-academy/issues"
+  },
+  "homepage": "https://github.com/ChaoprayaSoft/codeverse-academy#readme"
+}

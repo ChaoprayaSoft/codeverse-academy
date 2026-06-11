@@ -547,7 +547,10 @@
         });
 
         async function handleCredentialResponse(response) {
-            // Decode JWT Token
+            // Save the secure JWT token so the backend proxy can verify it
+            localStorage.setItem('codeverse_google_token', response.credential);
+
+            // Decode JWT Token for UI display
             const base64Url = response.credential.split('.')[1];
             const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
             const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {

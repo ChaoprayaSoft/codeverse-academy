@@ -3,23 +3,25 @@ const USER_KEY = 'codeverse_user';
 const LAST_ACTIVITY_KEY = 'codeverse_last_activity';
 const SESSION_TIMEOUT_MS = 1 * 60 * 60 * 1000; // 1 hour in milliseconds
 
-// --- Google Sheets Sync Logic ---
-// IMPORTANT: Replace this with your Google Apps Script Web App URL after deployment
-const SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbwlFbkGFdmLHA0olAwITzqUhCvD2bmfVkQRIN5XHAlAU8cyoQFmtgyQnBsbKKLExFEoJg/exec';
+// --- Backend API Sync Logic ---
+// Secure Vercel API endpoint for CodeVerse
+const BACKEND_API_URL = '/api/codeverse';
 
 async function syncWithSheets(action, extraData = {}) {
-    if (!SHEETS_API_URL) return null;
+    if (!BACKEND_API_URL) return null;
 
     const user = getUserProfile();
     const email = user ? user.email : 'guest';
+    const token = localStorage.getItem('codeverse_google_token');
+    
+    if (!token) return null;
 
     try {
-        const response = await fetch(SHEETS_API_URL, {
+        const response = await fetch(BACKEND_API_URL, {
             method: 'POST',
-            mode: 'no-cors', // Force simple request to bypass CORS blocks
-            keepalive: true,
             headers: {
-                'Content-Type': 'text/plain'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
                 action,
@@ -27,9 +29,10 @@ async function syncWithSheets(action, extraData = {}) {
                 ...extraData
             })
         });
-        return { status: 'success' };
+        const result = await response.json();
+        return result;
     } catch (error) {
-        console.error('Sheets Sync Error:', error);
+        console.error('Backend Sync Error:', error);
         return null;
     }
 }
@@ -37,7 +40,7 @@ async function syncWithSheets(action, extraData = {}) {
 async function syncNow() {
     const user = getUserProfile();
     const progress = getProgress();
-    if (!user || !user.email || !SHEETS_API_URL) return { status: 'error', message: 'Sync unavailable' };
+    if (!user || !user.email || !BACKEND_API_URL) return { status: 'error', message: 'Sync unavailable' };
 
     try {
         const result = await syncWithSheets('sync', {
@@ -60,10 +63,17 @@ async function syncNow() {
 // Function to specifically load progress (needs a regular fetch, not no-cors)
 // Returns: { status, name, avatar, color, role, progress } or null
 async function loadProgressFromSheets(email) {
-    if (!SHEETS_API_URL || !email || email === 'guest') return null;
+    if (!BACKEND_API_URL || !email || email === 'guest') return null;
+    const token = localStorage.getItem('codeverse_google_token');
+    if (!token) return null;
+
     try {
-        const response = await fetch(SHEETS_API_URL, {
+        const response = await fetch(BACKEND_API_URL, {
             method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
             body: JSON.stringify({ action: 'load', email })
         });
         const result = await response.json();
@@ -174,9 +184,9 @@ function saveProgress(progress) {
     localStorage.setItem(getProgressKey(), JSON.stringify(progress));
     window.dispatchEvent(new Event('progressUpdated'));
 
-    // Sync to Google Sheets in background
+    // Sync to backend
     const user = getUserProfile();
-    if (user && user.email && SHEETS_API_URL) {
+    if (user && user.email && BACKEND_API_URL) {
         syncWithSheets('sync', {
             progress,
             name: user.name,
@@ -280,12 +290,16 @@ async function setUserRole(role) {
 async function logoutUser() {
     const user = getUserProfile();
     if (user && user.email) {
-        const separator = SHEETS_API_URL.includes('?') ? '&' : '?';
-        const logoutUrl = `${SHEETS_API_URL}${separator}action=logout&email=${encodeURIComponent(user.email)}`;
-        const ping = new Image();
-        ping.src = logoutUrl;
-        await new Promise(resolve => setTimeout(resolve, 300));
+        const token = localStorage.getItem('codeverse_google_token');
+        if (token) {
+            try {
+                await fetch(`${BACKEND_API_URL}?action=logout&email=${encodeURIComponent(user.email)}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+            } catch (e) {}
+        }
     }
+    localStorage.removeItem('codeverse_google_token');
     localStorage.removeItem(USER_KEY);
     localStorage.removeItem(LAST_ACTIVITY_KEY);
     window.dispatchEvent(new Event('userStateChanged'));

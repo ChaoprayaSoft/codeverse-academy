@@ -170,11 +170,16 @@
             await loadUsers(fresh.email);
         });
 
-        // ── Fetch all users from Sheets ────────────────────────────
+        // ── Fetch all users from Backend ────────────────────────────
         async function loadUsers(adminEmail) {
             try {
-                const res = await fetch(SHEETS_API_URL, {
+                const token = localStorage.getItem('codeverse_google_token');
+                const res = await fetch('/api/codeverse', {
                     method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
                     body: JSON.stringify({ action: 'getUsers', email: adminEmail })
                 });
                 const data = await res.json();
