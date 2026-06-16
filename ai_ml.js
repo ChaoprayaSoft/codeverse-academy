@@ -456,7 +456,7 @@ function setupInteractiveTask(m) {
 function checkDragComplete(m) {
     const totalItems = m.items.length;
     let placedCount = 0;
-    interactiveZone.querySelectorAll('[id^="f"], [id^="s"], [id^="c"]').forEach(el => {
+    interactiveZone.querySelectorAll('[draggable="true"]').forEach(el => {
         if (el.parentElement.style.borderStyle === 'solid' || el.parentElement.style.borderStyle === 'dashed') {
             placedCount++;
         }
