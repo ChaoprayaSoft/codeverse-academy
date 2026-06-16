@@ -68,12 +68,12 @@ const LEVELS = [
         title: "Mission 5: Habitat Dome",
         tasks: [
             { text: "Add a SphereGeometry to the scene", check: (h,c,v,s,t) => stripComments(t).includes('SphereGeometry') },
-            { text: "Set the color to '#10b981'", check: (h,c,v,s,t) => stripComments(t).includes('#10b981') }
+            { text: "Set the color to '#10b981'", check: (h,c,v,s,t) => t.includes('#10b981') }
         ],
         hints: ["new SphereGeometry(5)", "color: '#10b981'"],
         tabs: ['three'],
         initialThree: "// 3D Mesh setup\nconst dome = new Mesh(\n    // Add geometry & material\n);\nscene.add(dome);",
-        validate: (h, c, v, s, t) => stripComments(t).includes('SphereGeometry') && stripComments(t).includes('#10b981')
+        validate: (h, c, v, s, t) => stripComments(t).includes('SphereGeometry') && t.includes('#10b981')
     }
 ];
 
