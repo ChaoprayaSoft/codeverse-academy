@@ -127,6 +127,15 @@ function updatePreview() {
 
     if (allDone) {
         nextMissionBtn.style.display = 'block';
+
+        const progress = getProgress();
+        if (currentLevelIndex + 2 > progress.levels.commander) {
+            progress.levels.commander = currentLevelIndex + 2;
+            saveProgress(progress);
+            awardXP(30);
+            renderLevelIndicators();
+        }
+
         // Still show modal for final celebration
         if (currentLevelIndex === LEVELS.length - 1) {
             setTimeout(showWin, 1500);
