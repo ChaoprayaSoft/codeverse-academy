@@ -454,14 +454,16 @@ function setupInteractiveTask(m) {
 }
 
 function checkDragComplete(m) {
-    const totalItems = m.items.length;
+    // Only require items that actually have a matching category on the screen
+    const itemsToPlace = m.items.filter(item => m.categories.some(c => c.id === item.category)).length;
+    
     let placedCount = 0;
     interactiveZone.querySelectorAll('[draggable="true"]').forEach(el => {
         if (el.parentElement.style.borderStyle === 'solid' || el.parentElement.style.borderStyle === 'dashed') {
             placedCount++;
         }
     });
-    if (placedCount >= totalItems) {
+    if (placedCount >= itemsToPlace) {
         handleSuccess(m.feedback);
     }
 }
