@@ -310,9 +310,7 @@ function checkAnswer(val) {
         // Update Highest Level reached
         const isNewLevel = (currentLevel + 2 > (progressData.levels.vision || 1));
         if (isNewLevel) {
-            progressData.levels.vision = currentLevel + 2;
-            saveProgress(progressData);
-            awardXP(50); // Award XP immediately
+            secureAdvanceLevel('vision', currentLevel + 2);
         }
     } else {
         showFeedback(false, "Not quite! " + level.hint);
@@ -347,7 +345,7 @@ function closeFeedback(success) {
 }
 
 async function finishGame() {
-    completeMission('vision', 250); // Standard final reward
+    secureCompleteCourse('vision');
     const progressData = getProgress();
     
     document.querySelector('.mission-card').innerHTML = `

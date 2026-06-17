@@ -264,9 +264,7 @@ function checkAnswer(isCorrect, element) {
         // Save Progress
         const progress = getProgress();
         if (currentLevelIndex + 2 > progress.levels.robotics) {
-            progress.levels.robotics = currentLevelIndex + 2;
-            saveProgress(progress);
-            awardXP(50);
+            secureAdvanceLevel('robotics', currentLevelIndex + 2);
         }
 
         setTimeout(showWin, 1000);
@@ -283,7 +281,7 @@ function showWin() {
     const modal = document.getElementById('winModal');
     
     if (isFinal) {
-        completeMission('robotics', 500);
+        secureCompleteCourse('robotics');
         modal.querySelector('h1').innerText = "COURSE GRADUATE! 🏆";
         modal.querySelector('p').innerText = "You are now a certified Robotics Engineer. The future is yours!";
         modal.querySelectorAll('button')[1].innerText = "Return to Dashboard";

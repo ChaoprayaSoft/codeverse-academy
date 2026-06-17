@@ -577,9 +577,7 @@ function executeCode() {
             const progress = getProgress();
             const isNewLevel = (currentModuleIndex + 2 > progress.levels.architect);
             if (isNewLevel) {
-                progress.levels.architect = currentModuleIndex + 2;
-                saveProgress(progress);
-                awardXP(40);
+                secureAdvanceLevel('architect', currentModuleIndex + 2);
             }
             addTerminalLine("Python Core: Execution Successful", "success");
             addTerminalLine("Variables mapped correctly.", "success");
@@ -591,7 +589,7 @@ function executeCode() {
             document.getElementById('nextModuleBtn').style.display = 'inline-block';
             recordMission(m);
             if (currentModuleIndex === modules.length - 1) {
-                completeMission('architect', 500);
+                secureCompleteCourse('architect');
             }
         } else {
             addTerminalLine("Python Core: Execution Failed", "error");
@@ -658,7 +656,6 @@ function nextModule() {
 }
 
 function triggerGraduation() {
-    awardXP(500); // Award graduation bonus first
     const overlay = document.getElementById('completionOverlay');
     overlay.style.display = 'flex';
     overlay.innerHTML = `

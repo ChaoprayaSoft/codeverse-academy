@@ -304,15 +304,13 @@ function showWin() {
     const isNewLevel = (currentLevelIndex + 2 > progress.levels.navigator);
     
     if (isNewLevel) {
-        progress.levels.navigator = currentLevelIndex + 2;
-        saveProgress(progress);
-        awardXP(25); // Award XP for first-time completion of this mission
+        secureAdvanceLevel('navigator', currentLevelIndex + 2);
     }
     
     const isFinal = currentLevelIndex === LEVELS.length - 1;
     if (isFinal) {
         console.log("🏁 Final Navigator mission reached. Awarding badge...");
-        completeMission('navigator', 500);
+        secureCompleteCourse('navigator');
         document.getElementById('winModalTitle').innerText = "NAVIGATOR GRADUATE! 🏆";
         document.getElementById('winModalDesc').innerText = "You have mastered Python starship logic and celestial navigation.";
         document.getElementById('nextLevelBtn').innerText = "Return to Dashboard";

@@ -306,29 +306,26 @@ async function logoutUser() {
 }
 
 function awardXP(amount) {
-    const progress = getProgress();
-    progress.xp += amount;
-    saveProgress(progress);
+    console.warn("awardXP is deprecated. Use secure server progression.");
 }
 
 function completeMission(missionId, xpReward) {
-    const progress = getProgress();
-    let updated = false;
+    console.warn("completeMission is deprecated. Use secure server progression.");
+}
 
-    if (!progress.missions[missionId]) {
-        progress.missions[missionId] = true;
-        progress.xp += xpReward;
-        updated = true;
+async function secureAdvanceLevel(courseKey, newLevel) {
+    const result = await syncWithSheets('advanceLevel', { courseKey, newLevel });
+    if (result && result.progress) {
+        localStorage.setItem(getProgressKey(), JSON.stringify(result.progress));
+        window.dispatchEvent(new Event('progressUpdated'));
     }
+}
 
-    const badgeName = missionId.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') + " Wings";
-    if (!progress.badges.includes(badgeName)) {
-        progress.badges.push(badgeName);
-        updated = true;
-    }
-
-    if (updated) {
-        saveProgress(progress);
+async function secureCompleteCourse(courseKey) {
+    const result = await syncWithSheets('completeCourse', { courseKey });
+    if (result && result.progress) {
+        localStorage.setItem(getProgressKey(), JSON.stringify(result.progress));
+        window.dispatchEvent(new Event('progressUpdated'));
     }
 }
 

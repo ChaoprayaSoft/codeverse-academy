@@ -470,9 +470,7 @@ function handleSuccess(msg) {
     const progress = getProgress();
     const isNewLevel = (currentModuleIndex + 2 > progress.levels.ai_ml);
     if (isNewLevel) {
-        progress.levels.ai_ml = currentModuleIndex + 2;
-        saveProgress(progress);
-        awardXP(15);
+        secureAdvanceLevel('ai_ml', currentModuleIndex + 2);
     }
     outputDisplay.innerHTML = `<div style="color:#10b981;">> SUCCESS: ${msg}</div>`;
     feedbackEl.textContent = msg;
@@ -669,7 +667,7 @@ function nextModule() {
     if (currentModuleIndex < modules.length - 1) {
         loadModule(currentModuleIndex + 1);
     } else {
-        completeMission('ai_ml', 500);
+        secureCompleteCourse('ai_ml');
         showCompletion();
     }
 }

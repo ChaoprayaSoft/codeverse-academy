@@ -5,6 +5,18 @@ const { OAuth2Client } = require('google-auth-library');
 const CLIENT_ID = "1049203742621-85p09ruvq6kr2m1bnu1kg933ajhbjen3.apps.googleusercontent.com";
 const client = new OAuth2Client(CLIENT_ID);
 
+const COURSE_REWARDS = {
+    explorer: { level: 20, course: 250, totalLevels: 5 },
+    navigator: { level: 25, course: 500, totalLevels: 6 },
+    commander: { level: 30, course: 400, totalLevels: 5 },
+    architect: { level: 40, course: 500, totalLevels: 12 },
+    data_analytic: { level: 20, course: 300, totalLevels: 10 },
+    ai_ml: { level: 15, course: 500, totalLevels: 20 },
+    vision: { level: 50, course: 250, totalLevels: 15 },
+    prompt_eng: { level: 30, course: 500, totalLevels: 10 },
+    robotics: { level: 50, course: 500, totalLevels: 20 }
+};
+
 const firebaseConfig = {
   apiKey: "AIzaSyCNMpcfZJUSQpHGIvqVc0QE2lCjP-i2fg0",
   authDomain: "codeverse-1a8ec.firebaseapp.com",
@@ -137,8 +149,59 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({ status: 'success', message: 'User permanently removed and blocked' });
     }
 
+    if (action === 'advanceLevel') {
+      const { courseKey, newLevel } = data;
+      const courseInfo = COURSE_REWARDS[courseKey];
+      if (!courseInfo) return res.status(400).json({ status: 'error', message: 'Invalid course' });
+      
+      let progress = docSnap.exists() && docSnap.data().progress ? docSnap.data().progress : {};
+      if (!progress.levels) progress.levels = {};
+      if (!progress.missions) progress.missions = {};
+      if (!progress.xp) progress.xp = 0;
+      if (!progress.badges) progress.badges = [];
+      
+      const currentLevel = progress.levels[courseKey] || 1;
+      
+      if (newLevel > currentLevel && newLevel <= courseInfo.totalLevels + 1) {
+          const levelsGained = newLevel - currentLevel;
+          progress.xp += (levelsGained * courseInfo.level);
+          progress.levels[courseKey] = newLevel;
+          
+          await setDoc(docRef, { progress, lastUpdated: new Date().toISOString() }, { merge: true });
+          return res.status(200).json({ status: 'success', progress });
+      }
+      return res.status(200).json({ status: 'success', progress, message: 'No XP granted (already completed)' });
+    }
+
+    if (action === 'completeCourse') {
+      const { courseKey } = data;
+      const courseInfo = COURSE_REWARDS[courseKey];
+      if (!courseInfo) return res.status(400).json({ status: 'error', message: 'Invalid course' });
+      
+      let progress = docSnap.exists() && docSnap.data().progress ? docSnap.data().progress : {};
+      if (!progress.missions) progress.missions = {};
+      if (!progress.xp) progress.xp = 0;
+      if (!progress.badges) progress.badges = [];
+      if (!progress.levels) progress.levels = {};
+      
+      if (!progress.missions[courseKey]) {
+          progress.missions[courseKey] = true;
+          progress.xp += courseInfo.course;
+          
+          const badgeName = courseKey.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') + " Wings";
+          if (!progress.badges.includes(badgeName)) {
+              progress.badges.push(badgeName);
+          }
+          
+          await setDoc(docRef, { progress, lastUpdated: new Date().toISOString() }, { merge: true });
+          return res.status(200).json({ status: 'success', progress });
+      }
+      return res.status(200).json({ status: 'success', progress, message: 'Course already completed' });
+    }
+
     if (action === 'sync' || action === 'login' || action === 'logout') {
-      const progressToSave = data.progress || (docSnap.exists() ? docSnap.data().progress : {});
+      // Secure Fix: Server acts as authority. Ignore client progress overrides.
+      const progressToSave = docSnap.exists() && docSnap.data().progress ? docSnap.data().progress : {};
       const statusStr = action === 'login' ? 'Online' : (action === 'logout' ? 'Offline' : 'Active');
       
       // Merge with existing data so we don't accidentally downgrade their role if the client tried to set it to 'Student'

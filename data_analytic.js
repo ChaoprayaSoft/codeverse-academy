@@ -278,15 +278,13 @@ function executeCode() {
             const progress = getProgress();
             const isNewLevel = (currentModuleIndex + 2 > progress.levels.data_analytic);
             if (isNewLevel) {
-                progress.levels.data_analytic = currentModuleIndex + 2;
-                saveProgress(progress);
-                awardXP(20);
+                secureAdvanceLevel('data_analytic', currentModuleIndex + 2);
             }
             outputDisplay.innerHTML += '<div style="color: #48BB78;">> Analysis Complete. Results valid.</div>';
             renderChart(m.chartData);
             document.getElementById('nextModuleBtn').style.display = 'inline-block';
             if (currentModuleIndex === modules.length - 1) {
-                completeMission('data_analytic', 300);
+                secureCompleteCourse('data_analytic');
             }
         } else {
             outputDisplay.innerHTML += '<div class="error">> Error: Syntax invalid or objectives not met.</div>';

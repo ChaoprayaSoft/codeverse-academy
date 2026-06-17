@@ -130,9 +130,7 @@ function updatePreview() {
 
         const progress = getProgress();
         if (currentLevelIndex + 2 > progress.levels.commander) {
-            progress.levels.commander = currentLevelIndex + 2;
-            saveProgress(progress);
-            awardXP(30);
+            secureAdvanceLevel('commander', currentLevelIndex + 2);
             renderLevelIndicators();
         }
 
@@ -243,14 +241,12 @@ function showWin() {
     const isNewLevel = (currentLevelIndex + 2 > progress.levels.commander);
     
     if (isNewLevel) {
-        progress.levels.commander = currentLevelIndex + 2;
-        saveProgress(progress);
-        awardXP(30); // Award XP for first-time completion of this mission
+        secureAdvanceLevel('commander', currentLevelIndex + 2);
     }
     
     const isFinal = currentLevelIndex === LEVELS.length - 1;
     if (isFinal) {
-        completeMission('commander', 400);
+        secureCompleteCourse('commander');
         document.querySelector('#winModal h1').innerText = "COMMANDER GRADUATE! 🏆";
         document.querySelector('#winModal p').innerText = "You have mastered full-stack development and complex system orchestration.";
         document.querySelector('#winModal button[onclick="nextLevel()"]').innerText = "Return to Dashboard";

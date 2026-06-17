@@ -292,9 +292,7 @@ function checkAnswer() {
         const nextLv = Math.min(currentLevelIndex + 2, LEVELS.length);
         const isNewLevel = (nextLv > progress.levels[COURSE_ID]);
         if (isNewLevel) {
-            progress.levels[COURSE_ID] = nextLv;
-            saveProgress(progress);
-            awardXP(XP_PER_LEVEL);
+            secureAdvanceLevel(COURSE_ID, nextLv);
         }
         updateStats();
         renderMap();
@@ -312,7 +310,7 @@ function nextLevel() {
         loadLevel(currentLevelIndex);
         renderMap();
     } else {
-        completeMission(COURSE_ID, 500); // Bonus for finishing
+        secureCompleteCourse(COURSE_ID);
         showCompletion();
     }
     updateStats();
