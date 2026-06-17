@@ -113,6 +113,7 @@
                         <th>Badges</th>
                         <th>Course Progress</th>
                         <th>Last Active</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
@@ -286,6 +287,12 @@
                 ? new Date(u.lastUpdated).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' })
                 : '—';
 
+            // Don't show block button for the current logged-in admin
+            const adminEmail = getUserProfile()?.email;
+            const actionHtml = (u.email !== adminEmail) 
+                ? `<button style="background:#ef4444;color:#fff;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;font-size:0.8rem;" onclick="removeAndBlockUser('${u.email}')">🚫 Remove & Block</button>` 
+                : `<span style="color:var(--muted);font-size:0.8rem;">(You)</span>`;
+
             return `
             <tr>
                 <td>
@@ -303,6 +310,7 @@
                 <td><div class="badges-cell">${badgeHtml}</div></td>
                 <td><div class="courses-cell">${courseHtml}</div></td>
                 <td style="color:var(--muted);font-size:.8rem;white-space:nowrap;">${lastActive}</td>
+                <td>${actionHtml}</td>
             </tr>`;
         }
 
@@ -321,7 +329,36 @@
 
         function showError(msg) {
             document.getElementById('tableBody').innerHTML =
-                `<tr class="state-row"><td colspan="6">⚠️ ${msg}</td></tr>`;
+                `<tr class="state-row"><td colspan="7">⚠️ ${msg}</td></tr>`;
+        }
+
+        async function removeAndBlockUser(targetEmail) {
+            if (!confirm(`WARNING: Are you sure you want to PERMANENTLY remove and block ${targetEmail}?\n\nAll their records will be deleted and they will not be able to log in again.`)) {
+                return;
+            }
+
+            try {
+                const adminEmail = getUserProfile().email;
+                const token = localStorage.getItem('codeverse_google_token');
+                const res = await fetch('/api/codeverse', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ action: 'removeUser', targetEmail: targetEmail, email: adminEmail })
+                });
+                const data = await res.json();
+
+                if (data.status === 'success') {
+                    alert('User permanently removed and blocked successfully.');
+                    loadUsers(adminEmail); // refresh table
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (e) {
+                alert('Network error: ' + e.message);
+            }
         }
     </script>
 </body>

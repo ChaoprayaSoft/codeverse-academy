@@ -1,5 +1,5 @@
 const { initializeApp } = require("firebase/app");
-const { getFirestore, doc, getDoc, setDoc, collection, getDocs } = require("firebase/firestore");
+const { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, getDocs } = require("firebase/firestore");
 const { OAuth2Client } = require('google-auth-library');
 
 const CLIENT_ID = "1049203742621-85p09ruvq6kr2m1bnu1kg933ajhbjen3.apps.googleusercontent.com";
@@ -77,6 +77,13 @@ module.exports = async function handler(req, res) {
   const action = data.action;
 
   try {
+    // Check if user is permanently blocked
+    const blockedRef = doc(db, "blocked_emails", userEmail);
+    const blockedSnap = await getDoc(blockedRef);
+    if (blockedSnap.exists()) {
+       return res.status(403).json({ status: 'error', message: 'This email has been permanently blocked from accessing CodeVerse.' });
+    }
+
     const docRef = doc(db, "users", userEmail);
     const docSnap = await getDoc(docRef);
 
@@ -108,6 +115,26 @@ module.exports = async function handler(req, res) {
           users.push(d.data());
       });
       return res.status(200).json({ status: 'success', message: 'Users fetched', users });
+    }
+
+    if (action === 'removeUser') {
+      if (!docSnap.exists() || docSnap.data().role !== 'Admin') {
+         return res.status(403).json({ status: 'error', message: 'Unauthorized: Admins only' });
+      }
+      if (!data.targetEmail) {
+         return res.status(400).json({ status: 'error', message: 'Missing targetEmail' });
+      }
+      
+      // 1. Add to blocked_emails collection
+      await setDoc(doc(db, "blocked_emails", data.targetEmail), {
+          blockedAt: new Date().toISOString(),
+          blockedBy: userEmail
+      });
+      
+      // 2. Delete the user document entirely
+      await deleteDoc(doc(db, "users", data.targetEmail));
+      
+      return res.status(200).json({ status: 'success', message: 'User permanently removed and blocked' });
     }
 
     if (action === 'sync' || action === 'login' || action === 'logout') {
