@@ -1,6 +1,5 @@
-﻿const { initializeApp } = require("firebase/app");
+const { initializeApp } = require("firebase/app");
 const { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, getDocs } = require("firebase/firestore");
-const { getAuth, signInWithCredential, GoogleAuthProvider } = require("firebase/auth");
 const { OAuth2Client } = require('google-auth-library');
 
 const CLIENT_ID = "1049203742621-85p09ruvq6kr2m1bnu1kg933ajhbjen3.apps.googleusercontent.com";
@@ -30,15 +29,13 @@ const firebaseConfig = {
 
 let app;
 let db;
-let auth;
 
 function initFirebase() {
   if (!app) {
     app = initializeApp(firebaseConfig);
     db = getFirestore(app);
-    auth = getAuth(app);
   }
-  return { db, auth };
+  return db;
 }
 
 module.exports = async function handler(req, res) {
@@ -80,13 +77,10 @@ module.exports = async function handler(req, res) {
       data.action = req.query.action;
   }
 
-  const { db, auth } = initFirebase();
+  const db = initFirebase();
   const action = data.action;
 
   try {
-    // SECURE FIX: Sign in on the server to satisfy Firestore Rules!
-    const credential = GoogleAuthProvider.credential(token);
-    await signInWithCredential(auth, credential);
 
     const blockedRef = doc(db, "blocked_emails", userEmail);
     const blockedSnap = await getDoc(blockedRef);
@@ -193,7 +187,15 @@ module.exports = async function handler(req, res) {
         status: statusStr
       };
       await setDoc(docRef, newUserData, { merge: true });
-      return res.status(200).json({ status: 'success' });
+      return res.status(200).json({
+        status: 'success',
+        message: 'Synchronized',
+        role: newUserData.role,
+        progress: progressToSave,
+        name: newUserData.name,
+        avatar: newUserData.avatar,
+        color: newUserData.color
+      });
     }
 
     return res.status(400).json({ status: 'error' });

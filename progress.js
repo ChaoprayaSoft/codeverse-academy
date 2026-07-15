@@ -52,6 +52,23 @@ async function syncNow() {
         });
 
         if (result && result.status === 'success') {
+            // Update local profile with server-side role and data
+            if (result.role || result.name || result.avatar || result.color) {
+                const updatedUser = getUserProfile();
+                if (updatedUser) {
+                    if (result.role) updatedUser.role = result.role;
+                    if (result.name) updatedUser.name = result.name;
+                    if (result.avatar) updatedUser.avatar = result.avatar;
+                    if (result.color) updatedUser.color = result.color;
+                    localStorage.setItem(USER_KEY, JSON.stringify(updatedUser));
+                }
+            }
+            // Update local progress with server-side progress
+            if (result.progress) {
+                localStorage.setItem(getProgressKey(), JSON.stringify(result.progress));
+            }
+            window.dispatchEvent(new Event('userStateChanged'));
+            window.dispatchEvent(new Event('progressUpdated'));
             return { status: 'success', message: 'Cloud Synced' };
         }
     } catch (e) {
