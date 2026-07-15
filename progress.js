@@ -282,13 +282,24 @@ async function loginUser(name, email, avatar, role = null) {
         }
     }
 
-    await syncWithSheets('login', {
-        name,
-        avatar,
+    const loginResult = await syncWithSheets('login', {
+        name: profile.name,
+        avatar: profile.avatar,
         status: 'Login',
         role: profile.role || "",
         progress: getProgress()
     });
+
+    // Use server response as authoritative source for role
+    if (loginResult && loginResult.status === 'success') {
+        if (loginResult.role) {
+            profile.role = loginResult.role;
+        }
+        if (loginResult.progress) {
+            localStorage.setItem(getProgressKey(), JSON.stringify(loginResult.progress));
+        }
+        localStorage.setItem(USER_KEY, JSON.stringify(profile));
+    }
 
     window.dispatchEvent(new Event('userStateChanged'));
     window.dispatchEvent(new Event('progressUpdated'));
