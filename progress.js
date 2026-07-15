@@ -347,7 +347,6 @@ window.addEventListener('progressUpdated', updateGlobalProgressUI);
 async function refreshRoleFromSheets() {
     const user = getUserProfile();
     if (!user || !user.email) return;
-    if (user.role) return;
 
     try {
         const remoteData = await loadProgressFromSheets(user.email);
