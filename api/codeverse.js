@@ -1,4 +1,6 @@
-const admin = require("firebase-admin");
+﻿const { initializeApp } = require("firebase/app");
+const { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, getDocs } = require("firebase/firestore");
+const { getAuth, signInWithCredential, GoogleAuthProvider } = require("firebase/auth");
 const { OAuth2Client } = require('google-auth-library');
 
 const CLIENT_ID = "1049203742621-85p09ruvq6kr2m1bnu1kg933ajhbjen3.apps.googleusercontent.com";
@@ -16,25 +18,30 @@ const COURSE_REWARDS = {
     robotics: { level: 50, course: 500, totalLevels: 20 }
 };
 
-if (!admin.apps.length) {
-  let cert;
-  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-    try {
-      cert = admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT));
-    } catch (err) {
-      console.error("Failed to parse FIREBASE_SERVICE_ACCOUNT", err);
-    }
-  }
+const firebaseConfig = {
+  apiKey: "AIzaSyCNMpcfZJUSQpHGIvqVc0QE2lCjP-i2fg0",
+  authDomain: "codeverse-1a8ec.firebaseapp.com",
+  projectId: "codeverse-1a8ec",
+  storageBucket: "codeverse-1a8ec.firebasestorage.app",
+  messagingSenderId: "722458959167",
+  appId: "1:722458959167:web:04381efd7a05b99eaac78a",
+  measurementId: "G-74N5JK9DZQ"
+};
 
-  admin.initializeApp({
-    credential: cert || admin.credential.applicationDefault(),
-    projectId: "codeverse-1a8ec"
-  });
+let app;
+let db;
+let auth;
+
+function initFirebase() {
+  if (!app) {
+    app = initializeApp(firebaseConfig);
+    db = getFirestore(app);
+    auth = getAuth(app);
+  }
+  return { db, auth };
 }
-const db = admin.firestore();
 
 module.exports = async function handler(req, res) {
-  // CORS setup
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -47,7 +54,6 @@ module.exports = async function handler(req, res) {
     return;
   }
 
-  // Expecting Authorization: Bearer <token>
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ status: 'error', message: 'Missing Authorization header' });
@@ -56,16 +62,12 @@ module.exports = async function handler(req, res) {
   const token = authHeader.split(' ')[1];
   let payload;
   try {
-    const ticket = await client.verifyIdToken({
-        idToken: token,
-        audience: CLIENT_ID,
-    });
+    const ticket = await client.verifyIdToken({ idToken: token, audience: CLIENT_ID });
     payload = ticket.getPayload();
   } catch (err) {
     return res.status(401).json({ status: 'error', message: 'Invalid or expired Google token' });
   }
 
-  // The true email of the logged in user
   const userEmail = String(payload.email).toLowerCase().trim();
   const userName = payload.name;
   const userPicture = payload.picture;
@@ -74,31 +76,32 @@ module.exports = async function handler(req, res) {
   if (req.body) {
       data = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
   }
-  
-  // If it's a GET request for logout ping, handle it from query params
   if (req.method === 'GET') {
       data.action = req.query.action;
   }
 
+  const { db, auth } = initFirebase();
   const action = data.action;
 
   try {
-    // Check if user is permanently blocked
-    const blockedRef = db.collection("blocked_emails").doc(userEmail);
-    const blockedSnap = await blockedRef.get();
-    if (blockedSnap.exists) {
-       return res.status(403).json({ status: 'error', message: 'This email has been permanently blocked from accessing CodeVerse.' });
+    // SECURE FIX: Sign in on the server to satisfy Firestore Rules!
+    const credential = GoogleAuthProvider.credential(token);
+    await signInWithCredential(auth, credential);
+
+    const blockedRef = doc(db, "blocked_emails", userEmail);
+    const blockedSnap = await getDoc(blockedRef);
+    if (blockedSnap.exists()) {
+       return res.status(403).json({ status: 'error', message: 'Blocked' });
     }
 
-    const docRef = db.collection("users").doc(userEmail);
-    const docSnap = await docRef.get();
+    const docRef = doc(db, "users", userEmail);
+    const docSnap = await getDoc(docRef);
 
     if (action === 'load') {
-      if (docSnap.exists) {
+      if (docSnap.exists()) {
         const userData = docSnap.data();
         return res.status(200).json({
           status: 'success',
-          message: 'Loaded',
           name: userData.name,
           avatar: userData.avatar,
           color: userData.color,
@@ -110,45 +113,35 @@ module.exports = async function handler(req, res) {
     }
 
     if (action === 'getUsers') {
-      // Check if user is an Admin securely
-      if (!docSnap.exists || docSnap.data().role !== 'Admin') {
+      if (!docSnap.exists() || docSnap.data().role !== 'Admin') {
          return res.status(403).json({ status: 'error', message: 'Unauthorized: Admins only' });
       }
-      
-      const querySnapshot = await db.collection("users").get();
+      const querySnapshot = await getDocs(collection(db, "users"));
       const users = [];
-      querySnapshot.forEach((d) => {
-          users.push(d.data());
-      });
-      return res.status(200).json({ status: 'success', message: 'Users fetched', users });
+      querySnapshot.forEach((d) => users.push(d.data()));
+      return res.status(200).json({ status: 'success', users });
     }
 
     if (action === 'removeUser') {
-      if (!docSnap.exists || docSnap.data().role !== 'Admin') {
+      if (!docSnap.exists() || docSnap.data().role !== 'Admin') {
          return res.status(403).json({ status: 'error', message: 'Unauthorized: Admins only' });
       }
-      if (!data.targetEmail) {
-         return res.status(400).json({ status: 'error', message: 'Missing targetEmail' });
-      }
+      if (!data.targetEmail) return res.status(400).json({ status: 'error' });
       
-      // 1. Add to blocked_emails collection
-      await db.collection("blocked_emails").doc(data.targetEmail).set({
+      await setDoc(doc(db, "blocked_emails", data.targetEmail), {
           blockedAt: new Date().toISOString(),
           blockedBy: userEmail
       });
-      
-      // 2. Delete the user document entirely
-      await db.collection("users").doc(data.targetEmail).delete();
-      
-      return res.status(200).json({ status: 'success', message: 'User permanently removed and blocked' });
+      await deleteDoc(doc(db, "users", data.targetEmail));
+      return res.status(200).json({ status: 'success' });
     }
 
     if (action === 'advanceLevel') {
       const { courseKey, newLevel } = data;
       const courseInfo = COURSE_REWARDS[courseKey];
-      if (!courseInfo) return res.status(400).json({ status: 'error', message: 'Invalid course' });
+      if (!courseInfo) return res.status(400).json({ status: 'error' });
       
-      let progress = docSnap.exists && docSnap.data().progress ? docSnap.data().progress : {};
+      let progress = docSnap.exists() && docSnap.data().progress ? docSnap.data().progress : {};
       if (!progress.levels) progress.levels = {};
       if (!progress.missions) progress.missions = {};
       if (!progress.xp) progress.xp = 0;
@@ -157,22 +150,19 @@ module.exports = async function handler(req, res) {
       const currentLevel = progress.levels[courseKey] || 1;
       
       if (newLevel > currentLevel && newLevel <= courseInfo.totalLevels + 1) {
-          const levelsGained = newLevel - currentLevel;
-          progress.xp += (levelsGained * courseInfo.level);
+          progress.xp += ((newLevel - currentLevel) * courseInfo.level);
           progress.levels[courseKey] = newLevel;
-          
-          await docRef.set({ progress, lastUpdated: new Date().toISOString() }, { merge: true });
-          return res.status(200).json({ status: 'success', progress });
+          await setDoc(docRef, { progress, lastUpdated: new Date().toISOString() }, { merge: true });
       }
-      return res.status(200).json({ status: 'success', progress, message: 'No XP granted (already completed)' });
+      return res.status(200).json({ status: 'success', progress });
     }
 
     if (action === 'completeCourse') {
       const { courseKey } = data;
       const courseInfo = COURSE_REWARDS[courseKey];
-      if (!courseInfo) return res.status(400).json({ status: 'error', message: 'Invalid course' });
+      if (!courseInfo) return res.status(400).json({ status: 'error' });
       
-      let progress = docSnap.exists && docSnap.data().progress ? docSnap.data().progress : {};
+      let progress = docSnap.exists() && docSnap.data().progress ? docSnap.data().progress : {};
       if (!progress.missions) progress.missions = {};
       if (!progress.xp) progress.xp = 0;
       if (!progress.badges) progress.badges = [];
@@ -181,42 +171,32 @@ module.exports = async function handler(req, res) {
       if (!progress.missions[courseKey]) {
           progress.missions[courseKey] = true;
           progress.xp += courseInfo.course;
-          
           const badgeName = courseKey.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') + " Wings";
-          if (!progress.badges.includes(badgeName)) {
-              progress.badges.push(badgeName);
-          }
-          
-          await docRef.set({ progress, lastUpdated: new Date().toISOString() }, { merge: true });
-          return res.status(200).json({ status: 'success', progress });
+          if (!progress.badges.includes(badgeName)) progress.badges.push(badgeName);
+          await setDoc(docRef, { progress, lastUpdated: new Date().toISOString() }, { merge: true });
       }
-      return res.status(200).json({ status: 'success', progress, message: 'Course already completed' });
+      return res.status(200).json({ status: 'success', progress });
     }
 
     if (action === 'sync' || action === 'login' || action === 'logout') {
-      // Secure Fix: Server acts as authority. Ignore client progress overrides.
-      const progressToSave = docSnap.exists && docSnap.data().progress ? docSnap.data().progress : {};
+      const progressToSave = docSnap.exists() && docSnap.data().progress ? docSnap.data().progress : {};
       const statusStr = action === 'login' ? 'Online' : (action === 'logout' ? 'Offline' : 'Active');
-      
-      // Merge with existing data so we don't accidentally downgrade their role if the client tried to set it to 'Student'
-      const existingData = docSnap.exists ? docSnap.data() : {};
+      const existingData = docSnap.exists() ? docSnap.data() : {};
       const newUserData = {
         email: userEmail,
         name: data.name || existingData.name || userName,
         avatar: data.avatar || existingData.avatar || userPicture,
         color: data.color || existingData.color || "",
-        // Role cannot be changed by the client unless they are a new user. 
         role: existingData.role ? existingData.role : (data.role || "Student"),
         progress: progressToSave,
         lastUpdated: new Date().toISOString(),
         status: statusStr
       };
-
-      await docRef.set(newUserData, { merge: true });
-      return res.status(200).json({ status: 'success', message: 'Synchronized' });
+      await setDoc(docRef, newUserData, { merge: true });
+      return res.status(200).json({ status: 'success' });
     }
 
-    return res.status(400).json({ status: 'error', message: 'Unknown action' });
+    return res.status(400).json({ status: 'error' });
 
   } catch (err) {
     console.error(err);
