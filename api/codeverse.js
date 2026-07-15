@@ -1,5 +1,4 @@
-const { initializeApp } = require("firebase/app");
-const { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, getDocs } = require("firebase/firestore");
+const admin = require("firebase-admin");
 const { OAuth2Client } = require('google-auth-library');
 
 const CLIENT_ID = "1049203742621-85p09ruvq6kr2m1bnu1kg933ajhbjen3.apps.googleusercontent.com";
@@ -17,26 +16,10 @@ const COURSE_REWARDS = {
     robotics: { level: 50, course: 500, totalLevels: 20 }
 };
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCNMpcfZJUSQpHGIvqVc0QE2lCjP-i2fg0",
-  authDomain: "codeverse-1a8ec.firebaseapp.com",
-  projectId: "codeverse-1a8ec",
-  storageBucket: "codeverse-1a8ec.firebasestorage.app",
-  messagingSenderId: "722458959167",
-  appId: "1:722458959167:web:04381efd7a05b99eaac78a",
-  measurementId: "G-74N5JK9DZQ"
-};
-
-let app;
-let db;
-
-function initFirebase() {
-  if (!app) {
-    app = initializeApp(firebaseConfig);
-    db = getFirestore(app);
-  }
-  return db;
+if (!admin.apps.length) {
+  admin.initializeApp({ projectId: "codeverse-1a8ec" });
 }
+const db = admin.firestore();
 
 module.exports = async function handler(req, res) {
   // CORS setup
@@ -85,22 +68,21 @@ module.exports = async function handler(req, res) {
       data.action = req.query.action;
   }
 
-  const db = initFirebase();
   const action = data.action;
 
   try {
     // Check if user is permanently blocked
-    const blockedRef = doc(db, "blocked_emails", userEmail);
-    const blockedSnap = await getDoc(blockedRef);
-    if (blockedSnap.exists()) {
+    const blockedRef = db.collection("blocked_emails").doc(userEmail);
+    const blockedSnap = await blockedRef.get();
+    if (blockedSnap.exists) {
        return res.status(403).json({ status: 'error', message: 'This email has been permanently blocked from accessing CodeVerse.' });
     }
 
-    const docRef = doc(db, "users", userEmail);
-    const docSnap = await getDoc(docRef);
+    const docRef = db.collection("users").doc(userEmail);
+    const docSnap = await docRef.get();
 
     if (action === 'load') {
-      if (docSnap.exists()) {
+      if (docSnap.exists) {
         const userData = docSnap.data();
         return res.status(200).json({
           status: 'success',
@@ -117,11 +99,11 @@ module.exports = async function handler(req, res) {
 
     if (action === 'getUsers') {
       // Check if user is an Admin securely
-      if (!docSnap.exists() || docSnap.data().role !== 'Admin') {
+      if (!docSnap.exists || docSnap.data().role !== 'Admin') {
          return res.status(403).json({ status: 'error', message: 'Unauthorized: Admins only' });
       }
       
-      const querySnapshot = await getDocs(collection(db, "users"));
+      const querySnapshot = await db.collection("users").get();
       const users = [];
       querySnapshot.forEach((d) => {
           users.push(d.data());
@@ -130,7 +112,7 @@ module.exports = async function handler(req, res) {
     }
 
     if (action === 'removeUser') {
-      if (!docSnap.exists() || docSnap.data().role !== 'Admin') {
+      if (!docSnap.exists || docSnap.data().role !== 'Admin') {
          return res.status(403).json({ status: 'error', message: 'Unauthorized: Admins only' });
       }
       if (!data.targetEmail) {
@@ -138,13 +120,13 @@ module.exports = async function handler(req, res) {
       }
       
       // 1. Add to blocked_emails collection
-      await setDoc(doc(db, "blocked_emails", data.targetEmail), {
+      await db.collection("blocked_emails").doc(data.targetEmail).set({
           blockedAt: new Date().toISOString(),
           blockedBy: userEmail
       });
       
       // 2. Delete the user document entirely
-      await deleteDoc(doc(db, "users", data.targetEmail));
+      await db.collection("users").doc(data.targetEmail).delete();
       
       return res.status(200).json({ status: 'success', message: 'User permanently removed and blocked' });
     }
@@ -154,7 +136,7 @@ module.exports = async function handler(req, res) {
       const courseInfo = COURSE_REWARDS[courseKey];
       if (!courseInfo) return res.status(400).json({ status: 'error', message: 'Invalid course' });
       
-      let progress = docSnap.exists() && docSnap.data().progress ? docSnap.data().progress : {};
+      let progress = docSnap.exists && docSnap.data().progress ? docSnap.data().progress : {};
       if (!progress.levels) progress.levels = {};
       if (!progress.missions) progress.missions = {};
       if (!progress.xp) progress.xp = 0;
@@ -167,7 +149,7 @@ module.exports = async function handler(req, res) {
           progress.xp += (levelsGained * courseInfo.level);
           progress.levels[courseKey] = newLevel;
           
-          await setDoc(docRef, { progress, lastUpdated: new Date().toISOString() }, { merge: true });
+          await docRef.set({ progress, lastUpdated: new Date().toISOString() }, { merge: true });
           return res.status(200).json({ status: 'success', progress });
       }
       return res.status(200).json({ status: 'success', progress, message: 'No XP granted (already completed)' });
@@ -178,7 +160,7 @@ module.exports = async function handler(req, res) {
       const courseInfo = COURSE_REWARDS[courseKey];
       if (!courseInfo) return res.status(400).json({ status: 'error', message: 'Invalid course' });
       
-      let progress = docSnap.exists() && docSnap.data().progress ? docSnap.data().progress : {};
+      let progress = docSnap.exists && docSnap.data().progress ? docSnap.data().progress : {};
       if (!progress.missions) progress.missions = {};
       if (!progress.xp) progress.xp = 0;
       if (!progress.badges) progress.badges = [];
@@ -193,7 +175,7 @@ module.exports = async function handler(req, res) {
               progress.badges.push(badgeName);
           }
           
-          await setDoc(docRef, { progress, lastUpdated: new Date().toISOString() }, { merge: true });
+          await docRef.set({ progress, lastUpdated: new Date().toISOString() }, { merge: true });
           return res.status(200).json({ status: 'success', progress });
       }
       return res.status(200).json({ status: 'success', progress, message: 'Course already completed' });
@@ -201,11 +183,11 @@ module.exports = async function handler(req, res) {
 
     if (action === 'sync' || action === 'login' || action === 'logout') {
       // Secure Fix: Server acts as authority. Ignore client progress overrides.
-      const progressToSave = docSnap.exists() && docSnap.data().progress ? docSnap.data().progress : {};
+      const progressToSave = docSnap.exists && docSnap.data().progress ? docSnap.data().progress : {};
       const statusStr = action === 'login' ? 'Online' : (action === 'logout' ? 'Offline' : 'Active');
       
       // Merge with existing data so we don't accidentally downgrade their role if the client tried to set it to 'Student'
-      const existingData = docSnap.exists() ? docSnap.data() : {};
+      const existingData = docSnap.exists ? docSnap.data() : {};
       const newUserData = {
         email: userEmail,
         name: data.name || existingData.name || userName,
@@ -218,7 +200,7 @@ module.exports = async function handler(req, res) {
         status: statusStr
       };
 
-      await setDoc(docRef, newUserData, { merge: true });
+      await docRef.set(newUserData, { merge: true });
       return res.status(200).json({ status: 'success', message: 'Synchronized' });
     }
 
