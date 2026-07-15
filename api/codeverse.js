@@ -17,7 +17,19 @@ const COURSE_REWARDS = {
 };
 
 if (!admin.apps.length) {
-  admin.initializeApp({ projectId: "codeverse-1a8ec" });
+  let cert;
+  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+    try {
+      cert = admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT));
+    } catch (err) {
+      console.error("Failed to parse FIREBASE_SERVICE_ACCOUNT", err);
+    }
+  }
+
+  admin.initializeApp({
+    credential: cert || admin.credential.applicationDefault(),
+    projectId: "codeverse-1a8ec"
+  });
 }
 const db = admin.firestore();
 
