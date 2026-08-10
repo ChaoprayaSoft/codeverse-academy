@@ -99,7 +99,10 @@
                     <button class="filter-btn"         data-role="Guest"   onclick="setFilter('Guest')">👤 Guest</button>
                 </div>
             </div>
-            <span class="total-count" id="countLabel">Loading…</span>
+            <div style="display:flex; align-items:center; gap:1rem;">
+                <span class="total-count" id="countLabel">Loading…</span>
+                <button class="btn-export" onclick="exportCSV()">📤 Export CSV</button>
+            </div>
         </div>
 
         <!-- User Table -->
@@ -107,18 +110,19 @@
             <table class="user-table" id="userTable">
                 <thead>
                     <tr>
-                        <th>User</th>
-                        <th>Role</th>
-                        <th>XP</th>
-                        <th>Badges</th>
-                        <th>Course Progress</th>
-                        <th>Last Active</th>
-                        <th>Actions</th>
+                        <th class="col-user">User</th>
+                        <th class="col-role">Role</th>
+                        <th class="col-xp">XP</th>
+                        <th class="col-completion">Completion</th>
+                        <th class="col-badges">Badges</th>
+                        <th class="col-progress">Course Progress</th>
+                        <th class="col-active">Last Active</th>
+                        <th class="col-actions">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
                     <tr class="state-row">
-                        <td colspan="6">
+                        <td colspan="8">
                             <span class="spinner"></span> Loading cadets from the stars…
                         </td>
                     </tr>
@@ -249,7 +253,7 @@
                 `Showing ${filtered.length} of ${allUsers.length} users`;
 
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr class="state-row"><td colspan="6">No users match your search.</td></tr>`;
+                tbody.innerHTML = `<tr class="state-row"><td colspan="8">No users match your search.</td></tr>`;
                 return;
             }
 
@@ -287,6 +291,29 @@
                 ? new Date(u.lastUpdated).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' })
                 : '—';
 
+            // Calculate % completion
+            let completedLevels = 0;
+            let totalLevels = 0;
+            COURSES.forEach(c => {
+                totalLevels += c.total;
+                if (missions[c.key] === true) {
+                    completedLevels += c.total;
+                } else {
+                    const lvl = levels[c.key] || 1;
+                    completedLevels += Math.min(Math.max(0, lvl - 1), c.total);
+                }
+            });
+            const completionPercent = totalLevels > 0 ? Math.round((completedLevels / totalLevels) * 100) : 0;
+
+            const completionHtml = `
+                <div class="completion-cell" title="${completedLevels}/${totalLevels} lessons completed">
+                    <div class="completion-bar-bg">
+                        <div class="completion-bar-fill" style="width: ${completionPercent}%;"></div>
+                    </div>
+                    <span class="completion-text">${completionPercent}%</span>
+                </div>
+            `;
+
             // Don't show block button for the current logged-in admin
             const adminEmail = getUserProfile()?.email;
             const actionHtml = (u.email !== adminEmail) 
@@ -295,7 +322,7 @@
 
             return `
             <tr>
-                <td>
+                <td class="col-user">
                     <div class="user-cell">
                         <img class="user-avatar" src="${avatarSrc}" alt="${u.name || '?'}"
                              onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(u.name||'?')}&background=6366f1&color=fff&size=80'">
@@ -305,12 +332,13 @@
                         </div>
                     </div>
                 </td>
-                <td><span class="role-pill role-${role}">${roleIcon(role)} ${role}</span></td>
-                <td><span class="xp-value">⚡ ${xp.toLocaleString()}</span></td>
-                <td><div class="badges-cell">${badgeHtml}</div></td>
-                <td><div class="courses-cell">${courseHtml}</div></td>
-                <td style="color:var(--muted);font-size:.8rem;white-space:nowrap;">${lastActive}</td>
-                <td>${actionHtml}</td>
+                <td class="col-role"><span class="role-pill role-${role}">${roleIcon(role)} ${role}</span></td>
+                <td class="col-xp"><span class="xp-value">⚡ ${xp.toLocaleString()}</span></td>
+                <td class="col-completion">${completionHtml}</td>
+                <td class="col-badges"><div class="badges-cell">${badgeHtml}</div></td>
+                <td class="col-progress"><div class="courses-cell">${courseHtml}</div></td>
+                <td class="col-active" style="color:var(--muted);font-size:.8rem;white-space:nowrap;">${lastActive}</td>
+                <td class="col-actions">${actionHtml}</td>
             </tr>`;
         }
 
@@ -322,6 +350,7 @@
             return '🧑‍🚀';
         }
 
+        // Set text
         function setText(id, val) {
             const el = document.getElementById(id);
             if (el) el.textContent = val;
@@ -329,7 +358,7 @@
 
         function showError(msg) {
             document.getElementById('tableBody').innerHTML =
-                `<tr class="state-row"><td colspan="7">⚠️ ${msg}</td></tr>`;
+                `<tr class="state-row"><td colspan="8">⚠️ ${msg}</td></tr>`;
         }
 
         async function removeAndBlockUser(targetEmail) {
@@ -359,6 +388,90 @@
             } catch (e) {
                 alert('Network error: ' + e.message);
             }
+        }
+
+        // ── Export to CSV ──────────────────────────────────────────
+        function exportCSV() {
+            const query = (document.getElementById('searchInput').value || '').toLowerCase();
+            const filtered = allUsers.filter(u => {
+                const actualRole = u.role || 'Student';
+                const matchRole = filterRole === 'All' || actualRole === filterRole;
+                const matchSearch = !query
+                    || (u.name || '').toLowerCase().includes(query)
+                    || (u.email || '').toLowerCase().includes(query);
+                return matchRole && matchSearch;
+            });
+
+            if (filtered.length === 0) {
+                alert("No data to export.");
+                return;
+            }
+
+            const headers = [
+                "Name", "Email", "Role", "XP", "Completion %", "Badges", "Last Active",
+                "Explorer Level", "Navigator Level", "Commander Level", "Architect Level",
+                "Data Analytic Level", "AI/ML Level", "Vision Level", "Prompt Eng Level", "Robotics Level"
+            ];
+
+            const rows = filtered.map(u => {
+                const p = u.progress || {};
+                const levels = p.levels || {};
+                const badges = (p.badges || []).join('; ');
+                const lastActive = u.lastUpdated ? new Date(u.lastUpdated).toISOString() : '';
+                
+                let completedLevels = 0;
+                let totalLevels = 0;
+                COURSES.forEach(c => {
+                    totalLevels += c.total;
+                    if (p.missions && p.missions[c.key] === true) {
+                        completedLevels += c.total;
+                    } else {
+                        const lvl = levels[c.key] || 1;
+                        completedLevels += Math.min(Math.max(0, lvl - 1), c.total);
+                    }
+                });
+                const completionPercent = totalLevels > 0 ? Math.round((completedLevels / totalLevels) * 100) : 0;
+
+                const courseLevels = COURSES.map(c => {
+                    if (p.missions && p.missions[c.key] === true) {
+                        return c.total;
+                    }
+                    const lvl = levels[c.key] || 1;
+                    return Math.min(Math.max(1, lvl), c.total);
+                });
+
+                const rowData = [
+                    u.name || '',
+                    u.email || '',
+                    u.role || 'Student',
+                    p.xp || 0,
+                    completionPercent,
+                    badges,
+                    lastActive,
+                    ...courseLevels
+                ];
+
+                return rowData.map(val => {
+                    let str = String(val);
+                    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+                        str = '"' + str.replace(/"/g, '""') + '"';
+                    }
+                    return str;
+                }).join(',');
+            });
+
+            const csvContent = [headers.join(','), ...rows].join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            const dateStr = new Date().toISOString().split('T')[0];
+            link.setAttribute("download", `codeverse_cadets_${dateStr}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
     </script>
 </body>
