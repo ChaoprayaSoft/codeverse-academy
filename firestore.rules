@@ -12,16 +12,23 @@ service cloud.firestore {
       return request.auth != null;
     }
     
+    // Checks if the user is the designated Super Administrator
+    function isSuperAdmin() {
+      return isAuthenticated() && request.auth.token.email == 'tiawongsombat@gmail.com';
+    }
+
     // Checks if the authenticated user's email matches the document ID (email)
     function isOwner(userEmail) {
-      return isAuthenticated() && request.auth.token.email == userEmail;
+      return isAuthenticated() && (request.auth.token.email == userEmail || isSuperAdmin());
     }
     
     // Checks if the requesting user has the Admin role
     function isAdmin() {
-      return isAuthenticated() && (
-        request.auth.token.admin == true ||
-        get(/databases/$(database)/documents/users/$(request.auth.token.email)).data.role == 'Admin'
+      return isSuperAdmin() || (
+        isAuthenticated() && (
+          request.auth.token.admin == true ||
+          get(/databases/$(database)/documents/users/$(request.auth.token.email)).data.role == 'Admin'
+        )
       );
     }
 
@@ -29,26 +36,27 @@ service cloud.firestore {
     // COLLECTION RULES
     // =========================================================================
 
-    // 1. Users Collection:
-    // - Document ID is the user's email.
-    // - Cadets can read and update only their own profile & progress.
-    // - Cadets cannot elevate their own role to 'Admin' or modify other cadets' data.
-    // - Admins can read all users and manage roles.
+    // 1. Users Collection (/users/{userEmail})
+    // - Document ID is the user's lowercase email.
+    // - Cadets can read/update their own profile & progress.
+    // - Cadets can select Teacher, Student, or Guest roles during onboarding.
+    // - Only Admins and Super Admins can manage roles and view all users.
     match /users/{userEmail} {
-      // Allow users to read their own document, or Admins to view all cadets
       allow read: if isOwner(userEmail) || isAdmin();
       
-      // Allow new user creation if authenticated as that user
-      allow create: if isOwner(userEmail) && (
+      // Allow new user creation with legitimate role options
+      allow create: if (isOwner(userEmail) && (
         !request.resource.data.keys().hasAny(['role']) ||
+        request.resource.data.role == 'Teacher' ||
         request.resource.data.role == 'Student' ||
-        request.resource.data.role == 'Guest'
-      );
+        request.resource.data.role == 'Guest' ||
+        request.resource.data.role == '' ||
+        isAdmin()
+      )) || isAdmin();
       
-      // Allow user updates while preventing unauthorized role escalation
+      // Allow user updates while preventing unauthorized role escalation to Admin
       allow update: if (
         isOwner(userEmail) && (
-          // Ensure non-admins cannot change their role to Admin
           request.resource.data.role == resource.data.role ||
           isAdmin()
         )
@@ -58,9 +66,9 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
-    // 2. Blocked Emails Collection:
+    // 2. Blocked Emails Collection (/blocked_emails/{userEmail})
     // - Only Admins can add or remove blocked emails.
-    // - Authenticated users can read to verify account status.
+    // - Authenticated users can read to verify account standing.
     match /blocked_emails/{userEmail} {
       allow read: if isAuthenticated();
       allow write: if isAdmin();
@@ -69,7 +77,6 @@ service cloud.firestore {
     // =========================================================================
     // DEFAULT DENY
     // =========================================================================
-    // Lock down all other collections and documents by default
     match /{document=**} {
       allow read, write: if false;
     }
