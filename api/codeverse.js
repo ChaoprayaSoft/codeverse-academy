@@ -5,6 +5,8 @@ const { OAuth2Client } = require('google-auth-library');
 const CLIENT_ID = "1049203742621-85p09ruvq6kr2m1bnu1kg933ajhbjen3.apps.googleusercontent.com";
 const client = new OAuth2Client(CLIENT_ID);
 
+const SUPER_ADMINS = ['tiawongsombat@gmail.com'];
+
 const COURSE_REWARDS = {
     explorer: { level: 20, course: 250, totalLevels: 5 },
     navigator: { level: 25, course: 500, totalLevels: 6 },
@@ -91,23 +93,31 @@ module.exports = async function handler(req, res) {
     const docRef = doc(db, "users", userEmail);
     const docSnap = await getDoc(docRef);
 
+    const isSuperAdmin = SUPER_ADMINS.includes(userEmail);
+
     if (action === 'load') {
       if (docSnap.exists()) {
         const userData = docSnap.data();
+        const role = isSuperAdmin ? 'Admin' : (userData.role || 'Student');
         return res.status(200).json({
           status: 'success',
           name: userData.name,
           avatar: userData.avatar,
           color: userData.color,
-          role: userData.role,
+          role: role,
           progress: userData.progress
         });
       }
-      return res.status(200).json({ status: 'new_user', message: 'No progress found' });
+      return res.status(200).json({ 
+        status: 'new_user', 
+        message: 'No progress found',
+        role: isSuperAdmin ? 'Admin' : 'Student'
+      });
     }
 
     if (action === 'getUsers') {
-      if (!docSnap.exists() || docSnap.data().role !== 'Admin') {
+      const userRole = isSuperAdmin ? 'Admin' : (docSnap.exists() ? docSnap.data().role : null);
+      if (userRole !== 'Admin') {
          return res.status(403).json({ status: 'error', message: 'Unauthorized: Admins only' });
       }
       const querySnapshot = await getDocs(collection(db, "users"));
@@ -173,15 +183,23 @@ module.exports = async function handler(req, res) {
     }
 
     if (action === 'sync' || action === 'login' || action === 'logout') {
-      const progressToSave = docSnap.exists() && docSnap.data().progress ? docSnap.data().progress : {};
-      const statusStr = action === 'login' ? 'Online' : (action === 'logout' ? 'Offline' : 'Active');
       const existingData = docSnap.exists() ? docSnap.data() : {};
+      let progressToSave = existingData.progress || {};
+      
+      if (action === 'sync' && data.progress) {
+        // When syncing from client, save the client's progress
+        progressToSave = data.progress;
+      }
+      
+      const statusStr = action === 'login' ? 'Online' : (action === 'logout' ? 'Offline' : 'Active');
+      let finalRole = isSuperAdmin ? 'Admin' : (existingData.role || data.role || "");
+      
       const newUserData = {
         email: userEmail,
         name: data.name || existingData.name || userName,
         avatar: data.avatar || existingData.avatar || userPicture,
         color: data.color || existingData.color || "",
-        role: existingData.role ? existingData.role : (data.role || "Student"),
+        role: finalRole,
         progress: progressToSave,
         lastUpdated: new Date().toISOString(),
         status: statusStr
@@ -190,7 +208,7 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({
         status: 'success',
         message: 'Synchronized',
-        role: newUserData.role,
+        role: finalRole,
         progress: progressToSave,
         name: newUserData.name,
         avatar: newUserData.avatar,

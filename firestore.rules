@@ -1,0 +1,77 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // =========================================================================
+    // HELPER FUNCTIONS
+    // =========================================================================
+    
+    // Checks if the user is authenticated via Firebase Auth
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Checks if the authenticated user's email matches the document ID (email)
+    function isOwner(userEmail) {
+      return isAuthenticated() && request.auth.token.email == userEmail;
+    }
+    
+    // Checks if the requesting user has the Admin role
+    function isAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.admin == true ||
+        get(/databases/$(database)/documents/users/$(request.auth.token.email)).data.role == 'Admin'
+      );
+    }
+
+    // =========================================================================
+    // COLLECTION RULES
+    // =========================================================================
+
+    // 1. Users Collection:
+    // - Document ID is the user's email.
+    // - Cadets can read and update only their own profile & progress.
+    // - Cadets cannot elevate their own role to 'Admin' or modify other cadets' data.
+    // - Admins can read all users and manage roles.
+    match /users/{userEmail} {
+      // Allow users to read their own document, or Admins to view all cadets
+      allow read: if isOwner(userEmail) || isAdmin();
+      
+      // Allow new user creation if authenticated as that user
+      allow create: if isOwner(userEmail) && (
+        !request.resource.data.keys().hasAny(['role']) ||
+        request.resource.data.role == 'Student' ||
+        request.resource.data.role == 'Guest'
+      );
+      
+      // Allow user updates while preventing unauthorized role escalation
+      allow update: if (
+        isOwner(userEmail) && (
+          // Ensure non-admins cannot change their role to Admin
+          request.resource.data.role == resource.data.role ||
+          isAdmin()
+        )
+      ) || isAdmin();
+      
+      // Only Admins can delete users
+      allow delete: if isAdmin();
+    }
+
+    // 2. Blocked Emails Collection:
+    // - Only Admins can add or remove blocked emails.
+    // - Authenticated users can read to verify account status.
+    match /blocked_emails/{userEmail} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // =========================================================================
+    // DEFAULT DENY
+    // =========================================================================
+    // Lock down all other collections and documents by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

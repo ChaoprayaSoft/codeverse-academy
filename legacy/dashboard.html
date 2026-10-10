@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academy Dashboard | CodeVerse</title>
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <div class="header">
+            <div style="display: flex; align-items: center; gap: 1.5rem;">
+                <img src="https://ui-avatars.com/api/?name=Commander&background=6366f1&color=fff" id="dashboardAvatar"
+                    alt="Avatar"
+                    style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid #6366f1; display: none;">
+                <div>
+                    <h1 style="font-size: 3rem; margin: 0;">Academy <span
+                            style="color: var(--primary);">Dashboard</span></h1>
+                    <p style="color: var(--muted); margin-top: 0.5rem; font-size: 1.1rem;" id="welcomeMsg">Welcome back,
+                        Commander. Ready for your next mission?</p>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;">
+                        <button onclick="document.getElementById('profileModal').style.display='flex'"
+                            style="background: var(--secondary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 12px; font-weight: bold; cursor: pointer; font-family: 'Nunito', sans-serif;">✎
+                            Edit Profile</button>
+                        <button id="syncBtn" onclick="handleManualSync()"
+                            style="background: #e2e8f0; color: #475569; border: none; padding: 0.5rem 1rem; border-radius: 12px; font-weight: bold; cursor: pointer; font-family: 'Nunito', sans-serif; display: flex; align-items: center; gap: 5px;">
+                            <span id="syncIcon">☁️</span> <span id="syncText">Sync Cloud</span>
+                        </button>
+                        <!-- Admin-only link (injected by JS) -->
+                        <span id="adminLinkSlot"></span>
+
+                    </div>
+                </div>
+
+                <div class="xp-card">
+                    <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                        <span style="font-weight: 800; font-size: 1.5rem;" id="totalXp">0</span>
+                        <span style="color: #94a3b8; font-size: 0.8rem;" id="rankLabel">Novice</span>
+                    </div>
+                    <div class="xp-bar-container">
+                        <div class="xp-bar-fill" id="xpBar"></div>
+                    </div>
+                    <div style="font-size: 0.75rem; color: #64748b; text-align: right;" id="nextRankMsg">
+                        Next Rank: Explorer (2,000 XP)
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+        <section>
+            <h2 style="margin-bottom: 1.5rem;">Your Badges</h2>
+            <div class="badge-grid" id="badgeGrid">
+                <!-- Badges will be injected here -->
+            </div>
+        </section>
+
+        <section style="margin-top: 5rem;">
+            <h2 style="margin-bottom: 1.5rem;">Mission Briefings</h2>
+            <div class="mission-status" id="missionStatus">
+                <!-- Explorer -->
+                <div class="status-card" id="card-explorer">
+                    <div>
+                        <h3 style="margin: 0;" id="title-explorer">Explorer Path</h3>
+                        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;" id="status-explorer">Path
+                            Unlocked</p>
+                    </div>
+                    <a href="explorer.html" class="btn-continue">Launch Mission</a>
+                </div>
+
+                <!-- Navigator -->
+                <div class="status-card" id="card-navigator">
+                    <div>
+                        <h3 style="margin: 0;" id="title-navigator">Navigator Path</h3>
+                        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;" id="status-navigator">Path
+                            Unlocked</p>
+                    </div>
+                    <a href="navigator.html" class="btn-continue">Launch Mission</a>
+                </div>
+
+                <!-- Commander -->
+                <div class="status-card" id="card-commander">
+                    <div>
+                        <h3 style="margin: 0;" id="title-commander">Commander Path</h3>
+                        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;" id="status-commander">Path
+                            Unlocked</p>
+                    </div>
+                    <a href="commander.html" class="btn-continue">Launch Mission</a>
+                </div>
+
+                <!-- Architect -->
+                <div class="status-card" id="card-architect">
+                    <div>
+                        <h3 style="margin: 0;" id="title-architect">Architect Path</h3>
+                        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;" id="status-architect">Path
+                            Unlocked</p>
+                    </div>
+                    <a href="architect.html" class="btn-continue">Launch Mission</a>
+                </div>
+
+                <!-- Data Analytic -->
+                <div class="status-card" id="card-data_analytic">
+                    <div>
+                        <h3 style="margin: 0;" id="title-data_analytic">Data Analytic</h3>
+                        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;" id="status-data_analytic">Path
+                            Unlocked</p>
+                    </div>
+                    <a href="data_analytic.html" class="btn-continue">Launch Mission</a>
+                </div>
+
+                <!-- AI & Machine Learning -->
+                <div class="status-card" id="card-ai_ml">
+                    <div>
+                        <h3 style="margin: 0;" id="title-ai_ml">AI & Machine Learning</h3>
+                        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;" id="status-ai_ml">Path Unlocked
+                        </p>
+                    </div>
+                    <a href="ai_ml.html" class="btn-continue">Launch Mission</a>
+                </div>
+
+                <!-- Computer Vision -->
+                <div class="status-card" id="card-vision">
+                    <div>
+                        <h3 style="margin: 0;" id="title-vision">Computer Vision</h3>
+                        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;" id="status-vision">Path Unlocked
+                        </p>
+                    </div>
+                    <a href="vision.html" class="btn-continue">Launch Mission</a>
+                </div>
+
+                <!-- Prompt Engineering -->
+                <div class="status-card" id="card-prompt_eng">
+                    <div>
+                        <h3 style="margin: 0;" id="title-prompt_eng">Prompt Engineering</h3>
+                        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;" id="status-prompt_eng">Path
+                            Unlocked</p>
+                    </div>
+                    <a href="prompt_eng.html" class="btn-continue">Launch Mission</a>
+                </div>
+
+                <!-- Robotics -->
+                <div class="status-card" id="card-robotics">
+                    <div>
+                        <h3 style="margin: 0;" id="title-robotics">Fundamentals of Robot</h3>
+                        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;" id="status-robotics">Path
+                            Unlocked</p>
+                    </div>
+                    <a href="robotics.html" class="btn-continue">Launch Mission</a>
+                </div>
+            </div>
+        </section>
+
+        <footer style="margin-top: 5rem; text-align: center; border-top: 3px dashed var(--border); padding-top: 2rem;">
+            <a href="index.html"
+                style="background: none; border: none; color: var(--muted); text-decoration: none; font-size: 1.1rem; font-weight: 800; cursor: pointer;">&larr;
+                Return to Spaceport</a>
+        </footer>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="profileModal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
+        <div
+            style="background: white; padding: 2rem; border-radius: 24px; border: 4px solid var(--border); width: 350px; font-family: 'Nunito', sans-serif;">
+            <h2 style="margin-top: 0;">Edit Profile</h2>
+            <div style="margin-bottom: 1rem;">
+                <label style="font-weight: bold; color: var(--text); display: block; margin-bottom: 0.5rem;">Commander
+                    Name</label>
+                <input type="text" id="editName"
+                    style="width: 100%; padding: 0.8rem; border: 2px solid var(--border); border-radius: 12px; font-family: 'Nunito', sans-serif; box-sizing: border-box;">
+            </div>
+            <div style="margin-bottom: 1.5rem;">
+                <label style="font-weight: bold; color: var(--text); display: block; margin-bottom: 0.5rem;">Avatar
+                    Color</label>
+                <input type="color" id="editColor" value="#FF9F1C"
+                    style="width: 100%; height: 40px; border: none; border-radius: 12px; cursor: pointer;">
+            </div>
+            <div style="margin-bottom: 1.5rem;">
+                <label style="font-weight: bold; color: var(--text); display: block; margin-bottom: 0.5rem;">Choose
+                    Avatar</label>
+                <div id="avatarPicker"
+                    style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 0.5rem;">
+                    <!-- Animals will be injected here -->
+                </div>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <button onclick="saveProfile()"
+                    style="flex: 1; background: #10b981; color: white; border: none; padding: 0.8rem; border-radius: 12px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 0 #2F855A;">Save</button>
+                <button onclick="document.getElementById('profileModal').style.display='none'"
+                    style="flex: 1; background: var(--border); color: var(--text); border: none; padding: 0.8rem; border-radius: 12px; font-weight: bold; cursor: pointer;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="progress.js"></script>
+    <script>
+        const animals = ['🦁', '🐼', '🐨', '🐰', '🦊', '🐯', '🐸', '🐧', '🦄', '🐵'];
+        let selectedAnimal = '🦁';
+
+        function initAvatarPicker() {
+            const picker = document.getElementById('avatarPicker');
+            if (!picker) return;
+            picker.innerHTML = '';
+            animals.forEach(ani => {
+                const div = document.createElement('div');
+                div.innerText = ani;
+                div.style.cssText = `
+                    font-size: 1.5rem;
+                    padding: 8px;
+                    border: 2px solid var(--border);
+                    border-radius: 12px;
+                    cursor: pointer;
+                    text-align: center;
+                    transition: all 0.2s;
+                `;
+                if (ani === selectedAnimal) {
+                    div.style.borderColor = 'var(--primary)';
+                    div.style.background = 'rgba(255, 159, 28, 0.1)';
+                }
+                div.onclick = () => {
+                    selectedAnimal = ani;
+                    initAvatarPicker();
+                };
+                picker.appendChild(div);
+            });
+        }
+
+        const COURSES = [
+            { key: 'explorer', label: 'Explorer Path', total: 5 },
+            { key: 'navigator', label: 'Navigator Path', total: 6 },
+            { key: 'commander', label: 'Commander Path', total: 5 },
+            { key: 'architect', label: 'Architect Path', total: 12 },
+            { key: 'data_analytic', label: 'Data Analytic', total: 10 },
+            { key: 'ai_ml', label: 'AI & Machine Learning', total: 20 },
+            { key: 'vision', label: 'Computer Vision', total: 15 },
+            { key: 'prompt_eng', label: 'Prompt Engineering', total: 10 },
+            { key: 'robotics', label: 'Fundamentals of Robot', total: 20 },
+        ];
+
+        function getRank(xp) {
+            if (xp >= 10000) return "Grandmaster";
+            if (xp >= 8000) return "Elite";
+            if (xp >= 6000) return "Commander";
+            if (xp >= 4000) return "Expert";
+            if (xp >= 2000) return "Explorer";
+            return "Novice";
+        }
+
+        function getNextRankInfo(xp) {
+            if (xp >= 10000) return { next: "Ultimate", goal: 15000 };
+            if (xp >= 8000) return { next: "Grandmaster", goal: 10000 };
+            if (xp >= 6000) return { next: "Elite", goal: 8000 };
+            if (xp >= 4000) return { next: "Commander", goal: 6000 };
+            if (xp >= 2000) return { next: "Expert", goal: 4000 };
+            return { next: "Explorer", goal: 2000 };
+        }
+
+        function updateDashboard() {
+            const user = getUserProfile();
+
+            if (!user) {
+                document.querySelector('.dashboard-container').innerHTML = `
+                    <div style="text-align: center; margin-top: 10rem;">
+                        <h1 style="font-size: 3rem; margin-bottom: 1rem; color: #ef4444;">Access <span style="color: #fff;">Restricted</span></h1>
+                        <p style="color: var(--muted); margin-bottom: 2rem; font-size: 1.2rem;">You must be logged in to access your personal dashboard.</p>
+                        <a href="index.html" style="background: var(--primary); color: white; padding: 0.8rem 2rem; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 1rem; transition: background 0.3s; box-shadow: 0 4px 0 #DD6B20;">Return to Spaceport</a>
+                    </div>
+                `;
+                return;
+            }
+
+            if (!user.role && !(user.email && SUPER_ADMINS.includes(String(user.email).toLowerCase().trim()))) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const progress = getProgress();
+
+            const welcomeMsg = document.getElementById('welcomeMsg');
+            const avatar = document.getElementById('dashboardAvatar');
+            const role = user.role || 'Student';
+            const roleColors = { Admin: '#f59e0b', Teacher: '#6366f1', Student: '#10b981', Guest: '#64748b' };
+            const roleIcons = { Admin: '🛡️', Teacher: '👩‍🏫', Student: '🧑‍🚀', Guest: '👤' };
+            const roleColor = roleColors[role] || '#10b981';
+            const roleIcon = roleIcons[role] || '🧑‍🚀';
+            welcomeMsg.innerHTML = `Welcome back, <strong>${user.name}</strong>. Ready for your next mission? &nbsp;<span style="font-size:0.8rem;font-weight:700;background:${roleColor}22;color:${roleColor};border:1px solid ${roleColor}55;padding:3px 10px;border-radius:100px;vertical-align:middle;">${roleIcon} ${role}</span>`;
+            avatar.src = user.avatar;
+            avatar.style.display = 'block';
+
+            const adminSlot = document.getElementById('adminLinkSlot');
+            if (adminSlot) {
+                adminSlot.innerHTML = role === 'Admin'
+                    ? `<a href="admin.html" style="background:#f59e0b;color:#fff;border:none;padding:0.5rem 1rem;border-radius:12px;font-weight:bold;cursor:pointer;font-family:'Nunito',sans-serif;text-decoration:none;display:inline-block;">🛡️ Admin Panel</a>`
+                    : '';
+            }
+
+            document.getElementById('editName').value = user.name;
+            const colorMatch = user.avatar.match(/background=([a-f0-9]{6})/i);
+            if (colorMatch) document.getElementById('editColor').value = '#' + colorMatch[1];
+            
+            const animalMatch = user.avatar.match(/name=([^&]+)/i);
+            if (animalMatch) {
+                const decoded = decodeURIComponent(animalMatch[1]);
+                if (animals.includes(decoded)) selectedAnimal = decoded;
+            }
+            initAvatarPicker();
+
+            document.getElementById('totalXp').innerText = progress.xp.toLocaleString();
+            const xpPercentage = Math.min(100, (progress.xp / 11000) * 100);
+            document.getElementById('xpBar').style.width = xpPercentage + '%';
+
+            const currentRank = getRank(progress.xp);
+            const nextRank = getNextRankInfo(progress.xp);
+            document.getElementById('rankLabel').innerText = currentRank;
+            document.getElementById('nextRankMsg').innerText = `Next Rank: ${nextRank.next} (${nextRank.goal.toLocaleString()} XP)`;
+
+            const badgeGrid = document.getElementById('badgeGrid');
+            badgeGrid.innerHTML = '';
+
+            function getAnimalStamp(badgeName) {
+                const name = badgeName.toLowerCase();
+                let emoji = "🌟";
+                let color = "#F6E05E";
+                if (name.includes("explorer")) { emoji = "🦁"; color = "#FF9F1C"; }
+                else if (name.includes("navigator")) { emoji = "🐙"; color = "#2EC4B6"; }
+                else if (name.includes("commander")) { emoji = "🦅"; color = "#E53E3E"; }
+                else if (name.includes("architect")) { emoji = "🦊"; color = "#805AD5"; }
+                else if (name.includes("python")) { emoji = "🐍"; color = "#38A169"; }
+                else if (name.includes("data")) { emoji = "🐼"; color = "#ED8936"; }
+                else if (name.includes("ai")) { emoji = "🧠"; color = "#A78BFA"; }
+                else if (name.includes("vision")) { emoji = "🖥️"; color = "#0EA5E9"; }
+                else if (name.includes("prompt")) { emoji = "✍️"; color = "#6366f1"; }
+                else if (name.includes("robot")) { emoji = "🤖"; color = "#ef4444"; }
+
+                const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="none" stroke="${color}" stroke-width="6" stroke-dasharray="10 6"/><circle cx="50" cy="50" r="38" fill="${color}" fill-opacity="0.15" stroke="${color}" stroke-width="2"/><text x="50" y="65" font-size="40" text-anchor="middle">${emoji}</text></svg>`;
+                return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+            }
+
+            if (progress.badges.length === 0) {
+                badgeGrid.innerHTML = '<p style="color: var(--muted); font-weight: bold;">No badges earned yet. Complete your first mission!</p>';
+            } else {
+                progress.badges.forEach(badge => {
+                    const div = document.createElement('div');
+                    div.className = 'badge-card';
+                    div.innerHTML = `<img src="${getAnimalStamp(badge)}" class="badge-icon" alt="${badge}"><div style="font-size: 0.9rem; font-weight: 800;">${badge}</div>`;
+                    badgeGrid.appendChild(div);
+                });
+            }
+
+            COURSES.forEach(c => {
+                const card = document.getElementById(`card-${c.key}`);
+                const title = document.getElementById(`title-${c.key}`);
+                const statusText = document.getElementById(`status-${c.key}`);
+                if (!card || !title || !statusText) return;
+
+                const completed = progress.missions[c.key] === true;
+                let currentLv = (progress.levels && progress.levels[c.key]) || 1;
+                currentLv = Math.min(currentLv, c.total);
+
+                if (completed) {
+                    title.innerHTML = `${c.label} <span style="font-size:0.8rem; color:var(--success); font-weight:800;">(COMPLETE)</span>`;
+                    card.classList.add('completed');
+                    statusText.innerText = 'MISSION COMPLETE';
+                    statusText.style.color = 'var(--success)';
+                } else {
+                    title.innerHTML = `${c.label} <span style="font-size:0.8rem; opacity:0.7; font-weight:normal;">(Level ${currentLv}/${c.total})</span>`;
+                    card.classList.remove('completed');
+                    statusText.innerText = 'Path Unlocked';
+                    statusText.style.color = '#94a3b8';
+                }
+            });
+        }
+
+        function saveProfile() {
+            const newName = document.getElementById('editName').value.trim();
+            let newColor = document.getElementById('editColor').value.replace('#', '');
+            if (newName) {
+                const user = getUserProfile();
+                if (user) {
+                    user.name = newName;
+                    user.color = newColor;
+                    user.avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedAnimal)}&background=${newColor}&color=fff&size=128&font-size=0.6`;
+                    localStorage.setItem('codeverse_user', JSON.stringify(user));
+                    window.dispatchEvent(new Event('userStateChanged'));
+                    updateDashboard();
+                    document.getElementById('profileModal').style.display = 'none';
+                    syncNow();
+                }
+            }
+        }
+
+        async function handleManualSync() {
+            const btn = document.getElementById('syncBtn');
+            const icon = document.getElementById('syncIcon');
+            const text = document.getElementById('syncText');
+            btn.disabled = true;
+            btn.style.opacity = '0.7';
+            icon.innerText = '⏳';
+            text.innerText = 'Syncing...';
+            const result = await syncNow();
+            if (result.status === 'success') {
+                icon.innerText = '✅';
+                text.innerText = 'Synced!';
+                btn.style.background = '#d1fae5';
+                btn.style.color = '#059669';
+            } else {
+                icon.innerText = '❌';
+                text.innerText = 'Error';
+                btn.style.background = '#fee2e2';
+                btn.style.color = '#ef4444';
+            }
+            setTimeout(() => {
+                icon.innerText = '☁️';
+                text.innerText = 'Sync Cloud';
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.style.background = '#e2e8f0';
+                btn.style.color = '#475569';
+            }, 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateDashboard();
+            handleManualSync();
+        });
+
+        window.addEventListener('userStateChanged', updateDashboard);
+        window.addEventListener('progressUpdated', updateDashboard);
+    </script>
+</body>
+</html>
