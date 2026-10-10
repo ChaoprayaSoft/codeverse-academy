@@ -59,28 +59,33 @@ export async function POST(req: NextRequest) {
 
     const db = getDb();
     const blockedRef = doc(db, 'blocked_emails', userEmail);
-    const blockedSnap = await getDoc(blockedRef);
+    const docRef = doc(db, 'users', userEmail);
+
+    // Optimized parallel read: Check blocklist & fetch user document concurrently
+    const [blockedSnap, docSnap] = await Promise.all([
+      getDoc(blockedRef),
+      getDoc(docRef),
+    ]);
+
     if (blockedSnap.exists()) {
       return NextResponse.json({ status: 'error', message: 'Account has been blocked' }, { status: 403 });
     }
 
     const body = await req.json().catch(() => ({}));
     const action = body.action || 'load';
-    const docRef = doc(db, 'users', userEmail);
-    const docSnap = await getDoc(docRef);
+    const existingData = docSnap.exists() ? docSnap.data() : {};
 
     // 1. ACTION: LOAD
     if (action === 'load') {
       if (docSnap.exists()) {
-        const userData = docSnap.data();
-        const role = isSuperAdmin ? 'Admin' : (userData.role || null);
+        const role = isSuperAdmin ? 'Admin' : (existingData.role || null);
         return NextResponse.json({
           status: 'success',
-          name: userData.name || userName,
-          avatar: userData.avatar || userPicture,
-          color: userData.color || '',
+          name: existingData.name || userName,
+          avatar: existingData.avatar || userPicture,
+          color: existingData.color || '',
           role,
-          progress: userData.progress,
+          progress: existingData.progress || null,
         });
       }
       return NextResponse.json({
@@ -92,7 +97,7 @@ export async function POST(req: NextRequest) {
 
     // 2. ACTION: GET USERS (Admin Only)
     if (action === 'getUsers') {
-      const userRole = isSuperAdmin ? 'Admin' : (docSnap.exists() ? docSnap.data().role : null);
+      const userRole = isSuperAdmin ? 'Admin' : (existingData.role || null);
       if (userRole !== 'Admin') {
         return NextResponse.json({ status: 'error', message: 'Unauthorized: Admins only' }, { status: 403 });
       }
@@ -108,7 +113,7 @@ export async function POST(req: NextRequest) {
 
     // 3. ACTION: REMOVE USER (Admin Only)
     if (action === 'removeUser') {
-      const userRole = isSuperAdmin ? 'Admin' : (docSnap.exists() ? docSnap.data().role : null);
+      const userRole = isSuperAdmin ? 'Admin' : (existingData.role || null);
       if (userRole !== 'Admin') {
         return NextResponse.json({ status: 'error', message: 'Unauthorized: Admins only' }, { status: 403 });
       }
@@ -118,11 +123,15 @@ export async function POST(req: NextRequest) {
       }
 
       const target = String(body.targetEmail).toLowerCase().trim();
-      await setDoc(doc(db, 'blocked_emails', target), {
-        blockedAt: new Date().toISOString(),
-        blockedBy: userEmail,
-      });
-      await deleteDoc(doc(db, 'users', target));
+      // Parallel write: block email and delete user document concurrently
+      await Promise.all([
+        setDoc(doc(db, 'blocked_emails', target), {
+          blockedAt: new Date().toISOString(),
+          blockedBy: userEmail,
+        }),
+        deleteDoc(doc(db, 'users', target)),
+      ]);
+
       return NextResponse.json({ status: 'success', message: 'User blocked and removed' });
     }
 
@@ -132,7 +141,7 @@ export async function POST(req: NextRequest) {
       const course = COURSES.find((c) => c.key === courseKey);
       if (!course) return NextResponse.json({ status: 'error', message: 'Invalid course' }, { status: 400 });
 
-      let progress = docSnap.exists() && docSnap.data().progress ? docSnap.data().progress : {};
+      let progress = existingData.progress ? { ...existingData.progress } : {};
       if (!progress.levels) progress.levels = {};
       if (!progress.missions) progress.missions = {};
       if (!progress.xp) progress.xp = 0;
@@ -154,7 +163,7 @@ export async function POST(req: NextRequest) {
       const course = COURSES.find((c) => c.key === courseKey);
       if (!course) return NextResponse.json({ status: 'error', message: 'Invalid course' }, { status: 400 });
 
-      let progress = docSnap.exists() && docSnap.data().progress ? docSnap.data().progress : {};
+      let progress = existingData.progress ? { ...existingData.progress } : {};
       if (!progress.missions) progress.missions = {};
       if (!progress.xp) progress.xp = 0;
       if (!progress.badges) progress.badges = [];
@@ -171,22 +180,45 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ status: 'success', progress });
     }
 
-    // 6. ACTION: SYNC / LOGIN / LOGOUT
-    if (action === 'sync' || action === 'login' || action === 'logout') {
-      const existingData = docSnap.exists() ? docSnap.data() : {};
+    // 6. ACTION: LOGIN (Unified Single-Pass Handshake) / SYNC / LOGOUT
+    if (action === 'login' || action === 'sync' || action === 'logout') {
       let progressToSave = existingData.progress || {};
 
       if (body.progress) {
-        progressToSave = body.progress;
+        // Merge existing remote progress with client-provided progress
+        const clientProg = body.progress;
+        const baseLevels = { ...(progressToSave.levels || {}) };
+        if (clientProg.levels) {
+          for (const [k, v] of Object.entries(clientProg.levels)) {
+            baseLevels[k] = Math.max(baseLevels[k] || 1, Number(v) || 1);
+          }
+        }
+        const baseMissions = { ...(progressToSave.missions || {}) };
+        if (clientProg.missions) {
+          for (const [k, v] of Object.entries(clientProg.missions)) {
+            if (v) baseMissions[k] = true;
+          }
+        }
+        const baseBadges = Array.from(
+          new Set([...(progressToSave.badges || []), ...(clientProg.badges || [])])
+        );
+        const baseXp = Math.max(Number(progressToSave.xp) || 0, Number(clientProg.xp) || 0);
+
+        progressToSave = {
+          xp: baseXp,
+          levels: baseLevels,
+          missions: baseMissions,
+          badges: baseBadges,
+        };
       }
 
       const statusStr = action === 'login' ? 'Online' : action === 'logout' ? 'Offline' : 'Active';
-      let finalRole = isSuperAdmin ? 'Admin' : (existingData.role || body.role || '');
-
-      // Preserve existing custom animal avatar or custom name if login action doesn't explicitly override
-      const finalName = action === 'login' && existingData.name ? existingData.name : (body.name || existingData.name || userName);
-      const finalAvatar = action === 'login' && existingData.avatar ? existingData.avatar : (body.avatar || existingData.avatar || userPicture);
+      const finalRole = isSuperAdmin ? 'Admin' : (existingData.role || body.role || '');
+      const finalName = existingData.name || body.name || userName;
+      const finalAvatar = existingData.avatar || body.avatar || userPicture;
       const finalColor = body.color || existingData.color || '';
+
+      const isNewUser = !isSuperAdmin && !existingData.role;
 
       const newUserData = {
         email: userEmail,
@@ -200,6 +232,7 @@ export async function POST(req: NextRequest) {
       };
 
       await setDoc(docRef, newUserData, { merge: true });
+
       return NextResponse.json({
         status: 'success',
         message: 'Synchronized',
@@ -208,6 +241,7 @@ export async function POST(req: NextRequest) {
         name: newUserData.name,
         avatar: newUserData.avatar,
         color: newUserData.color,
+        isNewUser,
       });
     }
 

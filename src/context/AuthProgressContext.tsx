@@ -211,7 +211,7 @@ export function AuthProgressProvider({ children }: { children: React.ReactNode }
     setUser(initialProfile);
     localStorage.setItem(USER_KEY, JSON.stringify(initialProfile));
 
-    // Query backend for existing profile & cloud progress
+    // Single-flight atomic handshake login with Firestore
     try {
       const res = await fetch('/api/codeverse', {
         method: 'POST',
@@ -219,61 +219,43 @@ export function AuthProgressProvider({ children }: { children: React.ReactNode }
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ action: 'load', email }),
+        body: JSON.stringify({
+          action: 'login',
+          name: initialProfile.name,
+          avatar: initialProfile.avatar,
+          color: '',
+          role: initialProfile.role || '',
+          progress: workingProgress,
+        }),
       });
 
       const data = await res.json();
       let newUserFlag = !isSuper;
 
-      let finalProfile = initialProfile;
-
       if (data && data.status === 'success') {
-        const remoteRole = isSuper ? 'Admin' : (data.role || null);
-        if (remoteRole) newUserFlag = false;
-
-        finalProfile = {
-          ...initialProfile,
+        newUserFlag = Boolean(data.isNewUser);
+        const resolvedProfile: UserProfile = {
+          email,
           name: data.name || initialProfile.name,
           avatar: data.avatar || initialProfile.avatar,
           color: data.color || '',
-          role: remoteRole,
+          role: isSuper ? 'Admin' : (data.role || null),
         };
 
-        // Merge remote progress with local progress
+        setUser(resolvedProfile);
+        localStorage.setItem(USER_KEY, JSON.stringify(resolvedProfile));
+
         if (data.progress) {
           workingProgress = mergeProgress(workingProgress, data.progress);
         }
       }
 
-      setUser(finalProfile);
-      localStorage.setItem(USER_KEY, JSON.stringify(finalProfile));
-
-      // Save locally and update state
       saveLocalProgress(workingProgress, email);
-
-      // Handshake login with Firestore and sync the merged progress
-      await fetch('/api/codeverse', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          action: 'login',
-          name: finalProfile.name,
-          avatar: finalProfile.avatar,
-          color: finalProfile.color,
-          role: finalProfile.role || '',
-          progress: workingProgress,
-        }),
-      });
-
       setIsNewUser(newUserFlag);
       setLoading(false);
       return { success: true, isNewUser: newUserFlag };
     } catch (err) {
       console.error('Login error:', err);
-      // Fallback: still set local progress
       saveLocalProgress(workingProgress, email);
       setLoading(false);
       return { success: false, isNewUser: false };
