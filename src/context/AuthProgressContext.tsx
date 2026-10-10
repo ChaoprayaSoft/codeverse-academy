@@ -24,7 +24,7 @@ const USER_KEY = 'codeverse_user';
 const TOKEN_KEY = 'codeverse_google_token';
 
 function getUserId(email?: string): string {
-  if (email) {
+  if (email && email !== 'guest') {
     return email.replace(/[^a-zA-Z0-9]/g, '');
   }
   return 'guest';
@@ -32,6 +32,38 @@ function getUserId(email?: string): string {
 
 function getProgressKey(email?: string): string {
   return `codeverse_progress_${getUserId(email)}`;
+}
+
+export function mergeProgress(base: UserProgress, incoming?: Partial<UserProgress> | null): UserProgress {
+  if (!incoming) return base;
+
+  const mergedLevels: Record<string, number> = { ...(base.levels || DEFAULT_PROGRESS.levels) };
+  if (incoming.levels) {
+    for (const [key, val] of Object.entries(incoming.levels)) {
+      mergedLevels[key] = Math.max(mergedLevels[key] || 1, Number(val) || 1);
+    }
+  }
+
+  const mergedMissions: Record<string, boolean> = { ...(base.missions || DEFAULT_PROGRESS.missions) };
+  if (incoming.missions) {
+    for (const [key, val] of Object.entries(incoming.missions)) {
+      if (val) mergedMissions[key] = true;
+    }
+  }
+
+  const baseBadges = Array.isArray(base.badges) ? base.badges : [];
+  const incomingBadges = Array.isArray(incoming.badges) ? incoming.badges : [];
+  const mergedBadges = Array.from(new Set([...baseBadges, ...incomingBadges]));
+
+  const baseXp = Number(base.xp) || 0;
+  const incomingXp = Number(incoming.xp) || 0;
+
+  return {
+    xp: Math.max(baseXp, incomingXp),
+    levels: mergedLevels,
+    missions: mergedMissions,
+    badges: mergedBadges,
+  };
 }
 
 export function AuthProgressProvider({ children }: { children: React.ReactNode }) {
@@ -51,7 +83,7 @@ export function AuthProgressProvider({ children }: { children: React.ReactNode }
         ...parsed,
         levels: { ...DEFAULT_PROGRESS.levels, ...(parsed.levels || {}) },
         missions: { ...DEFAULT_PROGRESS.missions, ...(parsed.missions || {}) },
-        badges: parsed.badges || [],
+        badges: Array.isArray(parsed.badges) ? parsed.badges : [],
       };
     } catch {
       return DEFAULT_PROGRESS;
@@ -90,28 +122,73 @@ export function AuthProgressProvider({ children }: { children: React.ReactNode }
     }
   }, [user]);
 
-  // Load state on initial boot
+  // Load state on initial boot and fetch latest cloud progress in background
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    try {
-      const storedUserStr = localStorage.getItem(USER_KEY);
-      if (storedUserStr) {
-        const storedUser: UserProfile = JSON.parse(storedUserStr);
-        if (storedUser && storedUser.email) {
-          const isSuper = SUPER_ADMINS.includes(storedUser.email.toLowerCase().trim());
-          if (isSuper) storedUser.role = 'Admin';
-          setUser(storedUser);
-          const currentProgress = getStoredProgress(storedUser.email);
-          setProgress(currentProgress);
+    const init = async () => {
+      try {
+        const storedUserStr = localStorage.getItem(USER_KEY);
+        const token = localStorage.getItem(TOKEN_KEY);
+
+        if (storedUserStr) {
+          const storedUser: UserProfile = JSON.parse(storedUserStr);
+          if (storedUser && storedUser.email) {
+            const isSuper = SUPER_ADMINS.includes(storedUser.email.toLowerCase().trim());
+            if (isSuper) storedUser.role = 'Admin';
+            setUser(storedUser);
+
+            const localProg = getStoredProgress(storedUser.email);
+            setProgress(localProg);
+
+            // Revalidate with Firestore in background
+            if (token) {
+              try {
+                const res = await fetch('/api/codeverse', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                  },
+                  body: JSON.stringify({ action: 'load', email: storedUser.email }),
+                });
+                const data = await res.json();
+                if (data && data.status === 'success') {
+                  const merged = mergeProgress(localProg, data.progress);
+                  setProgress(merged);
+                  saveLocalProgress(merged, storedUser.email);
+
+                  setUser((prev) =>
+                    prev
+                      ? {
+                          ...prev,
+                          name: data.name || prev.name,
+                          avatar: data.avatar || prev.avatar,
+                          color: data.color || prev.color,
+                          role: isSuper ? 'Admin' : (data.role || prev.role),
+                        }
+                      : prev
+                  );
+                }
+              } catch (cloudErr) {
+                console.warn('Background sync warning:', cloudErr);
+              }
+            }
+          }
+        } else {
+          // Guest session initial progress
+          const guestProg = getStoredProgress('guest');
+          setProgress(guestProg);
         }
+      } catch (e) {
+        console.error('Error loading stored user:', e);
+      } finally {
+        setLoading(false);
       }
-    } catch (e) {
-      console.error('Error loading stored user:', e);
-    } finally {
-      setLoading(false);
-    }
-  }, [getStoredProgress]);
+    };
+
+    init();
+  }, [getStoredProgress, saveLocalProgress]);
 
   const loginWithGoogleToken = async (token: string, payload: any) => {
     setLoading(true);
@@ -126,10 +203,15 @@ export function AuthProgressProvider({ children }: { children: React.ReactNode }
       role: isSuper ? 'Admin' : null,
     };
 
-    localStorage.setItem(USER_KEY, JSON.stringify(initialProfile));
-    setUser(initialProfile);
+    // Grab existing guest progress & user progress to avoid losing offline progress
+    const guestProgress = getStoredProgress('guest');
+    const existingUserProgress = getStoredProgress(email);
+    let workingProgress = mergeProgress(existingUserProgress, guestProgress);
 
-    // Query backend for existing profile & progress
+    setUser(initialProfile);
+    localStorage.setItem(USER_KEY, JSON.stringify(initialProfile));
+
+    // Query backend for existing profile & cloud progress
     try {
       const res = await fetch('/api/codeverse', {
         method: 'POST',
@@ -143,11 +225,13 @@ export function AuthProgressProvider({ children }: { children: React.ReactNode }
       const data = await res.json();
       let newUserFlag = !isSuper;
 
+      let finalProfile = initialProfile;
+
       if (data && data.status === 'success') {
         const remoteRole = isSuper ? 'Admin' : (data.role || null);
         if (remoteRole) newUserFlag = false;
 
-        const updatedProfile: UserProfile = {
+        finalProfile = {
           ...initialProfile,
           name: data.name || initialProfile.name,
           avatar: data.avatar || initialProfile.avatar,
@@ -155,15 +239,19 @@ export function AuthProgressProvider({ children }: { children: React.ReactNode }
           role: remoteRole,
         };
 
-        setUser(updatedProfile);
-        localStorage.setItem(USER_KEY, JSON.stringify(updatedProfile));
-
+        // Merge remote progress with local progress
         if (data.progress) {
-          saveLocalProgress(data.progress, email);
+          workingProgress = mergeProgress(workingProgress, data.progress);
         }
       }
 
-      // Handshake login
+      setUser(finalProfile);
+      localStorage.setItem(USER_KEY, JSON.stringify(finalProfile));
+
+      // Save locally and update state
+      saveLocalProgress(workingProgress, email);
+
+      // Handshake login with Firestore and sync the merged progress
       await fetch('/api/codeverse', {
         method: 'POST',
         headers: {
@@ -172,9 +260,11 @@ export function AuthProgressProvider({ children }: { children: React.ReactNode }
         },
         body: JSON.stringify({
           action: 'login',
-          name: initialProfile.name,
-          avatar: initialProfile.avatar,
-          role: initialProfile.role || '',
+          name: finalProfile.name,
+          avatar: finalProfile.avatar,
+          color: finalProfile.color,
+          role: finalProfile.role || '',
+          progress: workingProgress,
         }),
       });
 
@@ -183,6 +273,8 @@ export function AuthProgressProvider({ children }: { children: React.ReactNode }
       return { success: true, isNewUser: newUserFlag };
     } catch (err) {
       console.error('Login error:', err);
+      // Fallback: still set local progress
+      saveLocalProgress(workingProgress, email);
       setLoading(false);
       return { success: false, isNewUser: false };
     }
@@ -195,7 +287,8 @@ export function AuthProgressProvider({ children }: { children: React.ReactNode }
     localStorage.removeItem(USER_KEY);
     localStorage.removeItem(TOKEN_KEY);
     setUser(null);
-    setProgress(DEFAULT_PROGRESS);
+    const guestProg = getStoredProgress('guest');
+    setProgress(guestProg);
     setIsNewUser(false);
   };
 

@@ -176,18 +176,23 @@ export async function POST(req: NextRequest) {
       const existingData = docSnap.exists() ? docSnap.data() : {};
       let progressToSave = existingData.progress || {};
 
-      if (action === 'sync' && body.progress) {
+      if (body.progress) {
         progressToSave = body.progress;
       }
 
       const statusStr = action === 'login' ? 'Online' : action === 'logout' ? 'Offline' : 'Active';
       let finalRole = isSuperAdmin ? 'Admin' : (existingData.role || body.role || '');
 
+      // Preserve existing custom animal avatar or custom name if login action doesn't explicitly override
+      const finalName = action === 'login' && existingData.name ? existingData.name : (body.name || existingData.name || userName);
+      const finalAvatar = action === 'login' && existingData.avatar ? existingData.avatar : (body.avatar || existingData.avatar || userPicture);
+      const finalColor = body.color || existingData.color || '';
+
       const newUserData = {
         email: userEmail,
-        name: body.name || existingData.name || userName,
-        avatar: body.avatar || existingData.avatar || userPicture,
-        color: body.color || existingData.color || '',
+        name: finalName,
+        avatar: finalAvatar,
+        color: finalColor,
         role: finalRole,
         progress: progressToSave,
         lastUpdated: new Date().toISOString(),
